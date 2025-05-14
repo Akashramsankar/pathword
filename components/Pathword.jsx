@@ -25,19 +25,19 @@ import {
 const helpSlidesData = [
   {
     id: 'welcome',
-    imageUrl: '/images/help/pathword-grid-welcome.png', // Replace with your actual image path
+    imageUrl: '/pathword/images/help/pathword-grid-welcome.png', // Replace with your actual image path
     instruction: "Welcome to Pathword! Find the hidden word by charting a course through the letters from row 1 to 6.",
     altText: 'Pathword game grid with a welcoming message.'
   },
   {
     id: 'start-top',
-    imageUrl: '/images/help/pathword-start-top.png',
+    imageUrl: '/pathword/images/help/pathword-start-top.png',
     instruction: "1. Begin your expedition by selecting a letter from the <span class='font-semibold'>very first row</span>.",
     altText: 'Illustration showing selecting a letter from the first row of the Pathword grid.'
   },
   {
     id: 'row-below',
-    imageUrl: '/images/help/pathword-row-below.png',
+    imageUrl: '/pathword/images/help/pathword-row-below.png',
     instruction: "2. Your next step must be to a letter in the row right below your current position.",
     altText: 'Illustration showing moving to a letter in the row directly below.'
   },
