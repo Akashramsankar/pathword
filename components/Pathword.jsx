@@ -88,8 +88,8 @@ const dailyPuzzles = [
   answer: "ENIGMA",
   revealedLetter: { row: 2, col: 4, letter: "I" }, // Original col index
   clues: [
-    { position: 2, description: "Appears right in the first column of the second row" },
-    { position: 5, description: "Belongs to the second half of the alphabetical sequence." },
+    { position: 2, description: "It's the letter 'N'" },
+    { position: 5, description: "Belongs around the middle of the alphabetical sequence." },
     { position: 6, description: "I start it all, from apple to ace. Guess my name, I set the pace." }
   ]
 }
@@ -374,36 +374,65 @@ export default function Pathword() {
 
   // Core Game Logic Functions - All 'col' parameters now refer to ORIGINAL column index
     // Core Game Logic Functions
-  const canSelectCell = (row, originalCol) => {
-        if (gameState.status !== 'playing') return false;
+  // Pathword.jsx
 
-        const isTheRevealedCell = currentPuzzle.revealedLetter &&
-                               currentPuzzle.revealedLetter.row === row &&
-                               currentPuzzle.revealedLetter.col === originalCol;
+const canSelectCell = (row, originalCol) => {
+  if (gameState.status !== 'playing') return false;
 
-        // Rule 1: First letter selection
-        if (selectedPath.length === 0) {
-            // Can only select from the first row (row 0).
-            // The revealed letter, even if in row 0, is not special for the *first click*
-            // unless the game explicitly starts with it selected (which is not our current design).
-            return row === 0;
+  const { revealedLetter } = currentPuzzle; // Destructure for easier access
+
+  // Rule 1: First letter selection
+  if (selectedPath.length === 0) {
+    // If a revealed letter exists:
+    if (revealedLetter) {
+      // Player MUST select the revealed letter first if it's in row 0
+      if (revealedLetter.row === 0) {
+        return row === revealedLetter.row && originalCol === revealedLetter.col;
+      }
+      // If revealed letter is NOT in row 0, player can select any allowed cell in row 0
+      // EXCEPT those in the same column as the (future) revealed letter.
+      else {
+        if (row === 0) { // Only allow selection from row 0
+          return originalCol !== revealedLetter.col; // Cannot select from the revealed letter's future column
         }
+        return false; // Cannot select from other rows if path is empty and revealed is not in row 0
+      }
+    }
+    // If NO revealed letter, player can select any cell in row 0.
+    else {
+      return row === 0;
+    }
+  }
 
-        // Rule 2: Subsequent letter selection
-        const lastSelected = selectedPath[selectedPath.length - 1];
+  // Rule 2: Subsequent letter selection
+  const lastSelected = selectedPath[selectedPath.length - 1];
 
-        // Must be in the next row numerically after the last selected cell
-        if (row !== lastSelected.row + 1) return false;
+  // Must be in the next row numerically
+  if (row !== lastSelected.row + 1) return false;
 
-        // Cannot select from a column already used in the path
-        // This check includes the revealed letter's column if it's already part of the path.
-        if (selectedPath.some(p => p.col === originalCol)) return false;
+  // Cannot select from a column already used in the path
+  if (selectedPath.some(p => p.col === originalCol)) return false;
 
-        // If all above pass, the cell is selectable.
-        // The fact that it might be the 'revealedLetter' is handled by styling,
-        // its selectability is based on standard path rules.
-        return true;
-   };
+  // New Rule: If a revealed letter exists and hasn't been part of the path yet,
+  // and we are about to select from its row, we MUST select the revealed letter.
+  // Also, cannot select from its column if it's in a future row.
+  if (revealedLetter && !selectedPath.some(p => p.row === revealedLetter.row && p.col === revealedLetter.col)) {
+    // If we are selecting IN the revealed letter's row:
+    if (row === revealedLetter.row) {
+      return originalCol === revealedLetter.col; // Must be the revealed letter itself
+    }
+    // If we are selecting in a row BEFORE the revealed letter's row:
+    // (This part is mostly covered by the first-letter selection, but good for completeness)
+    // And the current column is the same as the revealed letter's column.
+    // This implies we cannot select from the revealed letter's column until we reach its row.
+    if (originalCol === revealedLetter.col) {
+        return false; // Cannot use the revealed letter's column before reaching its row
+    }
+  }
+
+  // If all above pass, the cell is selectable.
+  return true;
+};
 
     const handleCellSelect = (row, originalCol, letter) => {
         if (gameState.status !== 'playing') return;
