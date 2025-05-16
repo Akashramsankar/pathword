@@ -160,7 +160,6 @@ export default function Pathword() {
 
   const findTodaysPuzzle = useCallback(() => {
     const todayString = getTodayString();
-    console.log("Today's string",todayString);
     return dailyPuzzles.find((p) => p.date === todayString) || dailyPuzzles[0];
   }, []);
 
@@ -280,9 +279,7 @@ export default function Pathword() {
 
     // *** NEW: Check if already solved today ***
     const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${today}`;
-    console.log("Today key ", solvedTodayStorageKey);
     const alreadySolved = localStorage.getItem(solvedTodayStorageKey);
-    console.log("Already solved ",alreadySolved);
 
     if (alreadySolved === "true" && parsedMapping) { // Ensure mapping is also loaded
       setIsAlreadySolvedToday(true);
@@ -512,7 +509,7 @@ const canSelectCell = (row, originalCol) => {
       gtag.event({
       action: 'clue_unlocked',
       category: 'Game',
-      label: `Clue ${currentPuzzle.clues[index].position}`,
+      label: currentPuzzle.clues[index].position.toString(),
       value: index + 1 // e.g., 1st, 2nd, or 3rd clue card
     });
 
