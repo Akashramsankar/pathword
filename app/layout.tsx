@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({ // Assuming Geist_Mono is a function
 // --- Google Analytics Configuration ---
 // Replace G-YOUR_MEASUREMENT_ID with your actual Google Analytics Measurement ID
 // It's best to use an environment variable for this, e.g., process.env.NEXT_PUBLIC_GA_ID
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-5JXQDVYBK3';
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://akashramsankar.github.io/pathword'; // Your site URL
+const GA_MEASUREMENT_ID ='G-5JXQDVYBK3';
+const siteUrl ='https://akashramsankar.github.io/pathword/'; // Your site URL
 
 // --- Metadata Configuration (including Open Graph and Twitter Cards) ---
 export const metadata: Metadata = {
@@ -66,8 +66,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Conditionally render Google Analytics scripts only if ID is valid */}
-        {GA_MEASUREMENT_ID && GA_MEASUREMENT_ID !== 'G-5JXQDVYBK3' && (
           <>
             <Script
               strategy="afterInteractive"
@@ -89,7 +87,6 @@ export default function RootLayout({
               }}
             />
           </>
-        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
