@@ -21,6 +21,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"; // Make sure this path is correct for your setup
+import * as gtag from '../lib/gtag'; // Adjust path as necessary
 
 const helpSlidesData = [
   {
@@ -76,21 +77,22 @@ const helpSlidesData = [
 // Daily puzzles data
 const dailyPuzzles = [
   {
-  date: "2024-07-15", // Or your desired date
-  grid: [
-    ["R", "U", "E", "T", "P", "S"],
-    ["N", "R", "M", "H", "U", "A"],
-    ["B", "C", "D", "F", "I", "H"],
-    ["N", "G", "O", "L", "Q", "P"],
-    ["S", "A", "P", "E", "D", "M"], // Note: 'E' is a distractor here
-    ["R", "G", "H", "A", "X", "T"]  // Note: 'G' and 'H' are distractors
+  date: "2024-07-17", // Or your desired date
+    grid: [
+    ["M", "F", "S", "P", "Z", "L"],
+    ["Y", "U", "Q", "R", "A", "D"], // Distractor 'B' or 'C' could be near 'A'
+    ["V", "M", "R", "N", "J", "I"], // 'E' could be a distractor for 'A' if player forgets column
+    ["T", "U", "A", "P", "S", "O"], // Distractor 'S'
+    ["E", "R", "U", "O", "Y", "N"], // 'X', 'Y', 'Z' are good neutral fillers
+    ["G", "E", "Y", "R", "C", "S"]  // Distractor 'F' (first letter) and 'E'
   ],
-  answer: "ENIGMA",
-  revealedLetter: { row: 2, col: 4, letter: "I" }, // Original col index
+  answer: "FAVOUR",
+
+  revealedLetter: { row: 1, col: 4, letter: "A" }, // Original col index
   clues: [
-    { position: 2, description: "It's the letter 'N'" },
-    { position: 5, description: "Belongs around the middle of the alphabetical sequence." },
-    { position: 6, description: "I start it all, from apple to ace. Guess my name, I set the pace." }
+    { position: 4, description: "It's one of the vowels in the row" },
+    { position: 5, description: "It's 'YOU'" },
+    { position: 6, description: "It belongs to the second half of the alphabetical order." }
   ]
 }
   // Add other puzzles here
@@ -215,6 +217,7 @@ export default function Pathword() {
   const CELL_SIZE_APPROX = 56;
   const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-"; // New localStorage key prefix
 
+
   // Refs
   const gridRef = useRef(null);
   const cellRefs = useRef({}); // Keyed by `row-originalCol`
@@ -302,12 +305,12 @@ export default function Pathword() {
                   // A proper solution needs the solved path to be stored.
                   // For "BRANCH" and your grid:
                   // B is 0,1; R is 1,3; A is 2,0; N is 3,4; C is 4,2; H is 5,5
-                  if(index === 0 && letter === 'E') originalCol = 2;
-                  else if(index === 1 && letter === 'N') originalCol = 0;
-                  else if(index === 2 && letter === 'I') originalCol = 4;
-                  else if(index === 3 && letter === 'G') originalCol = 1;
-                  else if(index === 4 && letter === 'M') originalCol = 5;
-                  else if(index === 5 && letter === 'A') originalCol = 3;
+                  if(index === 0 && letter === 'F') originalCol = 1;
+                  else if(index === 1 && letter === 'A') originalCol = 4;
+                  else if(index === 2 && letter === 'V') originalCol = 0;
+                  else if(index === 3 && letter === 'O') originalCol = 5;
+                  else if(index === 4 && letter === 'U') originalCol = 2;
+                  else if(index === 5 && letter === 'R') originalCol = 3;
                   break;
               }
           }
@@ -474,6 +477,13 @@ const canSelectCell = (row, originalCol) => {
       const cluesUsed = unlockedClues.length;
       updateStatsOnSuccess(cluesUsed);
 
+      gtag.event({
+      action: 'puzzle_solved',
+      category: 'Game',
+      label: currentPuzzle.answer, // e.g., "ENIGMA"
+      value: unlockedClues.length // e.g., number of clues used
+    });
+
       // *** NEW: Mark as solved for today ***
             const today = getTodayString();
             const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${today}`;
@@ -498,6 +508,14 @@ const canSelectCell = (row, originalCol) => {
         ...prev,
         points: Math.max(0, prev.points - 25),
       }));
+
+      gtag.event({
+      action: 'clue_unlocked',
+      category: 'Game',
+      label: `Clue ${currentPuzzle.clues[index].position}`,
+      value: index + 1 // e.g., 1st, 2nd, or 3rd clue card
+    });
+
     }
   };
   const handleToggleFlip = (index) => {
@@ -635,7 +653,12 @@ async function copyToClipboard(fullClipboardText) { // Simplified arguments
     const shareTextForNative = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey:\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course!\n#PathwordGame #DailyPuzzle`;
     const gameUrl = GAME_URL;
     const fullClipboardText = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey:\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course: ${gameUrl}\n#PathwordGame #DailyPuzzle #BrainTeaser`;
-
+    
+    gtag.event({
+    action: 'share_attempted',
+    category: 'Engagement',
+    label: navigator.share ? 'Native Share' : 'Clipboard Copy'
+  });
 
     if (navigator.share) {
         try {
