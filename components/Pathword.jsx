@@ -77,22 +77,22 @@ const helpSlidesData = [
 // Daily puzzles data
 const dailyPuzzles = [
   {
-  date: "2024-07-17", // Or your desired date
+  date: "2025-05-18", // Or your desired date
     grid: [
-    ["M", "F", "S", "P", "Z", "L"],
-    ["Y", "U", "Q", "R", "A", "D"], // Distractor 'B' or 'C' could be near 'A'
-    ["V", "M", "R", "N", "J", "I"], // 'E' could be a distractor for 'A' if player forgets column
-    ["T", "U", "A", "P", "S", "O"], // Distractor 'S'
-    ["E", "R", "U", "O", "Y", "N"], // 'X', 'Y', 'Z' are good neutral fillers
-    ["G", "E", "Y", "R", "C", "S"]  // Distractor 'F' (first letter) and 'E'
+    ["K", "R", "A", "Q", "N", "I"],
+    ["A", "C", "E", "J", "S", "D"], // Distractor 'G' near 'D'
+    ["R", "V", "T", "X", "O", "M"], // 'J', 'K', 'L', 'M' are fairly neutral
+    ["O", "P", "Q", "E", "W", "S"], // Distractor 'R', 'S'
+    ["N", "E", "R", "Y", "A", "L"], // Fillers
+    ["M", "S", "G", "H", "T", "Y"]  // Distractor 'H' near 'T'
   ],
-  answer: "FAVOUR",
+  answer: "ADVENT",
 
-  revealedLetter: { row: 1, col: 4, letter: "A" }, // Original col index
+  revealedLetter: { row: 3, col: 3, letter: "E" }, // Original col index
   clues: [
-    { position: 4, description: "It's one of the vowels in the row" },
-    { position: 5, description: "It's 'YOU'" },
-    { position: 6, description: "It belongs to the second half of the alphabetical order." }
+    { position: 1, description: "It's one of the vowels in the row" },
+    { position: 5, description: "It belongs to the second half of the alphabetical order." },
+    { position: 6, description: "It's 'TEA' time!" }
   ]
 }
   // Add other puzzles here
@@ -191,8 +191,11 @@ export default function Pathword() {
     status: "playing",
     points: 100,
   });
-  const [isAlreadySolvedToday, setIsAlreadySolvedToday] = useState(false); // New state
 
+  const [tryCount, setTryCount] = useState(0); // Current try number.
+  const [incrementTryOnNextSelection, setIncrementTryOnNextSelection] =
+    useState(false);
+  const [isAlreadySolvedToday, setIsAlreadySolvedToday] = useState(false); // New state
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [pathCoords, setPathCoords] = useState([]);
   const [currentHelpSlide, setCurrentHelpSlide] = useState(0);
@@ -213,18 +216,25 @@ export default function Pathword() {
   const STATS_KEY = "pathwordUserStats";
   const HELP_VIEWED_KEY = "pathwordHelpViewed";
   const COLUMN_MAP_KEY_PREFIX = "pathwordColMap-"; // For localStorage
+  const TRY_COUNT_KEY_PREFIX = "pathwordTryCount-";
   const CELL_SIZE_APPROX = 56;
   const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-"; // New localStorage key prefix
-
 
   // Refs
   const gridRef = useRef(null);
   const cellRefs = useRef({}); // Keyed by `row-originalCol`
   const feedbackTimeoutRef = useRef(null);
 
-    // Effects
-  useEffect(() => () => { if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current); }, []);
-  const setCellRef = (row, originalCol, element) => { if (element) cellRefs.current[`${row}-${originalCol}`] = element; };
+  // Effects
+  useEffect(
+    () => () => {
+      if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+    },
+    []
+  );
+  const setCellRef = (row, originalCol, element) => {
+    if (element) cellRefs.current[`${row}-${originalCol}`] = element;
+  };
 
   useEffect(() => {
     const loadedStats = localStorage.getItem(STATS_KEY);
@@ -232,11 +242,13 @@ export default function Pathword() {
       try {
         const parsedStats = JSON.parse(loadedStats);
         setUserStats({
-            streak: parsedStats.streak || 0,
-            solves: parsedStats.solves || { "0": 0, "1": 0, "2": 0, "3": 0, "failed": 0 },
-            lastSolveDate: parsedStats.lastSolveDate || null
+          streak: parsedStats.streak || 0,
+          solves: parsedStats.solves || { 0: 0, 1: 0, 2: 0, 3: 0, failed: 0 },
+          lastSolveDate: parsedStats.lastSolveDate || null,
         });
-      } catch (e) { console.error("Failed to parse stats:", e); }
+      } catch (e) {
+        console.error("Failed to parse stats:", e);
+      }
     }
 
     // --- Column Mapping Logic ---
@@ -250,14 +262,17 @@ export default function Pathword() {
     if (todaysMappingStr && gridCols) {
       try {
         parsedMapping = JSON.parse(todaysMappingStr);
-        if (!Array.isArray(parsedMapping) || parsedMapping.length !== gridCols) {
+        if (
+          !Array.isArray(parsedMapping) ||
+          parsedMapping.length !== gridCols
+        ) {
           console.warn("Invalid column mapping length found. Regenerating.");
           parsedMapping = null;
         } else {
-          const sorted = [...parsedMapping].sort((a,b)=> a-b);
+          const sorted = [...parsedMapping].sort((a, b) => a - b);
           let isValidPermutation = true;
-          for(let i=0; i< gridCols; i++) {
-            if(sorted[i] !== i) {
+          for (let i = 0; i < gridCols; i++) {
+            if (sorted[i] !== i) {
               isValidPermutation = false;
               break;
             }
@@ -267,7 +282,10 @@ export default function Pathword() {
             parsedMapping = null;
           }
         }
-      } catch (e) { console.error("Failed to parse column mapping, regenerating.", e); parsedMapping = null; }
+      } catch (e) {
+        console.error("Failed to parse column mapping, regenerating.", e);
+        parsedMapping = null;
+      }
     }
 
     if (!parsedMapping && gridCols) {
@@ -281,42 +299,98 @@ export default function Pathword() {
     const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${today}`;
     const alreadySolved = localStorage.getItem(solvedTodayStorageKey);
 
-    if (alreadySolved === "true" && parsedMapping) { // Ensure mapping is also loaded
+
+    console.log("Date ",currentPuzzle.date);
+
+    const puzzleDate = currentPuzzle.date;
+    const tryCountStorageKey = `${TRY_COUNT_KEY_PREFIX}${puzzleDate}`;
+    const storedTryCount = localStorage.getItem(tryCountStorageKey);
+
+    console.log("storedtry count ",storedTryCount);
+
+
+    if (alreadySolved === "true" && parsedMapping) {
+      // Ensure mapping is also loaded
+
       setIsAlreadySolvedToday(true);
       setGameState({ status: "success", points: 0 }); // Or load stored points if desired
 
+      // Load the stored try count if solved
+      if (storedTryCount) {
+        const parsedTryCount = parseInt(storedTryCount, 10);
+        if (!isNaN(parsedTryCount) && parsedTryCount >= 0) {
+          setTryCount(parsedTryCount);
+        } else {
+          // Fallback if stored value is invalid, but it's solved, so at least 1 try.
+          setTryCount(0);
+          localStorage.setItem(tryCountStorageKey, "0"); // Correct invalid storage
+        }
+      } else {
+        // If solved but no try count, assume at least 1 try.
+        // This might happen if they solved before try count was stored.
+        setTryCount(0);
+      }
+      setIncrementTryOnNextSelection(false); // If solved, no "next selection" will increment tries.
+
       // Reconstruct the solved path based on the answer and columnMapping
-      const answerLetters = currentPuzzle.answer.split('');
+      const answerLetters = currentPuzzle.answer.split("");
       const reconstructedPath = [];
       const usedOriginalCols = new Set(); // To find the correct original column for each letter
 
       // To show the answer letters in the preview correctly:
       const answerPathForPreview = answerLetters.map((letter, index) => {
-          // This is a placeholder. We need the *actual* original column for styling.
-          // This assumes the Nth letter of answer is in Nth row.
-          // We'd need to find its original column in currentPuzzle.grid[index]
-          let originalCol = -1;
-          for(let c=0; c<currentPuzzle.grid[index].length; c++) {
-              if (currentPuzzle.grid[index][c] === letter && !reconstructedPath.find(p => p.row === index && p.col === c)) {
-                  // This is a very naive way if letters repeat in a row
-                  // A proper solution needs the solved path to be stored.
-                  // For "BRANCH" and your grid:
-                  // B is 0,1; R is 1,3; A is 2,0; N is 3,4; C is 4,2; H is 5,5
-                  if(index === 0 && letter === 'F') originalCol = 1;
-                  else if(index === 1 && letter === 'A') originalCol = 4;
-                  else if(index === 2 && letter === 'V') originalCol = 0;
-                  else if(index === 3 && letter === 'O') originalCol = 5;
-                  else if(index === 4 && letter === 'U') originalCol = 2;
-                  else if(index === 5 && letter === 'R') originalCol = 3;
-                  break;
-              }
+        // This is a placeholder. We need the *actual* original column for styling.
+        // This assumes the Nth letter of answer is in Nth row.
+        // We'd need to find its original column in currentPuzzle.grid[index]
+        let originalCol = -1;
+        for (let c = 0; c < currentPuzzle.grid[index].length; c++) {
+          if (
+            currentPuzzle.grid[index][c] === letter &&
+            !reconstructedPath.find((p) => p.row === index && p.col === c)
+          ) {
+            // This is a very naive way if letters repeat in a row
+            // A proper solution needs the solved path to be stored.
+            // For "BRANCH" and your grid:
+            // B is 0,1; R is 1,3; A is 2,0; N is 3,4; C is 4,2; H is 5,5
+            if (index === 0 && letter === "A") originalCol = 2;
+            else if (index === 1 && letter === "D") originalCol = 5;
+            else if (index === 2 && letter === "V") originalCol = 1;
+            else if (index === 3 && letter === "E") originalCol = 3;
+            else if (index === 4 && letter === "N") originalCol = 0;
+            else if (index === 5 && letter === "T") originalCol = 4;
+            break;
           }
-          return { row: index, col: originalCol, letter: letter, isRevealed: (currentPuzzle.revealedLetter?.row === index && currentPuzzle.revealedLetter?.col === originalCol) };
+        }
+        return {
+          row: index,
+          col: originalCol,
+          letter: letter,
+          isRevealed:
+            currentPuzzle.revealedLetter?.row === index &&
+            currentPuzzle.revealedLetter?.col === originalCol,
+        };
       });
-      setSelectedPath(answerPathForPreview.filter(p => p.col !== -1)); // Filter out any unfound (shouldn't happen with correct logic)
-
-
+      setSelectedPath(answerPathForPreview.filter((p) => p.col !== -1)); // Filter out any unfound (shouldn't happen with correct logic)
     } else {
+      if (storedTryCount) {
+        // If game is ongoing and there's a stored try count, load it.
+        const parsedTryCount = parseInt(storedTryCount, 10);
+        if (!isNaN(parsedTryCount) && parsedTryCount >= 0) {
+          setTryCount(parsedTryCount);
+        } else {
+          setTryCount(0); // Fallback to 1 if invalid
+          localStorage.removeItem(tryCountStorageKey); // Remove invalid item
+        }
+        // If they refresh mid-try, we need to know if the next selection should increment.
+        // This is tricky. For simplicity, on refresh, assume next selection is part of current tryCount
+        // unless the path is empty.
+        // For now, let's reset this flag on load if not solved; it gets set by user actions.
+        setIncrementTryOnNextSelection(selectedPath.length === 0); // If path empty, next click is a "new" segment
+      } else {
+        // No stored try count, and not solved, so it's the first attempt session.
+        setTryCount(0);
+        setIncrementTryOnNextSelection(true); // First selection is part of try 1 by default
+      }
       // Regular first visit help logic
       const helpViewed = localStorage.getItem(HELP_VIEWED_KEY);
       if (!helpViewed) {
@@ -330,41 +404,103 @@ export default function Pathword() {
   // --- (Rest of stats, path calculation, core game logic functions remain largely the same,
   // but ensure they use ORIGINAL column indices for selectedPath and rules) ---
 
- const saveStats = (stats) => { try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) { console.error("Failed to save stats:", e); }};
+  const saveStats = (stats) => {
+    try {
+      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    } catch (e) {
+      console.error("Failed to save stats:", e);
+    }
+  };
 
- const updateStatsOnSuccess = (cluesUsed) => { const todayStr = getTodayString(); setUserStats(prevStats => { let newStreak = prevStats.streak; const lastSolve = prevStats.lastSolveDate; if (lastSolve) { const lastDate = new Date(lastSolve); const todayDate = new Date(todayStr); const diffTime = todayDate - lastDate; const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); if (diffDays === 1) newStreak += 1; else if (diffDays > 1) newStreak = 1; } else newStreak = 1; const newSolves = { ...prevStats.solves }; const cluesKey = String(cluesUsed); if (newSolves.hasOwnProperty(cluesKey)) newSolves[cluesKey] = (newSolves[cluesKey] || 0) + 1; const newStats = { ...prevStats, streak: newStreak, solves: newSolves, lastSolveDate: todayStr }; saveStats(newStats); return newStats; }); };
+  const updateStatsOnSuccess = (cluesUsed) => {
+    const todayStr = getTodayString();
+    setUserStats((prevStats) => {
+      let newStreak = prevStats.streak;
+      const lastSolve = prevStats.lastSolveDate;
+      if (lastSolve) {
+        const lastDate = new Date(lastSolve);
+        const todayDate = new Date(todayStr);
+        const diffTime = todayDate - lastDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) newStreak += 1;
+        else if (diffDays > 1) newStreak = 1;
+      } else newStreak = 1;
+      const newSolves = { ...prevStats.solves };
+      const cluesKey = String(cluesUsed);
+      if (newSolves.hasOwnProperty(cluesKey))
+        newSolves[cluesKey] = (newSolves[cluesKey] || 0) + 1;
+      const newStats = {
+        ...prevStats,
+        streak: newStreak,
+        solves: newSolves,
+        lastSolveDate: todayStr,
+      };
+      saveStats(newStats);
+      return newStats;
+    });
+  };
   // Path Coordinate Calculation Effect - This should work as selectedPath stores original cols,
   // and cellRefs are keyed by original cols, pointing to the displayed DOM elements.
+  // Effect to save tryCount to localStorage whenever it changes
+  useEffect(() => {
+    if (currentPuzzle && currentPuzzle.date) {
+      // Ensure puzzle data is available
+      const puzzleDate = currentPuzzle.date;
+      const tryCountStorageKey = `${TRY_COUNT_KEY_PREFIX}${puzzleDate}`;
+      // Only save if tryCount is a valid number and greater than 0
+      // (tryCount=0 might be a temporary state before first real try initialization)
+      if (typeof tryCount === "number" && tryCount > 0) {
+        localStorage.setItem(tryCountStorageKey, tryCount.toString());
+      }
+    }
+  }, [tryCount, currentPuzzle.date]); // Re-run when tryCount or the puzzle (and its date) changes
+
   useEffect(() => {
     if (!columnMapping || !gridRef.current || selectedPath.length < 2) {
       setPathCoords([]);
       return;
     }
     const calculateCoords = () => {
-        const gridRect = gridRef.current?.getBoundingClientRect(); if (!gridRect) return;
-        const newCoords = [];
-        for (let i = 0; i < selectedPath.length - 1; i++) {
-            const startItem = selectedPath[i]; // {row, col (original)}
-            const endItem = selectedPath[i+1];   // {row, col (original)}
+      const gridRect = gridRef.current?.getBoundingClientRect();
+      if (!gridRect) return;
+      const newCoords = [];
+      for (let i = 0; i < selectedPath.length - 1; i++) {
+        const startItem = selectedPath[i]; // {row, col (original)}
+        const endItem = selectedPath[i + 1]; // {row, col (original)}
 
-            const startCellKey = `${startItem.row}-${startItem.col}`;
-            const endCellKey = `${endItem.row}-${endItem.col}`;
-            const startElem = cellRefs.current[startCellKey];
-            const endElem = cellRefs.current[endCellKey];
+        const startCellKey = `${startItem.row}-${startItem.col}`;
+        const endCellKey = `${endItem.row}-${endItem.col}`;
+        const startElem = cellRefs.current[startCellKey];
+        const endElem = cellRefs.current[endCellKey];
 
-            if (startElem && endElem) {
-                const cellRadius = startElem.offsetWidth / 2; // Assuming cells are same size
-                const startRect = startElem.getBoundingClientRect();
-                const endRect = endElem.getBoundingClientRect();
-                const cx1 = startRect.left + startRect.width / 2 - gridRect.left, cy1 = startRect.top + startRect.height / 2 - gridRect.top;
-                const cx2 = endRect.left + endRect.width / 2 - gridRect.left, cy2 = endRect.top + endRect.height / 2 - gridRect.top;
-                const dx = cx2 - cx1, dy = cy2 - cy1; const dist = Math.sqrt(dx * dx + dy * dy); if (dist === 0) continue;
-                const nx = dx / dist, ny = dy / dist; const x1 = cx1 + nx * cellRadius, y1 = cy1 + ny * cellRadius;
-                const x2 = cx2 - nx * cellRadius, y2 = cy2 - ny * cellRadius;
-                newCoords.push({ x1, y1, x2, y2, id: `${startCellKey}_${endCellKey}` });
-            }
+        if (startElem && endElem) {
+          const cellRadius = startElem.offsetWidth / 2; // Assuming cells are same size
+          const startRect = startElem.getBoundingClientRect();
+          const endRect = endElem.getBoundingClientRect();
+          const cx1 = startRect.left + startRect.width / 2 - gridRect.left,
+            cy1 = startRect.top + startRect.height / 2 - gridRect.top;
+          const cx2 = endRect.left + endRect.width / 2 - gridRect.left,
+            cy2 = endRect.top + endRect.height / 2 - gridRect.top;
+          const dx = cx2 - cx1,
+            dy = cy2 - cy1;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist === 0) continue;
+          const nx = dx / dist,
+            ny = dy / dist;
+          const x1 = cx1 + nx * cellRadius,
+            y1 = cy1 + ny * cellRadius;
+          const x2 = cx2 - nx * cellRadius,
+            y2 = cy2 - ny * cellRadius;
+          newCoords.push({
+            x1,
+            y1,
+            x2,
+            y2,
+            id: `${startCellKey}_${endCellKey}`,
+          });
         }
-        setPathCoords(newCoords);
+      }
+      setPathCoords(newCoords);
     };
     calculateCoords();
     const resizeObserver = new ResizeObserver(calculateCoords);
@@ -373,97 +509,120 @@ export default function Pathword() {
   }, [selectedPath, columnMapping]); // Ensure columnMapping is a dependency
 
   // Core Game Logic Functions - All 'col' parameters now refer to ORIGINAL column index
-    // Core Game Logic Functions
+  // Core Game Logic Functions
   // Pathword.jsx
 
-const canSelectCell = (row, originalCol) => {
-  if (gameState.status !== 'playing') return false;
+  const canSelectCell = (row, originalCol) => {
+    if (gameState.status !== "playing") return false;
 
-  const { revealedLetter } = currentPuzzle; // Destructure for easier access
+    const { revealedLetter } = currentPuzzle; // Destructure for easier access
 
-  // Rule 1: First letter selection
-  if (selectedPath.length === 0) {
-    // If a revealed letter exists:
-    if (revealedLetter) {
-      // Player MUST select the revealed letter first if it's in row 0
-      if (revealedLetter.row === 0) {
-        return row === revealedLetter.row && originalCol === revealedLetter.col;
+    // Rule 1: First letter selection
+    if (selectedPath.length === 0) {
+      // If a revealed letter exists:
+      if (revealedLetter) {
+        // Player MUST select the revealed letter first if it's in row 0
+        if (revealedLetter.row === 0) {
+          return (
+            row === revealedLetter.row && originalCol === revealedLetter.col
+          );
+        }
+        // If revealed letter is NOT in row 0, player can select any allowed cell in row 0
+        // EXCEPT those in the same column as the (future) revealed letter.
+        else {
+          if (row === 0) {
+            // Only allow selection from row 0
+            return originalCol !== revealedLetter.col; // Cannot select from the revealed letter's future column
+          }
+          return false; // Cannot select from other rows if path is empty and revealed is not in row 0
+        }
       }
-      // If revealed letter is NOT in row 0, player can select any allowed cell in row 0
-      // EXCEPT those in the same column as the (future) revealed letter.
+      // If NO revealed letter, player can select any cell in row 0.
       else {
-        if (row === 0) { // Only allow selection from row 0
-          return originalCol !== revealedLetter.col; // Cannot select from the revealed letter's future column
-        }
-        return false; // Cannot select from other rows if path is empty and revealed is not in row 0
+        return row === 0;
       }
     }
-    // If NO revealed letter, player can select any cell in row 0.
-    else {
-      return row === 0;
-    }
-  }
 
-  // Rule 2: Subsequent letter selection
-  const lastSelected = selectedPath[selectedPath.length - 1];
+    // Rule 2: Subsequent letter selection
+    const lastSelected = selectedPath[selectedPath.length - 1];
 
-  // Must be in the next row numerically
-  if (row !== lastSelected.row + 1) return false;
+    // Must be in the next row numerically
+    if (row !== lastSelected.row + 1) return false;
 
-  // Cannot select from a column already used in the path
-  if (selectedPath.some(p => p.col === originalCol)) return false;
+    // Cannot select from a column already used in the path
+    if (selectedPath.some((p) => p.col === originalCol)) return false;
 
-  // New Rule: If a revealed letter exists and hasn't been part of the path yet,
-  // and we are about to select from its row, we MUST select the revealed letter.
-  // Also, cannot select from its column if it's in a future row.
-  if (revealedLetter && !selectedPath.some(p => p.row === revealedLetter.row && p.col === revealedLetter.col)) {
-    // If we are selecting IN the revealed letter's row:
-    if (row === revealedLetter.row) {
-      return originalCol === revealedLetter.col; // Must be the revealed letter itself
-    }
-    // If we are selecting in a row BEFORE the revealed letter's row:
-    // (This part is mostly covered by the first-letter selection, but good for completeness)
-    // And the current column is the same as the revealed letter's column.
-    // This implies we cannot select from the revealed letter's column until we reach its row.
-    if (originalCol === revealedLetter.col) {
+    // New Rule: If a revealed letter exists and hasn't been part of the path yet,
+    // and we are about to select from its row, we MUST select the revealed letter.
+    // Also, cannot select from its column if it's in a future row.
+    if (
+      revealedLetter &&
+      !selectedPath.some(
+        (p) => p.row === revealedLetter.row && p.col === revealedLetter.col
+      )
+    ) {
+      // If we are selecting IN the revealed letter's row:
+      if (row === revealedLetter.row) {
+        return originalCol === revealedLetter.col; // Must be the revealed letter itself
+      }
+      // If we are selecting in a row BEFORE the revealed letter's row:
+      // (This part is mostly covered by the first-letter selection, but good for completeness)
+      // And the current column is the same as the revealed letter's column.
+      // This implies we cannot select from the revealed letter's column until we reach its row.
+      if (originalCol === revealedLetter.col) {
         return false; // Cannot use the revealed letter's column before reaching its row
+      }
     }
-  }
 
-  // If all above pass, the cell is selectable.
-  return true;
-};
+    // If all above pass, the cell is selectable.
+    return true;
+  };
 
-    const handleCellSelect = (row, originalCol, letter) => {
-        if (gameState.status !== 'playing') return;
-        if (feedbackMessage) setFeedbackMessage("");
-        if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+  const handleCellSelect = (row, originalCol, letter) => {
+    if (gameState.status !== "playing") return;
 
-        // isRevealed is still useful for the path entry data
-        const isRevealedCell = currentPuzzle.revealedLetter &&
-                             currentPuzzle.revealedLetter.row === row &&
-                             currentPuzzle.revealedLetter.col === originalCol;
+    if (feedbackMessage) setFeedbackMessage("");
+    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
 
-        const cellKey = `${row}-${originalCol}`;
-        const element = cellRefs.current[cellKey]; // Ref key uses originalCol
-        const existingIndex = selectedPath.findIndex(p => p.row === row && p.col === originalCol);
+    // isRevealed is still useful for the path entry data
+    const isRevealedCell =
+      currentPuzzle.revealedLetter &&
+      currentPuzzle.revealedLetter.row === row &&
+      currentPuzzle.revealedLetter.col === originalCol;
 
-        if (existingIndex !== -1) {
-            // If cell is already selected, deselect it and subsequent ones
-            setSelectedPath(selectedPath.slice(0, existingIndex));
-        } else {
-            // Check if selection is valid according to rules (now stricter for revealed letter)
-            if (canSelectCell(row, originalCol)) {
-                const newPathEntry = { row, col: originalCol, letter, element, isRevealed: isRevealedCell };
-                const newPath = [...selectedPath, newPathEntry];
-                setSelectedPath(newPath);
+    const cellKey = `${row}-${originalCol}`;
+    const element = cellRefs.current[cellKey]; // Ref key uses originalCol
+    const existingIndex = selectedPath.findIndex(
+      (p) => p.row === row && p.col === originalCol
+    );
 
-                if (newPath.length === currentPuzzle.grid.length) {
-                    checkAnswer(newPath);
-                }
-            }
+    if (existingIndex !== -1) {
+      // If cell is already selected, deselect it and subsequent ones
+      setSelectedPath(selectedPath.slice(0, existingIndex));
+      setIncrementTryOnNextSelection(true); // Mark that the next selection should increment tries
+    } else {
+      // Check if selection is valid according to rules (now stricter for revealed letter)
+      if (canSelectCell(row, originalCol)) {
+        if (incrementTryOnNextSelection) {
+          setTryCount((prev) => prev + 1);
+          setIncrementTryOnNextSelection(false); // Consume the flag
         }
-   };
+        const newPathEntry = {
+          row,
+          col: originalCol,
+          letter,
+          element,
+          isRevealed: isRevealedCell,
+        };
+        const newPath = [...selectedPath, newPathEntry];
+        setSelectedPath(newPath);
+
+        if (newPath.length === currentPuzzle.grid.length) {
+          checkAnswer(newPath);
+        }
+      }
+    }
+  };
 
   const checkAnswer = (path) => {
     // path contains {row, col (original), letter}
@@ -473,24 +632,24 @@ const canSelectCell = (row, originalCol) => {
       setFeedbackMessage("");
       const cluesUsed = unlockedClues.length;
       updateStatsOnSuccess(cluesUsed);
-
       gtag.event({
-      action: 'puzzle_solved',
-      category: 'Game',
-      label: currentPuzzle.answer, // e.g., "ENIGMA"
-      value: unlockedClues.length // e.g., number of clues used
-    });
+        action: "puzzle_solved",
+        category: "Game",
+        label: currentPuzzle.answer, // e.g., "ENIGMA"
+        value: unlockedClues.length, // e.g., number of clues used
+      });
 
       // *** NEW: Mark as solved for today ***
-            const today = getTodayString();
-            const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${today}`;
-            localStorage.setItem(solvedTodayStorageKey, "true");
+      const today = getTodayString();
+      const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${today}`;
+      localStorage.setItem(solvedTodayStorageKey, "true");
 
       setTimeout(() => {
         setShowSuccessPopup(true);
         setIsStatsOpen(true);
       }, 2000);
     } else {
+      setIncrementTryOnNextSelection(true); // Failed attempt means next selection is part of a new try
       setFeedbackMessage("Incorrect path. Try adjusting!");
       feedbackTimeoutRef.current = setTimeout(
         () => setFeedbackMessage(""),
@@ -507,12 +666,11 @@ const canSelectCell = (row, originalCol) => {
       }));
 
       gtag.event({
-      action: 'clue_unlocked',
-      category: 'Game',
-      label: currentPuzzle.clues[index].position.toString(),
-      value: index + 1 // e.g., 1st, 2nd, or 3rd clue card
-    });
-
+        action: "clue_unlocked",
+        category: "Game",
+        label: currentPuzzle.clues[index].position.toString(),
+        value: index + 1, // e.g., 1st, 2nd, or 3rd clue card
+      });
     }
   };
   const handleToggleFlip = (index) => {
@@ -526,6 +684,7 @@ const canSelectCell = (row, originalCol) => {
   };
   const resetGame = () => {
     setSelectedPath([]);
+    setIncrementTryOnNextSelection(true); // So the first click *after* reset increments.
     setUnlockedClues([]);
     setFlippedClues([]);
     setPathCoords([]);
@@ -537,61 +696,74 @@ const canSelectCell = (row, originalCol) => {
   };
 
   // Cell Styling Function - Takes originalCol
-      // Cell Styling Function - Takes originalCol
-    const getCellClassName = (row, originalCol) => {
-      const isSelected = selectedPath.some(p => p.row === row && p.col === originalCol);
-      const isInCorrectPath = gameState.status === 'success' && isSelected;
-      const isTheRevealedCell = currentPuzzle.revealedLetter &&
-                             currentPuzzle.revealedLetter.row === row &&
-                             currentPuzzle.revealedLetter.col === originalCol;
-      const isSelectable = canSelectCell(row, originalCol); // This now correctly evaluates revealed cells
+  // Cell Styling Function - Takes originalCol
+  const getCellClassName = (row, originalCol) => {
+    const isSelected = selectedPath.some(
+      (p) => p.row === row && p.col === originalCol
+    );
+    const isInCorrectPath = gameState.status === "success" && isSelected;
+    const isTheRevealedCell =
+      currentPuzzle.revealedLetter &&
+      currentPuzzle.revealedLetter.row === row &&
+      currentPuzzle.revealedLetter.col === originalCol;
+    const isSelectable = canSelectCell(row, originalCol); // This now correctly evaluates revealed cells
 
-      let baseStyle = `w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
-      let backgroundStyle = 'bg-transparent';
-      let textStyle = 'text-gray-700';
-      let interactionStyle = 'cursor-default';
+    let baseStyle = `w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
+    let backgroundStyle = "bg-transparent";
+    let textStyle = "text-gray-700";
+    let interactionStyle = "cursor-default";
 
-      if (isInCorrectPath) {
-        backgroundStyle = 'bg-green-300 scale-110 shadow-md'; textStyle = 'text-green-900 font-semibold';
-      } else if (isSelected) {
-        backgroundStyle = 'bg-blue-300 scale-110 shadow-md'; textStyle = 'text-blue-900 font-semibold'; interactionStyle = 'cursor-pointer';
-      } else if (isTheRevealedCell && !isSelected) { // Styling for revealed but not yet selected
-        backgroundStyle = 'bg-green-200'; // Highlight it
-        textStyle = 'text-green-800 font-semibold';
-        // Clickability depends on whether the path allows it
-        interactionStyle = gameState.status === 'playing' && isSelectable ? 'cursor-pointer hover:scale-105' : 'cursor-default opacity-80';
-      } else if (gameState.status === 'playing') {
-        if (isSelectable) {
-            textStyle = 'text-black hover:text-blue-600'; interactionStyle = 'cursor-pointer hover:scale-105';
-        } else {
-            textStyle = 'text-gray-400'; interactionStyle = 'cursor-not-allowed opacity-50';
-        }
-      } else { // Game over, not selected
-        textStyle = 'text-gray-400 opacity-60';
+    if (isInCorrectPath) {
+      backgroundStyle = "bg-green-300 scale-110 shadow-md";
+      textStyle = "text-green-900 font-semibold";
+    } else if (isSelected) {
+      backgroundStyle = "bg-blue-300 scale-110 shadow-md";
+      textStyle = "text-blue-900 font-semibold";
+      interactionStyle = "cursor-pointer";
+    } else if (isTheRevealedCell && !isSelected) {
+      // Styling for revealed but not yet selected
+      backgroundStyle = "bg-green-200"; // Highlight it
+      textStyle = "text-green-800 font-semibold";
+      // Clickability depends on whether the path allows it
+      interactionStyle =
+        gameState.status === "playing" && isSelectable
+          ? "cursor-pointer hover:scale-105"
+          : "cursor-default opacity-80";
+    } else if (gameState.status === "playing") {
+      if (isSelectable) {
+        textStyle = "text-black hover:text-blue-600";
+        interactionStyle = "cursor-pointer hover:scale-105";
+      } else {
+        textStyle = "text-gray-400";
+        interactionStyle = "cursor-not-allowed opacity-50";
       }
-      return `${baseStyle} ${backgroundStyle} ${textStyle} ${interactionStyle}`;
-    };
+    } else {
+      // Game over, not selected
+      textStyle = "text-gray-400 opacity-60";
+    }
+    return `${baseStyle} ${backgroundStyle} ${textStyle} ${interactionStyle}`;
+  };
 
-  
-// Helper function for clipboard copy
-async function copyToClipboard(fullClipboardText) { // Simplified arguments
+  // Helper function for clipboard copy
+  async function copyToClipboard(fullClipboardText) {
+    // Simplified arguments
     setIsCopying(true); // Indicate "copying" action for button text
     setShareFeedback(""); // Clear previous feedback
     try {
-        await navigator.clipboard.writeText(fullClipboardText);
-        setShareFeedback("Path Copied!"); // Set feedback message
-        // alert("Pathword journey copied! Ready to share your adventure?"); // Replaced by shareFeedback
+      await navigator.clipboard.writeText(fullClipboardText);
+      setShareFeedback("Path Copied!"); // Set feedback message
+      // alert("Pathword journey copied! Ready to share your adventure?"); // Replaced by shareFeedback
     } catch (err) {
-        console.error("Failed to copy text: ", err);
-        setShareFeedback("Failed to copy.");
-        // alert("Failed to copy. Please try again or copy manually.");
+      console.error("Failed to copy text: ", err);
+      setShareFeedback("Failed to copy.");
+      // alert("Failed to copy. Please try again or copy manually.");
     } finally {
-        setTimeout(() => {
-            setIsCopying(false);
-            setShareFeedback(""); // Clear feedback after a delay
-        }, 2000);
+      setTimeout(() => {
+        setIsCopying(false);
+        setShareFeedback(""); // Clear feedback after a delay
+      }, 2000);
     }
-}
+  }
 
   // --- Share Functionality: Updated for Path Concept & Emoji Grid ---
   const handleShare = async () => {
@@ -603,7 +775,6 @@ async function copyToClipboard(fullClipboardText) { // Simplified arguments
     // For now, let's use isCopying to disable the button.
     setIsCopying(true); // Disable button during any share operation
     setShareFeedback(""); // Clear previous feedback
-
 
     const cluesUsed = unlockedClues.length;
     let achievementText = "";
@@ -617,85 +788,91 @@ async function copyToClipboard(fullClipboardText) { // Simplified arguments
     const gridCols = currentPuzzle.grid[0]?.length || 0;
 
     for (let r = 0; r < gridRows; r++) {
-        for (let dc = 0; dc < gridCols; dc++) {
+      for (let dc = 0; dc < gridCols; dc++) {
         let originalColAtThisDisplaySlot = -1;
         for (let i = 0; i < columnMapping.length; i++) {
-            if (columnMapping[i] === dc) {
+          if (columnMapping[i] === dc) {
             originalColAtThisDisplaySlot = i;
             break;
-            }
+          }
         }
         const pathIndex = selectedPath.findIndex(
-            (p) => p.row === r && p.col === originalColAtThisDisplaySlot
+          (p) => p.row === r && p.col === originalColAtThisDisplaySlot
         );
         if (pathIndex !== -1) {
-            if (pathIndex === selectedPath.length - 1) {
+          if (pathIndex === selectedPath.length - 1) {
             pathGridEmoji += "🎯";
-            } else {
+          } else {
             const nextPathItemOriginalCol = selectedPath[pathIndex + 1].col;
-            const nextPathItemDisplayCol = columnMapping[nextPathItemOriginalCol];
+            const nextPathItemDisplayCol =
+              columnMapping[nextPathItemOriginalCol];
             if (nextPathItemDisplayCol < dc) pathGridEmoji += "↙️";
             else if (nextPathItemDisplayCol > dc) pathGridEmoji += "↘️";
             else pathGridEmoji += "⬇️";
-            }
+          }
         } else {
-            pathGridEmoji += "⬜";
+          pathGridEmoji += "⬜";
         }
-        }
-        if (r < gridRows - 1) pathGridEmoji += "\n";
+      }
+      if (r < gridRows - 1) pathGridEmoji += "\n";
     }
-
 
     const shareTitle = `Pathword Result - ${getTodayString()}`;
-    const shareTextForNative = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey:\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course!\n#PathwordGame #DailyPuzzle`;
+    const shareTextForNative = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey (${tryCount} ${
+      tryCount === 1 ? "try" : "tries"
+    }):\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course!\n#PathwordGame #DailyPuzzle`;
     const gameUrl = GAME_URL;
-    const fullClipboardText = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey:\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course: ${gameUrl}\n#PathwordGame #DailyPuzzle #BrainTeaser`;
-    
+    const fullClipboardText = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey (${tryCount} ${
+      tryCount === 1 ? "try" : "tries"
+    }):\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course: ${gameUrl}\n#PathwordGame #DailyPuzzle #BrainTeaser`;
+
     gtag.event({
-    action: 'share_attempted',
-    category: 'Engagement',
-    label: navigator.share ? 'Native Share' : 'Clipboard Copy'
-  });
+      action: "share_attempted",
+      category: "Engagement",
+      label: navigator.share ? "Native Share" : "Clipboard Copy",
+    });
 
     if (navigator.share) {
-        try {
-            await navigator.share({
-                title: shareTitle,
-                text: shareTextForNative,
-                url: gameUrl,
-            });
-            setShareFeedback("Shared!"); // Or no feedback if native UI is enough
-            // setIsCopying(false) will be handled by a finally block or timeout
-        } catch (err) {
-            console.error("Error sharing:", err);
-            if (err.name !== 'AbortError') {
-                // If native share fails (not due to user cancellation), fall back to clipboard
-                setShareFeedback("Share failed. Copied to clipboard instead.");
-                await copyToClipboard(fullClipboardText); // copyToClipboard will handle its own isCopying and feedback
-                return; // Exit early as copyToClipboard handles its own timeouts for isCopying
-            } else {
-                setShareFeedback(""); // User cancelled, clear any pending feedback
-            }
-        } finally {
-             // Reset isCopying after a short delay to allow native share UI to dismiss
-             // or to allow clipboard success message to show.
-             // This timeout needs to be carefully managed.
-             // If copyToClipboard was called, it handles its own timeout.
-             // If only navigator.share was used:
-             if (navigator.share && !(Error.name === 'AbortError' && shareFeedback.includes("Copied"))) {
-                setTimeout(() => {
-                    setIsCopying(false);
-                    setShareFeedback("");
-                }, 1500);
-             }
-
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareTextForNative,
+          url: gameUrl,
+        });
+        setShareFeedback("Shared!"); // Or no feedback if native UI is enough
+        // setIsCopying(false) will be handled by a finally block or timeout
+      } catch (err) {
+        console.error("Error sharing:", err);
+        if (err.name !== "AbortError") {
+          // If native share fails (not due to user cancellation), fall back to clipboard
+          setShareFeedback("Share failed. Copied to clipboard instead.");
+          await copyToClipboard(fullClipboardText); // copyToClipboard will handle its own isCopying and feedback
+          return; // Exit early as copyToClipboard handles its own timeouts for isCopying
+        } else {
+          setShareFeedback(""); // User cancelled, clear any pending feedback
         }
+      } finally {
+        // Reset isCopying after a short delay to allow native share UI to dismiss
+        // or to allow clipboard success message to show.
+        // This timeout needs to be carefully managed.
+        // If copyToClipboard was called, it handles its own timeout.
+        // If only navigator.share was used:
+        if (
+          navigator.share &&
+          !(Error.name === "AbortError" && shareFeedback.includes("Copied"))
+        ) {
+          setTimeout(() => {
+            setIsCopying(false);
+            setShareFeedback("");
+          }, 1500);
+        }
+      }
     } else {
-        // Fallback to Clipboard Copy
-        await copyToClipboard(fullClipboardText);
-        // copyToClipboard will manage setIsCopying(false) via its own setTimeout
+      // Fallback to Clipboard Copy
+      await copyToClipboard(fullClipboardText);
+      // copyToClipboard will manage setIsCopying(false) via its own setTimeout
     }
-};
+  };
 
   // --- UI Rendering Functions ---
   const renderGrid = () => {
@@ -916,110 +1093,118 @@ async function copyToClipboard(fullClipboardText) { // Simplified arguments
   };
   // Pathword.jsx
 
-// ...
+  // ...
 
-// Pathword.jsx
+  // Pathword.jsx
 
-const renderCluesSection = () => {
-  const numClues = currentPuzzle.clues.length;
+  const renderCluesSection = () => {
+    const numClues = currentPuzzle.clues.length;
 
-  if (numClues === 0) {
+    if (numClues === 0) {
+      return (
+        <div className="mt-2 mb-4 px-2 w-full max-w-full">
+          <h2 className="text-xl font-semibold mb-4 text-center text-gray-700">
+            Clues
+          </h2>
+          <p className="text-gray-500 text-sm text-center px-4">
+            No clues available.
+          </p>
+        </div>
+      );
+    }
+
+    const sortedClues = [...currentPuzzle.clues].sort(
+      (a, b) => a.position - b.position
+    );
+    const currentClueData = sortedClues[currentClueIndex];
+
+    const originalClueIndex = currentPuzzle.clues.findIndex(
+      (clue) =>
+        clue.position === currentClueData.position &&
+        clue.description === currentClueData.description
+    );
+
+    const goToNextClue = () => {
+      setCurrentClueIndex((prevIndex) => (prevIndex + 1) % numClues);
+    };
+
+    const goToPrevClue = () => {
+      setCurrentClueIndex((prevIndex) => (prevIndex - 1 + numClues) % numClues);
+    };
+
     return (
-      <div className="mt-2 mb-4 px-2 w-full max-w-full">
+      <div className="mt-2 mb-4 px-2 w-full max-w-lg mx-auto">
         <h2 className="text-xl font-semibold mb-4 text-center text-gray-700">
           Clues
         </h2>
-        <p className="text-gray-500 text-sm text-center px-4">
-          No clues available.
-        </p>
-      </div>
-    );
-  }
+        <div className="flex flex-col items-center gap-4">
+          {/* Main Clue Card Area with Arrow Navigation */}
+          <div className="flex items-center justify-center w-full space-x-2 sm:space-x-4">
+            {/* Previous Clue Button */}
+            {numClues > 1 ? (
+              <Button
+                onClick={goToPrevClue}
+                variant="ghost" // Use ghost or outline for less emphasis
+                size="icon"
+                className="p-2 rounded-full text-gray-600 hover:bg-gray-200"
+                aria-label="Previous Clue"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
+            ) : (
+              <div className="w-10 h-10"></div> // Placeholder for alignment if only one clue
+            )}
 
-  const sortedClues = [...currentPuzzle.clues].sort((a, b) => a.position - b.position);
-  const currentClueData = sortedClues[currentClueIndex];
+            {/* Clue Card */}
+            {currentClueData && (
+              <ClueCard
+                key={originalClueIndex}
+                clue={currentClueData}
+                isUnlocked={unlockedClues.includes(originalClueIndex)}
+                isFlipped={flippedClues.includes(originalClueIndex)}
+                onUnlock={() => handleUnlockClue(originalClueIndex)}
+                onToggleFlip={() => handleToggleFlip(originalClueIndex)}
+              />
+            )}
 
-  const originalClueIndex = currentPuzzle.clues.findIndex(
-    (clue) => clue.position === currentClueData.position && clue.description === currentClueData.description
-  );
+            {/* Next Clue Button */}
+            {numClues > 1 ? (
+              <Button
+                onClick={goToNextClue}
+                variant="ghost"
+                size="icon"
+                className="p-2 rounded-full text-gray-600 hover:bg-gray-200"
+                aria-label="Next Clue"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </Button>
+            ) : (
+              <div className="w-10 h-10"></div> // Placeholder for alignment
+            )}
+          </div>
 
-  const goToNextClue = () => {
-    setCurrentClueIndex((prevIndex) => (prevIndex + 1) % numClues);
-  };
-
-  const goToPrevClue = () => {
-    setCurrentClueIndex((prevIndex) => (prevIndex - 1 + numClues) % numClues);
-  };
-
-  return (
-    <div className="mt-2 mb-4 px-2 w-full max-w-lg mx-auto">
-      <h2 className="text-xl font-semibold mb-4 text-center text-gray-700">
-        Clues
-      </h2>
-      <div className="flex flex-col items-center gap-4">
-        {/* Main Clue Card Area with Arrow Navigation */}
-        <div className="flex items-center justify-center w-full space-x-2 sm:space-x-4">
-          {/* Previous Clue Button */}
-          {numClues > 1 ? (
-            <Button
-              onClick={goToPrevClue}
-              variant="ghost" // Use ghost or outline for less emphasis
-              size="icon"
-              className="p-2 rounded-full text-gray-600 hover:bg-gray-200"
-              aria-label="Previous Clue"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-          ) : (
-            <div className="w-10 h-10"></div> // Placeholder for alignment if only one clue
-          )}
-
-          {/* Clue Card */}
-          {currentClueData && (
-            <ClueCard
-              key={originalClueIndex}
-              clue={currentClueData}
-              isUnlocked={unlockedClues.includes(originalClueIndex)}
-              isFlipped={flippedClues.includes(originalClueIndex)}
-              onUnlock={() => handleUnlockClue(originalClueIndex)}
-              onToggleFlip={() => handleToggleFlip(originalClueIndex)}
-            />
-          )}
-
-          {/* Next Clue Button */}
-          {numClues > 1 ? (
-            <Button
-              onClick={goToNextClue}
-              variant="ghost"
-              size="icon"
-              className="p-2 rounded-full text-gray-600 hover:bg-gray-200"
-              aria-label="Next Clue"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </Button>
-          ) : (
-            <div className="w-10 h-10"></div> // Placeholder for alignment
+          {/* Dot Indicators (as per your screenshot) */}
+          {numClues > 1 && (
+            <div className="flex justify-center space-x-2 mt-3">
+              {sortedClues.map((_, index) => (
+                <button
+                  key={`dot-${index}`}
+                  onClick={() => setCurrentClueIndex(index)}
+                  aria-label={`Go to Clue ${index + 1}`}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors
+                  ${
+                    currentClueIndex === index
+                      ? "bg-teal-500"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                />
+              ))}
+            </div>
           )}
         </div>
-
-        {/* Dot Indicators (as per your screenshot) */}
-        {numClues > 1 && (
-          <div className="flex justify-center space-x-2 mt-3">
-            {sortedClues.map((_, index) => (
-              <button
-                key={`dot-${index}`}
-                onClick={() => setCurrentClueIndex(index)}
-                aria-label={`Go to Clue ${index + 1}`}
-                className={`w-2.5 h-2.5 rounded-full transition-colors
-                  ${currentClueIndex === index ? 'bg-teal-500' : 'bg-gray-300 hover:bg-gray-400'}`}
-              />
-            ))}
-          </div>
-        )}
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   // --- Main Component Return (Structure remains the same, dialogs use existing logic) ---
   return (
@@ -1098,6 +1283,24 @@ const renderCluesSection = () => {
                     </div>{" "}
                   </div>{" "}
                 </div>{" "}
+                <div className="flex justify-center mb-6">
+                  {" "}
+                  {/* This flex container will center its child */}
+                  <div className="w-full max-w-[calc(50%-0.5rem)] sm:max-w-[calc(50%-0.5rem)] md:max-w-[160x]">
+                    {" "}
+                    {/* Adjust width constraint */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center w-full max-w-xs mx-auto">
+                      {" "}
+                      {/* Added max-w-xs and mx-auto for the box itself */}
+                      <div className="text-3xl font-bold text-blue-700">
+                        {gameState.status === "success" ? tryCount : "-"}
+                      </div>
+                      <div className="text-xs uppercase text-blue-600 font-medium tracking-wide">
+                        Path Tries This Game
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <h3 className="text-center font-semibold mb-3 text-gray-700 text-sm">
                   Explorer's Log{" "}
                   <span className="font-normal text-gray-500">
@@ -1150,111 +1353,134 @@ const renderCluesSection = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-{/* Help Dialog */}
-<Dialog open={isHelpOpen} onOpenChange={(open) => {
-    setIsHelpOpen(open);
-    if (open) setCurrentHelpSlide(0); // Reset to first slide when dialog opens
-}}>
-    <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Help">
-            <HelpCircle className="h-6 w-6 text-gray-600" />
-        </Button>
-    </DialogTrigger>
-    <DialogContent className="bg-white rounded-lg shadow-xl p-0 sm:max-w-lg md:max-w-xl"> {/* Adjusted max-width */}
-        <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
-            <DialogTitle className="text-lg font-semibold text-gray-900">How to Play Pathword</DialogTitle>
-            {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+          {/* Help Dialog */}
+          <Dialog
+            open={isHelpOpen}
+            onOpenChange={(open) => {
+              setIsHelpOpen(open);
+              if (open) setCurrentHelpSlide(0); // Reset to first slide when dialog opens
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Help">
+                <HelpCircle className="h-6 w-6 text-gray-600" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-white rounded-lg shadow-xl p-0 sm:max-w-lg md:max-w-xl">
+              {" "}
+              {/* Adjusted max-width */}
+              <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
+                <DialogTitle className="text-lg font-semibold text-gray-900">
+                  How to Play Pathword
+                </DialogTitle>
+                {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                 <CloseIcon className="h-5 w-5 text-gray-500 hover:text-gray-700" />
                 <span className="sr-only">Close</span>
             </DialogClose> */}
-        </DialogHeader>
-
-        {/* Carousel Content */}
-        <div className="px-2 sm:px-6 py-6 text-gray-700 max-h-[75vh] md:max-h-[70vh] overflow-y-auto">
-            <div className="carousel-viewport relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[300px] md:max-h-[350px] mx-auto overflow-hidden rounded-lg bg-gray-100 shadow-inner mb-4"> {/* Added aspect ratio and max-h for image area */}
-                <div
+              </DialogHeader>
+              {/* Carousel Content */}
+              <div className="px-2 sm:px-6 py-6 text-gray-700 max-h-[75vh] md:max-h-[70vh] overflow-y-auto">
+                <div className="carousel-viewport relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[300px] md:max-h-[350px] mx-auto overflow-hidden rounded-lg bg-gray-100 shadow-inner mb-4">
+                  {" "}
+                  {/* Added aspect ratio and max-h for image area */}
+                  <div
                     className="carousel-track flex h-full transition-transform duration-300 ease-in-out"
-                    style={{ transform: `translateX(-${currentHelpSlide * 100}%)` }}
-                >
+                    style={{
+                      transform: `translateX(-${currentHelpSlide * 100}%)`,
+                    }}
+                  >
                     {helpSlidesData.map((slide) => (
-                        <div
-                            key={slide.id}
-                            className="carousel-slide min-w-full h-full flex-shrink-0 flex flex-col items-center justify-center p-1"
-                        >
-                            <img
-                                src={slide.imageUrl}
-                                alt={slide.altText}
-                                className="max-w-full max-h-full object-contain" // Ensure image fits
-                            />
-                        </div>
+                      <div
+                        key={slide.id}
+                        className="carousel-slide min-w-full h-full flex-shrink-0 flex flex-col items-center justify-center p-1"
+                      >
+                        <img
+                          src={slide.imageUrl}
+                          alt={slide.altText}
+                          className="max-w-full max-h-full object-contain" // Ensure image fits
+                        />
+                      </div>
                     ))}
+                  </div>
                 </div>
-            </div>
 
-            {/* Instruction Text below image */}
-            <div className="instruction-text text-center min-h-[4em] mb-4 px-4"> {/* min-h to reduce layout shift */}
-                 <p
+                {/* Instruction Text below image */}
+                <div className="instruction-text text-center min-h-[4em] mb-4 px-4">
+                  {" "}
+                  {/* min-h to reduce layout shift */}
+                  <p
                     className="text-sm text-gray-700 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: helpSlidesData[currentHelpSlide]?.instruction || '' }}
-                />
-            </div>
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        helpSlidesData[currentHelpSlide]?.instruction || "",
+                    }}
+                  />
+                </div>
 
-
-            {/* Navigation: Arrows and Dots */}
-            {helpSlidesData.length > 1 && (
-                <div className="flex items-center justify-between px-1">
+                {/* Navigation: Arrows and Dots */}
+                {helpSlidesData.length > 1 && (
+                  <div className="flex items-center justify-between px-1">
                     {/* Previous Button */}
                     <Button
-                        variant="outline"
-                        size="icon"
-                        className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                        onClick={() => setCurrentHelpSlide(prev => Math.max(0, prev - 1))}
-                        disabled={currentHelpSlide === 0}
-                        aria-label="Previous help slide"
+                      variant="outline"
+                      size="icon"
+                      className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                      onClick={() =>
+                        setCurrentHelpSlide((prev) => Math.max(0, prev - 1))
+                      }
+                      disabled={currentHelpSlide === 0}
+                      aria-label="Previous help slide"
                     >
-                        <ChevronLeft className="h-5 w-5" />
+                      <ChevronLeft className="h-5 w-5" />
                     </Button>
 
                     {/* Dot Indicators */}
                     <div className="flex justify-center space-x-2">
-                        {helpSlidesData.map((_, index) => (
-                            <button
-                                key={`dot-${index}`}
-                                onClick={() => setCurrentHelpSlide(index)}
-                                aria-label={`Go to help slide ${index + 1}`}
-                                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2
-                                    ${currentHelpSlide === index ? 'bg-teal-500 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
-                            />
-                        ))}
+                      {helpSlidesData.map((_, index) => (
+                        <button
+                          key={`dot-${index}`}
+                          onClick={() => setCurrentHelpSlide(index)}
+                          aria-label={`Go to help slide ${index + 1}`}
+                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2
+                                    ${
+                                      currentHelpSlide === index
+                                        ? "bg-teal-500 scale-125"
+                                        : "bg-gray-300 hover:bg-gray-400"
+                                    }`}
+                        />
+                      ))}
                     </div>
 
                     {/* Next Button */}
                     <Button
-                        variant="outline"
-                        size="icon"
-                        className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                        onClick={() => setCurrentHelpSlide(prev => Math.min(helpSlidesData.length - 1, prev + 1))}
-                        disabled={currentHelpSlide === helpSlidesData.length - 1}
-                        aria-label="Next help slide"
+                      variant="outline"
+                      size="icon"
+                      className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                      onClick={() =>
+                        setCurrentHelpSlide((prev) =>
+                          Math.min(helpSlidesData.length - 1, prev + 1)
+                        )
+                      }
+                      disabled={currentHelpSlide === helpSlidesData.length - 1}
+                      aria-label="Next help slide"
                     >
-                        <ChevronRight className="h-5 w-5" />
+                      <ChevronRight className="h-5 w-5" />
                     </Button>
-                </div>
-            )}
-        </div>
-
-        <DialogFooter className="px-6 pb-6 pt-4 border-t border-gray-200">
-            <DialogClose asChild>
-                <Button
+                  </div>
+                )}
+              </div>
+              <DialogFooter className="px-6 pb-6 pt-4 border-t border-gray-200">
+                <DialogClose asChild>
+                  <Button
                     type="button"
                     className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm py-2.5" // Themed button
-                >
+                  >
                     Got It!
-                </Button>
-            </DialogClose>
-        </DialogFooter>
-    </DialogContent>
-</Dialog>
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
       <main className="flex-grow flex flex-col items-center w-full mt-4">
@@ -1274,9 +1500,9 @@ const renderCluesSection = () => {
               </p>
               <Button
                 onClick={() => {
-                    // Open stats dialog and ensure success popup content is shown
-                    setShowSuccessPopup(true); // This flag triggers the "Path Conquered!" title in stats
-                    setIsStatsOpen(true);
+                  // Open stats dialog and ensure success popup content is shown
+                  setShowSuccessPopup(true); // This flag triggers the "Path Conquered!" title in stats
+                  setIsStatsOpen(true);
                 }}
                 // Or directly call handleShare if you prefer that as the primary action
                 // onClick={handleShare}
@@ -1299,11 +1525,18 @@ const renderCluesSection = () => {
               {feedbackMessage}
             </p>
           ) : gameState.status === "playing" && !feedbackMessage ? (
-            <div className="h-full"></div> // Placeholder to maintain height
-          ) : null}
+            // Display Try Count when playing and no other message
+            <p className="text-blue-600 font-semibold text-md">
+              Path Tries: {tryCount}
+            </p>
+          ) : (
+            <div className="h-full"></div> // Placeholder if no message
+          )}
         </div>
-         {/* --- CONDITIONALLY RENDER CLUES SECTION --- */}
-        {gameState.status !== "success" && !isAlreadySolvedToday && renderCluesSection()}
+        {/* --- CONDITIONALLY RENDER CLUES SECTION --- */}
+        {gameState.status !== "success" &&
+          !isAlreadySolvedToday &&
+          renderCluesSection()}
         {/*
           Alternative more concise condition if isAlreadySolvedToday always implies gameState.status is 'success':
           Simply: gameState.status !== "success"
