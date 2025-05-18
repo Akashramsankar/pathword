@@ -77,22 +77,22 @@ const helpSlidesData = [
 // Daily puzzles data
 const dailyPuzzles = [
   {
-  date: "2025-05-18", // Or your desired date
+  date: "2025-05-19", // Or your desired date
     grid: [
-    ["K", "R", "A", "Q", "N", "I"],
-    ["A", "C", "E", "J", "S", "D"], // Distractor 'G' near 'D'
-    ["R", "V", "T", "X", "O", "M"], // 'J', 'K', 'L', 'M' are fairly neutral
-    ["O", "P", "Q", "E", "W", "S"], // Distractor 'R', 'S'
-    ["N", "E", "R", "Y", "A", "L"], // Fillers
-    ["M", "S", "G", "H", "T", "Y"]  // Distractor 'H' near 'T'
+    ["A", "C", "B", "D", "J", "R"], // J
+    ["H", "E", "X", "U", "L", "O"], // E1
+    ["N", "S", "M", "C", "A", "R"], // R
+    ["S", "K", "U", "T", "P", "L"], // S
+    ["Z", "A", "E", "B", "C", "D"], // E2 - Distractors A, B, C, D around it
+    ["L", "G", "H", "Y", "S", "R"]  // Y - Distractors F, G, H, I, K
   ],
-  answer: "ADVENT",
+  answer: "JERSEY",
 
-  revealedLetter: { row: 3, col: 3, letter: "E" }, // Original col index
+  revealedLetter: { row: 4, col: 2, letter: "E" }, // Original col index
   clues: [
-    { position: 1, description: "It's one of the vowels in the row" },
-    { position: 5, description: "It belongs to the second half of the alphabetical order." },
-    { position: 6, description: "It's 'TEA' time!" }
+    { position: 2, description: "It's one of the vowels in the row" },
+    { position: 3, description: "It belongs to the second half of the alphabetical order." },
+    { position: 6, description: "'Why?'" }
   ]
 }
   // Add other puzzles here
@@ -300,13 +300,9 @@ export default function Pathword() {
     const alreadySolved = localStorage.getItem(solvedTodayStorageKey);
 
 
-    console.log("Date ",currentPuzzle.date);
-
     const puzzleDate = currentPuzzle.date;
     const tryCountStorageKey = `${TRY_COUNT_KEY_PREFIX}${puzzleDate}`;
     const storedTryCount = localStorage.getItem(tryCountStorageKey);
-
-    console.log("storedtry count ",storedTryCount);
 
 
     if (alreadySolved === "true" && parsedMapping) {
@@ -352,12 +348,12 @@ export default function Pathword() {
             // A proper solution needs the solved path to be stored.
             // For "BRANCH" and your grid:
             // B is 0,1; R is 1,3; A is 2,0; N is 3,4; C is 4,2; H is 5,5
-            if (index === 0 && letter === "A") originalCol = 2;
-            else if (index === 1 && letter === "D") originalCol = 5;
-            else if (index === 2 && letter === "V") originalCol = 1;
-            else if (index === 3 && letter === "E") originalCol = 3;
-            else if (index === 4 && letter === "N") originalCol = 0;
-            else if (index === 5 && letter === "T") originalCol = 4;
+            if (index === 0 && letter === "J") originalCol = 4;
+            else if (index === 1 && letter === "E") originalCol = 1;
+            else if (index === 2 && letter === "R") originalCol = 5;
+            else if (index === 3 && letter === "S") originalCol = 0;
+            else if (index === 4 && letter === "E") originalCol = 2;
+            else if (index === 5 && letter === "Y") originalCol = 3;
             break;
           }
         }
@@ -637,6 +633,13 @@ export default function Pathword() {
         category: "Game",
         label: currentPuzzle.answer, // e.g., "ENIGMA"
         value: unlockedClues.length, // e.g., number of clues used
+      });
+
+      gtag.event({
+        action: "puzzle_solved2",
+        category: "Game",
+        label: currentPuzzle.answer, // e.g., "ENIGMA"
+        value: tryCount, // e.g., number of clues used
       });
 
       // *** NEW: Mark as solved for today ***
