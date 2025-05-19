@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button"; // Make sure this path is correct for your setup
 import {
   Lock,
@@ -10,6 +10,7 @@ import {
   X as CloseIcon,
   ChevronLeft, // <-- Add this
   ChevronRight, // <-- Add this
+  CalendarDays
 } from "lucide-react";
 import {
   Dialog,
@@ -77,6 +78,24 @@ const helpSlidesData = [
 // Daily puzzles data
 const dailyPuzzles = [
   {
+  date: "2025-05-20", // Set your desired date
+  grid: [
+    ["B", "R", "Z", "K", "C", "I"],
+    ["S", "A", "Y", "T", "E", "R"], // Note: Original 'A' is grid[1][1]. grid[1][0] is another 'A'.
+    ["P", "E", "V", "A", "T", "S"],
+    ["U", "M", "X", "O", "N", "P"],
+    ["S", "G", "A", "R", "D", "E"], // Note: Original 'A' is grid[4][2]
+    ["Y", "R", "J", "L", "S", "P"]
+  ],
+  answer: "CASUAL",
+  revealedLetter: { row: 4, col: 2, letter: "A" }, // Original col index
+  clues: [ // Clues remain the same as they target the letters of CASUAL
+    { position: 3, description: "It belongs to the second half of the alphabetical order." },
+    { position: 4, description: "It's one of the vowels in the row" },
+    { position: 6, description: "Without me, 'lol' is just oh." }
+  ]
+},
+  {
   date: "2025-05-19", // Or your desired date
     grid: [
     ["A", "K", "B", "D", "J", "R"], // J
@@ -94,9 +113,94 @@ const dailyPuzzles = [
     { position: 3, description: "It belongs to the second half of the alphabetical order." },
     { position: 6, description: "'Why?'" }
   ]
-}
-  // Add other puzzles here
+},
+
+{
+  date: "2025-05-18", // Or your desired date
+    grid: [
+    ["K", "R", "A", "Q", "N", "I"],
+    ["A", "C", "E", "J", "S", "D"], // Distractor 'G' near 'D'
+    ["R", "V", "T", "X", "O", "M"], // 'J', 'K', 'L', 'M' are fairly neutral
+    ["O", "P", "Q", "E", "W", "S"], // Distractor 'R', 'S'
+    ["N", "E", "R", "Y", "A", "L"], // Fillers
+    ["M", "S", "G", "H", "T", "Y"]  // Distractor 'H' near 'T'
+  ],
+  answer: "ADVENT",
+
+  revealedLetter: { row: 3, col: 3, letter: "E" }, // Original col index
+  clues: [
+    { position: 1, description: "It's one of the vowels in the row" },
+    { position: 5, description: "It belongs to the second half of the alphabetical order." },
+    { position: 6, description: "It's 'TEA' time!" }
+  ]
+},
+
+{
+  date: "2025-05-17", // Or your desired date
+    grid: [
+    ["M", "F", "S", "P", "Z", "L"],
+    ["Y", "U", "Q", "R", "A", "D"], // Distractor 'B' or 'C' could be near 'A'
+    ["V", "M", "R", "N", "J", "I"], // 'E' could be a distractor for 'A' if player forgets column
+    ["T", "U", "A", "P", "S", "O"], // Distractor 'S'
+    ["E", "R", "U", "O", "Y", "N"], // 'X', 'Y', 'Z' are good neutral fillers
+    ["G", "E", "Y", "R", "C", "S"]  // Distractor 'F' (first letter) and 'E'
+  ],
+  answer: "FAVOUR",
+
+  revealedLetter: { row: 1, col: 4, letter: "A" }, // Original col index
+  clues: [
+    { position: 4, description: "It's one of the vowels in the row" },
+    { position: 5, description: "It's 'YOU'" },
+    { position: 6, description: "It belongs to the second half of the alphabetical order." }
+  ]
+}  // Add other puzzles here
 ];
+
+// Pathword.jsx
+
+function DateSelector({ availableDates, selectedDate, onDateChange }) {
+  // Sort dates for display, newest first if not already
+  const sortedDates = [...availableDates].sort((a, b) => new Date(b) - new Date(a));
+
+  const formatDateForDisplay = (dateStr) => {
+    const dateObj = new Date(dateStr + 'T00:00:00'); // Ensure local timezone interpretation
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    if (dateObj.getTime() === today.getTime()) return "Today";
+    if (dateObj.getTime() === yesterday.getTime()) return "Yesterday";
+    return dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
+  return (
+    <div className="my-3 md:my-4 flex justify-center items-center relative">
+          <CalendarDays className="h-5 w-5 text-gray-500 mr-2" />
+      
+      <select
+        value={selectedDate}
+        onChange={(e) => onDateChange(e.target.value)}
+        className="appearance-none bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm block w-auto
+                   py-2.5 pl-3 pr-8 leading-tight hover:border-gray-400 cursor-pointer
+                   transition-colors duration-150 ease-in-out" // Added appearance-none for custom arrow
+        aria-label="Select puzzle date"
+      >
+        {sortedDates.map((dateStr) => (
+          <option key={dateStr} value={dateStr}>
+            {formatDateForDisplay(dateStr)}
+          </option>
+        ))}
+      </select>
+      {/* Custom dropdown arrow if appearance-none is used */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.14-.446 1.576 0 .436.445.408 1.197 0 1.642l-3.417 3.356c-.27.272-.63.408-.99.408s-.72-.136-.99-.408L5.516 9.19c-.408-.445-.436-1.197 0-1.642z"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 // --- ClueCard Component ---
 function ClueCard({ clue, isUnlocked, isFlipped, onToggleFlip, onUnlock }) {
@@ -152,11 +256,22 @@ function ClueCard({ clue, isUnlocked, isFlipped, onToggleFlip, onUnlock }) {
 // --- Main Pathword Component ---
 export default function Pathword() {
   // Utility Functions (Defined BEFORE state)
-  const getTodayString = () => {
-    const today = new Date();
-    // return "2024-07-27"; // Force date for testing
-    return today.toISOString().split("T")[0];
-  };
+
+    const getTodayString = () => {
+      const today = new Date();
+
+      const year = today.getFullYear();
+      const month = today.getMonth() + 1; // getMonth() is 0-indexed (0 for January, 11 for December)
+      const day = today.getDate();
+
+      // Pad month and day with a leading zero if they are single digits
+      const monthFormatted = month < 10 ? `0${month}` : month;
+      const dayFormatted = day < 10 ? `0${day}` : day;
+
+      const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
+      // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
+      return localDateString;
+    };
 
   const findTodaysPuzzle = useCallback(() => {
     const todayString = getTodayString();
@@ -178,8 +293,14 @@ export default function Pathword() {
     return array;
   };
 
+  const [selectedDate, setSelectedDate] = useState(getTodayString());
+  // const [currentPuzzle, setCurrentPuzzle] = useState(
+  //   () => dailyPuzzles.find((p) => p.date === selectedDate) || dailyPuzzles[0]
+  // );
+
   // State Declarations
   const [currentPuzzle, setCurrentPuzzle] = useState(() => findTodaysPuzzle());
+
   const [selectedPath, setSelectedPath] = useState([]); // Stores { row, col (original), letter }
   const [unlockedClues, setUnlockedClues] = useState([]);
   const [flippedClues, setFlippedClues] = useState([]);
@@ -220,12 +341,49 @@ export default function Pathword() {
   const CELL_SIZE_APPROX = 56;
   const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-"; // New localStorage key prefix
 
+
+
   // Refs
   const gridRef = useRef(null);
   const cellRefs = useRef({}); // Keyed by `row-originalCol`
   const feedbackTimeoutRef = useRef(null);
 
+  // Memoize availablePuzzleDates
+  const availablePuzzleDates = useMemo(() => {
+    // Ensure dailyPuzzles is defined and is an array
+    if (!Array.isArray(dailyPuzzles)) {
+        console.error("dailyPuzzles is not an array or is undefined");
+        return []; // Return empty array or handle error appropriately
+    }
+    return dailyPuzzles.map(p => p.date);
+  }, []); // Dependency array is empty because dailyPuzzles is a constant defined outside the component
+
+
   // Effects
+
+  // Effect to update currentPuzzle and reset game state when selectedDate changes
+  useEffect(() => {
+    const newPuzzle =
+      dailyPuzzles.find((p) => p.date === selectedDate) || dailyPuzzles[0];
+    setCurrentPuzzle(newPuzzle);
+
+    // Reset game state for the newly selected puzzle
+    setSelectedPath([]);
+    setUnlockedClues([]);
+    setFlippedClues([]);
+    setPathCoords([]);
+    setFeedbackMessage("");
+    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+    setGameState({ status: "playing", points: 100 });
+    setCurrentClueIndex(0);
+    setIncrementTryOnNextSelection(true); // Ready for the first try of this selected puzzle
+    // Try count for the new puzzle will be loaded in the main data loading useEffect
+
+    // Note: The main data loading useEffect (that depends on currentPuzzle.date/grid)
+    // will handle loading localStorage data (solved status, column map, try count)
+    // for this newPuzzle.
+  }, [selectedDate]); // Run when selectedDate changes
+
   useEffect(
     () => () => {
       if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
@@ -251,9 +409,11 @@ export default function Pathword() {
       }
     }
 
+    const puzzleDate = currentPuzzle.date;
+
     // --- Column Mapping Logic ---
     const today = getTodayString(); // Get the date string once for this effect run
-    const columnMapStorageKey = `${COLUMN_MAP_KEY_PREFIX}${today}`;
+    const columnMapStorageKey = `${COLUMN_MAP_KEY_PREFIX}${puzzleDate}`;
     let todaysMappingStr = localStorage.getItem(columnMapStorageKey);
     let parsedMapping = null;
 
@@ -296,14 +456,11 @@ export default function Pathword() {
     setColumnMapping(parsedMapping); // This is the setState call
 
     // *** NEW: Check if already solved today ***
-    const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${today}`;
+    const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${puzzleDate}`;
     const alreadySolved = localStorage.getItem(solvedTodayStorageKey);
 
-
-    const puzzleDate = currentPuzzle.date;
     const tryCountStorageKey = `${TRY_COUNT_KEY_PREFIX}${puzzleDate}`;
     const storedTryCount = localStorage.getItem(tryCountStorageKey);
-
 
     if (alreadySolved === "true" && parsedMapping) {
       // Ensure mapping is also loaded
@@ -313,69 +470,79 @@ export default function Pathword() {
 
       // Load the stored try count if solved
       if (storedTryCount) {
+
         const parsedTryCount = parseInt(storedTryCount, 10);
         if (!isNaN(parsedTryCount) && parsedTryCount >= 0) {
           setTryCount(parsedTryCount);
         } else {
           // Fallback if stored value is invalid, but it's solved, so at least 1 try.
-          setTryCount(0);
-          localStorage.setItem(tryCountStorageKey, "0"); // Correct invalid storage
+          setTryCount(1);
+          localStorage.setItem(tryCountStorageKey, "1"); // Correct invalid storage
         }
       } else {
+
         // If solved but no try count, assume at least 1 try.
         // This might happen if they solved before try count was stored.
-        setTryCount(0);
+        setTryCount(1);
+        localStorage.setItem(tryCountStorageKey, "1"); // Correct invalid storage
       }
       setIncrementTryOnNextSelection(false); // If solved, no "next selection" will increment tries.
 
-      // Reconstruct the solved path based on the answer and columnMapping
-      const answerLetters = currentPuzzle.answer.split("");
-      const reconstructedPath = [];
-      const usedOriginalCols = new Set(); // To find the correct original column for each letter
+      const answerLetters = currentPuzzle.answer.split('');
+  let reconstructedSolvedPath = []; // This will store { row, col, letter, isRevealed }
+  const usedOriginalColsInReconstruction = new Set();
 
-      // To show the answer letters in the preview correctly:
-      const answerPathForPreview = answerLetters.map((letter, index) => {
-        // This is a placeholder. We need the *actual* original column for styling.
-        // This assumes the Nth letter of answer is in Nth row.
-        // We'd need to find its original column in currentPuzzle.grid[index]
-        let originalCol = -1;
-        for (let c = 0; c < currentPuzzle.grid[index].length; c++) {
-          if (
-            currentPuzzle.grid[index][c] === letter &&
-            !reconstructedPath.find((p) => p.row === index && p.col === c)
-          ) {
-            // This is a very naive way if letters repeat in a row
-            // A proper solution needs the solved path to be stored.
-            // For "BRANCH" and your grid:
-            // B is 0,1; R is 1,3; A is 2,0; N is 3,4; C is 4,2; H is 5,5
-            if (index === 0 && letter === "J") originalCol = 4;
-            else if (index === 1 && letter === "E") originalCol = 1;
-            else if (index === 2 && letter === "R") originalCol = 5;
-            else if (index === 3 && letter === "S") originalCol = 0;
-            else if (index === 4 && letter === "E") originalCol = 2;
-            else if (index === 5 && letter === "Y") originalCol = 3;
-            break;
-          }
+  for (let i = 0; i < answerLetters.length; i++) {
+    const letterToFind = answerLetters[i];
+    const currentRow = i; // Assuming Nth letter of answer is in Nth row
+    let foundOriginalCol = -1;
+
+    if (currentPuzzle.grid[currentRow]) {
+      for (let c = 0; c < currentPuzzle.grid[currentRow].length; c++) {
+        if (currentPuzzle.grid[currentRow][c] === letterToFind && !usedOriginalColsInReconstruction.has(c)) {
+          // Found the letter in an original column not yet used for this reconstructed path
+          foundOriginalCol = c;
+          usedOriginalColsInReconstruction.add(c);
+          break; // Move to the next letter of the answer
         }
-        return {
-          row: index,
-          col: originalCol,
-          letter: letter,
-          isRevealed:
-            currentPuzzle.revealedLetter?.row === index &&
-            currentPuzzle.revealedLetter?.col === originalCol,
-        };
+      }
+    }
+
+    if (foundOriginalCol !== -1) {
+      reconstructedSolvedPath.push({
+        row: currentRow,
+        col: foundOriginalCol, // This is the original column index
+        letter: letterToFind,
+        isRevealed:
+          currentPuzzle.revealedLetter?.row === currentRow &&
+          currentPuzzle.revealedLetter?.col === foundOriginalCol,
       });
-      setSelectedPath(answerPathForPreview.filter((p) => p.col !== -1)); // Filter out any unfound (shouldn't happen with correct logic)
     } else {
+      // Fallback: Could not uniquely determine the path for this letter.
+      // This might happen if the answer has repeating letters and the grid setup is ambiguous
+      // without knowing the exact path taken, or if the answer isn't actually possible from the grid.
+      console.warn(`Could not reconstruct path for letter '${letterToFind}' at row ${currentRow} for answer '${currentPuzzle.answer}'. Using placeholder.`);
+      reconstructedSolvedPath.push({
+        row: currentRow,
+        col: -1, // Indicate column couldn't be determined
+        letter: letterToFind,
+        isRevealed: false, // Cannot determine if revealed if col is unknown
+      });
+    }
+  }
+  setSelectedPath(reconstructedSolvedPath.filter(p => p.col !== -1)); // Use only successfully reconstructed parts
+    } else {
+
+      setIsAlreadySolvedToday(false);
+
       if (storedTryCount) {
         // If game is ongoing and there's a stored try count, load it.
         const parsedTryCount = parseInt(storedTryCount, 10);
         if (!isNaN(parsedTryCount) && parsedTryCount >= 0) {
           setTryCount(parsedTryCount);
         } else {
-          setTryCount(0); // Fallback to 1 if invalid
-          localStorage.removeItem(tryCountStorageKey); // Remove invalid item
+          setTryCount(0); // Fallback to 0
+          localStorage.setItem(tryCountStorageKey, "0"); // Correct invalid storage
         }
         // If they refresh mid-try, we need to know if the next selection should increment.
         // This is tricky. For simplicity, on refresh, assume next selection is part of current tryCount
@@ -383,8 +550,11 @@ export default function Pathword() {
         // For now, let's reset this flag on load if not solved; it gets set by user actions.
         setIncrementTryOnNextSelection(selectedPath.length === 0); // If path empty, next click is a "new" segment
       } else {
+
         // No stored try count, and not solved, so it's the first attempt session.
         setTryCount(0);
+        localStorage.setItem(tryCountStorageKey, "0"); // Correct invalid storage
+
         setIncrementTryOnNextSelection(true); // First selection is part of try 1 by default
       }
       // Regular first visit help logic
@@ -395,7 +565,7 @@ export default function Pathword() {
         localStorage.setItem(HELP_VIEWED_KEY, "true");
       }
     }
-  }, [currentPuzzle.grid]); // Keep dependencies
+  }, [currentPuzzle.date, currentPuzzle.grid]); // Keep dependencies
 
   // --- (Rest of stats, path calculation, core game logic functions remain largely the same,
   // but ensure they use ORIGINAL column indices for selectedPath and rules) ---
@@ -408,33 +578,6 @@ export default function Pathword() {
     }
   };
 
-  const updateStatsOnSuccess = (cluesUsed) => {
-    const todayStr = getTodayString();
-    setUserStats((prevStats) => {
-      let newStreak = prevStats.streak;
-      const lastSolve = prevStats.lastSolveDate;
-      if (lastSolve) {
-        const lastDate = new Date(lastSolve);
-        const todayDate = new Date(todayStr);
-        const diffTime = todayDate - lastDate;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays === 1) newStreak += 1;
-        else if (diffDays > 1) newStreak = 1;
-      } else newStreak = 1;
-      const newSolves = { ...prevStats.solves };
-      const cluesKey = String(cluesUsed);
-      if (newSolves.hasOwnProperty(cluesKey))
-        newSolves[cluesKey] = (newSolves[cluesKey] || 0) + 1;
-      const newStats = {
-        ...prevStats,
-        streak: newStreak,
-        solves: newSolves,
-        lastSolveDate: todayStr,
-      };
-      saveStats(newStats);
-      return newStats;
-    });
-  };
   // Path Coordinate Calculation Effect - This should work as selectedPath stores original cols,
   // and cellRefs are keyed by original cols, pointing to the displayed DOM elements.
   // Effect to save tryCount to localStorage whenever it changes
@@ -449,7 +592,7 @@ export default function Pathword() {
         localStorage.setItem(tryCountStorageKey, tryCount.toString());
       }
     }
-  }, [tryCount, currentPuzzle.date]); // Re-run when tryCount or the puzzle (and its date) changes
+  }, [tryCount]); // Re-run when tryCount or the puzzle (and its date) changes
 
   useEffect(() => {
     if (!columnMapping || !gridRef.current || selectedPath.length < 2) {
@@ -623,11 +766,49 @@ export default function Pathword() {
   const checkAnswer = (path) => {
     // path contains {row, col (original), letter}
     const pathWord = path.map((p) => p.letter).join("");
+    const isSolvingTodaysPuzzle = currentPuzzle.date === getTodayString(); // Check if it's today's puzzle
+    
     if (pathWord === currentPuzzle.answer) {
       setGameState((prev) => ({ ...prev, status: "success" }));
       setFeedbackMessage("");
       const cluesUsed = unlockedClues.length;
-      updateStatsOnSuccess(cluesUsed);
+      setUserStats((prevStats) => {
+        const newSolves = { ...prevStats.solves };
+        const cluesKey = String(cluesUsed);
+        if (newSolves.hasOwnProperty(cluesKey)) {
+          newSolves[cluesKey] = (newSolves[cluesKey] || 0) + 1;
+        }
+
+        let newStreak = prevStats.streak;
+        let newLastSolveDate = prevStats.lastSolveDate;
+
+        if (isSolvingTodaysPuzzle) {
+          // Only update streak & lastSolveDate for today's puzzle
+          const todayStr = getTodayString(); // Or currentPuzzle.date, should be same
+          newLastSolveDate = todayStr;
+          const lastSolve = prevStats.lastSolveDate;
+          if (lastSolve) {
+            const lastDate = new Date(lastSolve);
+            const todayDate = new Date(todayStr);
+            const diffTime = todayDate - lastDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays === 1) newStreak += 1;
+            else if (diffDays > 1) newStreak = 1;
+            // If diffDays is 0 or less (solved same day again, or date issue), streak doesn't change here
+          } else {
+            newStreak = 1; // First time solving (today's puzzle)
+          }
+        }
+
+        const newStats = {
+          ...prevStats,
+          streak: newStreak,
+          solves: newSolves,
+          lastSolveDate: newLastSolveDate, // Only updated if it was today's puzzle
+        };
+        saveStats(newStats); // Save all stats (global + potentially updated streak)
+        return newStats;
+      });
       gtag.event({
         action: "puzzle_solved",
         category: "Game",
@@ -643,14 +824,14 @@ export default function Pathword() {
       });
 
       // *** NEW: Mark as solved for today ***
-      const today = getTodayString();
-      const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${today}`;
+      const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${currentPuzzle.date}`;
       localStorage.setItem(solvedTodayStorageKey, "true");
-
-      setTimeout(() => {
-        setShowSuccessPopup(true);
-        setIsStatsOpen(true);
-      }, 2000);
+      if (isSolvingTodaysPuzzle) {
+        setTimeout(() => {
+          setShowSuccessPopup(true);
+          setIsStatsOpen(true);
+        }, 2000);
+      }
     } else {
       setIncrementTryOnNextSelection(true); // Failed attempt means next selection is part of a new try
       setFeedbackMessage("Incorrect path. Try adjusting!");
@@ -1208,12 +1389,12 @@ export default function Pathword() {
       </div>
     );
   };
-
+  const isDisplayingTodaysPuzzle = currentPuzzle.date === getTodayString();
   // --- Main Component Return (Structure remains the same, dialogs use existing logic) ---
   return (
     <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 min-h-screen flex flex-col items-center">
       {/* Header */}
-      <header className="text-center pt-6 pb-4 flex items-center justify-between px-4 md:px-0">
+      <header className="text-center flex items-center justify-between px-4 md:px-0">
         <div className="w-16"></div>
         <div className="text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">
@@ -1486,6 +1667,15 @@ export default function Pathword() {
           </Dialog>
         </div>
       </header>
+      <DateSelector
+        availableDates={availablePuzzleDates}
+        selectedDate={selectedDate}
+        onDateChange={(newDate) => {
+          // Before changing date, consider if you want to save any "in-progress" state for the current date
+          // For now, we assume changing date resets progress for the *previous* date if not submitted.
+          setSelectedDate(newDate);
+        }}
+      />
       <main className="flex-grow flex flex-col items-center w-full mt-4">
         {columnMapping ? (
           renderGrid()
@@ -1494,47 +1684,68 @@ export default function Pathword() {
             Shuffling Path...
           </div>
         )}
+        {/* Display Try Count only when playing */}
+        {gameState.status === "playing" && (
+          <div className="text-center">
+            {" "}
+            {/* Added margin top/bottom and text-center */}
+            <p className="text-gray-500 font-semibold text-lg">
+              {" "}
+              {/* Adjusted color and size slightly */}
+              Path Tries: {tryCount}
+            </p>
+          </div>
+        )}
         {renderSelectedPathPreview()}
-        <div className="text-center h-12 mb-2 px-4 w-full flex flex-col items-center justify-center">
-          {isAlreadySolvedToday ? ( // If solved today (on reload or fresh solve)
-            <div className="flex flex-col items-center gap-2">
+        <div className="text-center mb-3 px-4 w-full flex flex-col items-center justify-center">
+          {" "}
+          <div className="flex flex-col items-center gap-6">
+          {/* Increased min-h and mb */}
+          {isAlreadySolvedToday && isDisplayingTodaysPuzzle ? (
+            <div className="flex flex-col items-center gap-6">
+              {" "}
+              {/* Increased gap */}
               <p className="text-green-600 font-semibold text-lg">
                 You've already found today's Pathword: {currentPuzzle.answer}!
               </p>
               <Button
                 onClick={() => {
-                  // Open stats dialog and ensure success popup content is shown
-                  setShowSuccessPopup(true); // This flag triggers the "Path Conquered!" title in stats
+                  setShowSuccessPopup(true);
                   setIsStatsOpen(true);
                 }}
-                // Or directly call handleShare if you prefer that as the primary action
-                // onClick={handleShare}
-                // disabled={isCopying}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm py-2 px-4"
+                variant="default" // Use your default button style for primary action
+                className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm py-2.5 px-6 shadow-md hover:shadow-lg transition-all duration-150 ease-in-out" // More prominent styling
               >
                 <Share2 className="h-4 w-4 mr-2" />
-                {/* Manage button text based on shareFeedback or isCopying if handleShare is direct */}
-                {/* For now, let's make it open the Stats/Share dialog */}
                 View Stats & Share
               </Button>
             </div>
-          ) : gameState.status === "success" && !isStatsOpen ? (
-            // This is for the brief moment after solving, before stats dialog might open automatically
+          ) : isAlreadySolvedToday && !isDisplayingTodaysPuzzle ? ( // Solved a PAST puzzle
+            <p className="text-green-600 font-semibold text-lg">
+              You previously solved: {currentPuzzle.answer} (from{" "}
+              {currentPuzzle.date})
+            </p>
+          
+          ) : gameState.status === "success" &&
+            !isStatsOpen &&
+            isDisplayingTodaysPuzzle ? (
+            // Transient success message for TODAY'S puzzle just solved
             <p className="text-green-600 font-semibold text-lg animate-pulse">
               Success! Word found: {currentPuzzle.answer}
+            </p>
+          ) : gameState.status === "success" && !isDisplayingTodaysPuzzle ? (
+            // Transient success message for a PAST puzzle just solved
+            <p className="text-green-600 font-semibold text-lg">
+              Solved: {currentPuzzle.answer} (from {currentPuzzle.date})
             </p>
           ) : feedbackMessage ? (
             <p className="text-red-600 font-semibold text-md">
               {feedbackMessage}
             </p>
-          ) : gameState.status === "playing" && !feedbackMessage ? (
-            // Display Try Count when playing and no other message
-            <p className="text-blue-600 font-semibold text-md">
-              Path Tries: {tryCount}
-            </p>
           ) : (
-            <div className="h-full"></div> // Placeholder if no message
+            gameState.status !== "playing" && <div className="h-full"></div> // Placeholder
           )}
+        </div>
         </div>
         {/* --- CONDITIONALLY RENDER CLUES SECTION --- */}
         {gameState.status !== "success" &&
