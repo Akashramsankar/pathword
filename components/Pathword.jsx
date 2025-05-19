@@ -80,7 +80,7 @@ const dailyPuzzles = [
   date: "2025-05-19", // Or your desired date
     grid: [
     ["A", "K", "B", "D", "J", "R"], // J
-    ["H", "E", "X", "U", "L", "O"], // E1
+    ["H", "E", "X", "O", "L", "U"], // E1
     ["N", "S", "M", "C", "A", "R"], // R
     ["S", "K", "U", "T", "P", "L"], // S
     ["Z", "A", "E", "B", "C", "D"], // E2 - Distractors A, B, C, D around it
