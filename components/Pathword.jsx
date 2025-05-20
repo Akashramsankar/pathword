@@ -78,6 +78,24 @@ const helpSlidesData = [
 // Daily puzzles data
 const dailyPuzzles = [
   {
+  date: "2025-05-21", // Set your desired date
+  grid: [
+    ["T", "S", "F", "M", "D", "J"],
+    ["L", "M", "N", "O", "P", "I"],
+    ["E", "C", "L", "R", "N", "W"],
+    ["I", "S", "E", "K", "A", "B"],
+    ["L", "E", "R", "T", "H", "X"],
+    ["R", "S", "T", "Y", "E", "P"]
+  ],
+  answer: "FICKLE",
+  revealedLetter: { row: 1, col: 5, letter: "I" }, // Original col index
+  clues: [
+    { position: 1, description: "I’m the only grade you fear and the start of fun!" },
+    { position: 5, description: "It belongs to the first half of the alphabetical order." },
+    { position: 6, description: "The most used letter, but I stay silent in ‘queue’." }
+  ]
+},
+  {
   date: "2025-05-20", // Set your desired date
   grid: [
     ["B", "R", "Z", "K", "C", "I"],
