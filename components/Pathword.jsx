@@ -78,6 +78,24 @@ const helpSlidesData = [
 // Daily puzzles data
 const dailyPuzzles = [
   {
+  date: "2025-05-22", // Day 1
+  grid: [
+    ["X", "C", "T", "M", "P", "W"], 
+    ["R", "E", "O", "R", "H", "L"], 
+    ["A", "Y", "F", "G", "J", "K"], 
+    ["L", "T", "M", "L", "R", "N"], 
+    ["S", "E", "C", "L", "V", "R"], 
+    ["Z", "Y", "S", "N", "R", "E"]  
+  ],
+  answer: "WHALES",
+  revealedLetter: { row: 2, col: 0, letter: "A" }, // Original col index
+  clues: [
+    { position: 2, description: "I’m silent in 'hour', but loud in ‘haha'" },
+    { position: 4, description: "It belongs to the first half of the alphabetical order." },
+    { position: 6, description: "I make things plural." },
+  ]
+},
+  {
   date: "2025-05-21", // Set your desired date
   grid: [
     ["T", "S", "F", "M", "D", "J"],
