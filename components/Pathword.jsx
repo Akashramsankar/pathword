@@ -77,6 +77,24 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+   {
+  date: "2025-05-23", // Day 2
+  grid: [
+    ["X", "D", "R", "M", "B", "C"], 
+    ["O", "G", "H", "I", "J", "L"], 
+    ["Y", "A", "R", "C", "N", "G"], 
+    ["Z", "K", "E", "L", "I", "D"], 
+    ["W", "R", "A", "N", "L", "E"], 
+    ["Q", "E", "Y", "R", "S", "L"]  
+  ],
+  answer: "MONKEY",
+  revealedLetter: { row: 1, col: 0, letter: "O" }, // Original col index
+  clues: [
+    { position: 3, description: "Without me, ‘never’ is ever." },
+    { position: 5, description: "It's one of the vowels in the row" },
+    { position: 6, description: "I end ‘happy’ and ask ‘why’" }
+  ]
+},
   {
   date: "2025-05-22", // Day 1
   grid: [
@@ -307,6 +325,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
+      //return "2025-05-23";
     };
 
   const findTodaysPuzzle = useCallback(() => {
