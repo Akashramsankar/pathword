@@ -77,6 +77,60 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  {
+  date: "2025-05-26", // Set your desired date
+  grid: [
+    ["A", "P", "N", "B", "X", "T"], 
+    ["U", "E", "R", "L", "Q", "M"],  
+    ["X", "Y", "Z", "Q", "R", "B"], 
+    ["D", "E", "I", "T", "Y", "S"],  
+    ["L", "M", "N", "O", "Z", "A"],  
+    ["Y", "R", "U", "S", "W", "E"]   
+  ],
+  answer: "BUREAU",
+  revealedLetter: { row: 2, col: 4, letter: "R" }, // Original col index
+  clues: [
+    { position: 2, description: "I follow Q everywhere." },
+    { position: 4, description: "It's one of the vowels in the row" },
+    { position: 5, description: "I’m so extra, I show up twice in ‘alphabet’." },
+  ]
+},
+    {
+  date: "2025-05-25", 
+  grid: [
+    ["H", "R", "D", "P", "X", "A"], 
+    ["R", "E", "L", "A", "Z", "I"], 
+    ["A", "R", "S", "T", "V", "B"], 
+    ["M", "I", "L", "U", "Y", "R"], 
+    ["A", "C", "D", "F", "T", "G"],
+    ["E", "H", "S", "Y", "W", "O"]  
+  ],
+  answer: "HABITS",
+  revealedLetter: { row: 1, col: 3, letter: "A" }, // Original col index
+  clues: [
+    { position: 2, description: "It's one of the vowels in the row" },
+    { position: 4, description: "I’m the only letter that’s all about me!" },
+    { position: 6, description: "A hissing sound, or a plural ending." }
+  ]
+},
+  {
+  date: "2025-05-24", // Day 4
+  grid: [
+    ["A", "B", "S", "R", "E", "X"], 
+    ["N", "M", "I", "L", "O", "Y"], 
+    ["Q", "W", "H", "Z", "X", "E"], 
+    ["R", "S", "T", "K", "L", "W"], 
+    ["L", "E", "G", "R", "A", "Z"], 
+    ["R", "Y", "S", "E", "T", "V"]  
+  ],
+  answer: "EMERGE",
+  revealedLetter: { row: 2, col: 5, letter: "E" }, // Original col index
+  clues: [
+    { position: 2, description: "It's one of the consonants in the row" },
+    { position: 5, description: "Without me, you just 'ame' at any game." },
+    { position: 6, description: "Same as the first letter!" }
+  ]
+},
    {
   date: "2025-05-23", // Day 2
   grid: [
@@ -325,7 +379,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-05-23";
+      //return "2025-05-26";
     };
 
   const findTodaysPuzzle = useCallback(() => {
@@ -396,6 +450,10 @@ export default function Pathword() {
   const CELL_SIZE_APPROX = 56;
   const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-"; // New localStorage key prefix
 
+  const UNLOCKED_CLUES_KEY_PREFIX = "pathwordUnlockedClues-";
+  const FLIPPED_CLUES_KEY_PREFIX = "pathwordFlippedClues-";
+
+
 
 
   // Refs
@@ -403,26 +461,64 @@ export default function Pathword() {
   const cellRefs = useRef({}); // Keyed by `row-originalCol`
   const feedbackTimeoutRef = useRef(null);
 
-  // Memoize availablePuzzleDates
+  // At the top of your component
+const isInitialMount = useRef(true);
+
+
+  // Memoize availablePuzzleDates and filter them
   const availablePuzzleDates = useMemo(() => {
-    // Ensure dailyPuzzles is defined and is an array
     if (!Array.isArray(dailyPuzzles)) {
-        console.error("dailyPuzzles is not an array or is undefined");
-        return []; // Return empty array or handle error appropriately
+      console.error("dailyPuzzles is not an array or is undefined");
+      return [];
     }
-    return dailyPuzzles.map(p => p.date);
-  }, []); // Dependency array is empty because dailyPuzzles is a constant defined outside the component
+    const todayStr = getTodayString(); // Get today's date in YYYY-MM-DD format
+    return dailyPuzzles
+      .map(p => p.date)
+      .filter(dateStr => dateStr <= todayStr) // Only include dates up to and including today
+      .sort((a, b) => new Date(b) - new Date(a)); // Sort them newest first after filtering
+  }, []); // Recalculate if dailyPuzzles or getTodayString were to change (they are stable here)
 
 
   // Effects
 
-  // Effect to update currentPuzzle and reset game state when selectedDate changes
-  useEffect(() => {
+  // Effect to save unlockedClues to localStorage
+useEffect(() => {
+  if (currentPuzzle && currentPuzzle.date) {
+    const puzzleDate = currentPuzzle.date;
+    const unlockedCluesStorageKey = `${UNLOCKED_CLUES_KEY_PREFIX}${puzzleDate}`;
+    if(unlockedClues.length > 0){
+      console.log("Setting unlockedClues as ",JSON.stringify(unlockedClues));
+      localStorage.setItem(unlockedCluesStorageKey, JSON.stringify(unlockedClues));
+    }
+  }
+}, [unlockedClues, currentPuzzle.date]);
+
+// Effect to save flippedClues to localStorage
+useEffect(() => {
+  if (currentPuzzle && currentPuzzle.date) {
+    const puzzleDate = currentPuzzle.date;
+    const flippedCluesStorageKey = `${FLIPPED_CLUES_KEY_PREFIX}${puzzleDate}`;
+    if(flippedClues.length > 0){
+      localStorage.setItem(flippedCluesStorageKey, JSON.stringify(flippedClues));
+    }
+  }
+}, [flippedClues, currentPuzzle.date]);
+
+
+  //Effect to update currentPuzzle and reset game state when selectedDate changes
+useEffect(() => {
+  if (isInitialMount.current && selectedDate === getTodayString()) { // Or a more robust check if selectedDate could init to something else
+    // For the very first load where selectedDate is initialized to today,
+    // let the main data loading effect handle everything. Don't reset here.
+    console.log(`EFFECT (selectedDate): Initial mount with selectedDate ${selectedDate}. Skipping reset.`);
+    isInitialMount.current = false; // Mark initial mount as done
+  } else {
+    // This is for actual user-driven date changes
+    console.log(`EFFECT (selectedDate): selectedDate changed to: ${selectedDate}. Resetting transient game state.`);
     const newPuzzle =
       dailyPuzzles.find((p) => p.date === selectedDate) || dailyPuzzles[0];
     setCurrentPuzzle(newPuzzle);
 
-    // Reset game state for the newly selected puzzle
     setSelectedPath([]);
     setUnlockedClues([]);
     setFlippedClues([]);
@@ -432,12 +528,10 @@ export default function Pathword() {
     setGameState({ status: "playing", points: 100 });
     setCurrentClueIndex(0);
     setIncrementTryOnNextSelection(true); // Ready for the first try of this selected puzzle
-    // Try count for the new puzzle will be loaded in the main data loading useEffect
+    isInitialMount.current = false; // Also set here in case selectedDate initializes to something other than today
+  }
+}, [selectedDate]);
 
-    // Note: The main data loading useEffect (that depends on currentPuzzle.date/grid)
-    // will handle loading localStorage data (solved status, column map, try count)
-    // for this newPuzzle.
-  }, [selectedDate]); // Run when selectedDate changes
 
   useEffect(
     () => () => {
@@ -509,6 +603,42 @@ export default function Pathword() {
       localStorage.setItem(columnMapStorageKey, JSON.stringify(parsedMapping));
     }
     setColumnMapping(parsedMapping); // This is the setState call
+
+    // --- *** NEW: Load Unlocked and Flipped Clues *** ---
+  const unlockedCluesStorageKey = `${UNLOCKED_CLUES_KEY_PREFIX}${puzzleDate}`;
+  const storedUnlockedClues = localStorage.getItem(unlockedCluesStorageKey);
+  if (storedUnlockedClues) {
+    console.log("There is stored unlock");
+    try {
+      const parsedUnlocked = JSON.parse(storedUnlockedClues);
+      if (Array.isArray(parsedUnlocked)) {
+        setUnlockedClues(parsedUnlocked);
+      }
+    } catch (e) {
+      console.error("Failed to parse unlocked clues:", e);
+      localStorage.removeItem(unlockedCluesStorageKey); // Remove corrupted data
+    }
+  } else {
+        console.log("There is no stored unlock");
+
+    setUnlockedClues([]); // Default to no clues unlocked if nothing in storage
+  }
+
+  const flippedCluesStorageKey = `${FLIPPED_CLUES_KEY_PREFIX}${puzzleDate}`;
+  const storedFlippedClues = localStorage.getItem(flippedCluesStorageKey);
+  if (storedFlippedClues) {
+    try {
+      const parsedFlipped = JSON.parse(storedFlippedClues);
+      if (Array.isArray(parsedFlipped)) {
+        setFlippedClues(parsedFlipped);
+      }
+    } catch (e) {
+      console.error("Failed to parse flipped clues:", e);
+      localStorage.removeItem(flippedCluesStorageKey); // Remove corrupted data
+    }
+  } else {
+    setFlippedClues([]); // Default to no clues flipped
+  }
 
     // *** NEW: Check if already solved today ***
     const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${puzzleDate}`;
@@ -1004,114 +1134,130 @@ export default function Pathword() {
     }
   }
 
-  // --- Share Functionality: Updated for Path Concept & Emoji Grid ---
-  const handleShare = async () => {
-    if (isCopying || !columnMapping) return; // isCopying also prevents re-entry while native share is open
 
-    // Set isCopying to true to disable button, but we won't show "Copying..." if native share is used.
-    // The button text change will be managed by the shareFeedback or the copyToClipboard's internal isCopying.
-    // A more robust way would be a general "isSharing" state.
-    // For now, let's use isCopying to disable the button.
-    setIsCopying(true); // Disable button during any share operation
-    setShareFeedback(""); // Clear previous feedback
+ // Pathword.jsx
 
-    const cluesUsed = unlockedClues.length;
-    let achievementText = "";
-    if (cluesUsed === 0) achievementText = "flawlessly with NO clues! 🏅";
-    else if (cluesUsed === 1) achievementText = "with just 1 clue! ✨";
-    else achievementText = `using ${cluesUsed} clues!`;
+const handleShare = async () => {
+  if (isCopying || !columnMapping) return;
+  setIsCopying(true);
+  setShareFeedback("");
 
-    let pathGridEmoji = "";
-    // ... (emoji grid generation remains the same) ...
-    const gridRows = currentPuzzle.grid.length;
-    const gridCols = currentPuzzle.grid[0]?.length || 0;
+  const cluesUsedArray = unlockedClues.map(clueIndex => currentPuzzle.clues[clueIndex]);
+  const cluesUsedCount = unlockedClues.length;
 
-    for (let r = 0; r < gridRows; r++) {
-      for (let dc = 0; dc < gridCols; dc++) {
-        let originalColAtThisDisplaySlot = -1;
-        for (let i = 0; i < columnMapping.length; i++) {
-          if (columnMapping[i] === dc) {
-            originalColAtThisDisplaySlot = i;
-            break;
-          }
+  // --- Achievement Text ---
+  let achievementText = "";
+  if (cluesUsedCount === 0) achievementText = "flawlessly with NO clues! 🏅";
+  else if (cluesUsedCount === 1) achievementText = "with just 1 clue! ✨";
+  else achievementText = `using ${cluesUsedCount} clues!`;
+
+  // --- Streak Information ---
+  let streakText = "";
+  // userStats.streak should be up-to-date if checkAnswer ran and it was today's puzzle
+  if (userStats.streak > 1 && currentPuzzle.date === getTodayString()) { // Only show streak for today's puzzle result
+    streakText = `\n🔥 Current Streak: ${userStats.streak} days!`;
+  }
+
+  // --- Emoji Grid Generation (as per previous correct implementation) ---
+  let pathGridEmoji = "";
+  const gridRows = currentPuzzle.grid.length;
+  const gridCols = currentPuzzle.grid[0]?.length || 0;
+  const rowsWithUnlockedClues = new Set(
+    cluesUsedArray.map(clue => clue.position - 1)
+  );
+
+  for (let r = 0; r < gridRows; r++) {
+    for (let dc = 0; dc < gridCols; dc++) {
+      let originalColAtThisDisplaySlot = -1;
+      for (let i = 0; i < columnMapping.length; i++) {
+        if (columnMapping[i] === dc) {
+          originalColAtThisDisplaySlot = i;
+          break;
         }
-        const pathIndex = selectedPath.findIndex(
-          (p) => p.row === r && p.col === originalColAtThisDisplaySlot
+      }
+      const pathCellData = selectedPath.find(
+        (p) => p.row === r && p.col === originalColAtThisDisplaySlot
+      );
+
+      if (pathCellData) {
+        let colorEmoji = rowsWithUnlockedClues.has(r) ? "🟨" : "🟩";
+        const currentPathItemIndex = selectedPath.findIndex(
+            (p) => p.row === pathCellData.row && p.col === pathCellData.col
         );
-        if (pathIndex !== -1) {
-          if (pathIndex === selectedPath.length - 1) {
-            pathGridEmoji += "🎯";
-          } else {
-            const nextPathItemOriginalCol = selectedPath[pathIndex + 1].col;
-            const nextPathItemDisplayCol =
-              columnMapping[nextPathItemOriginalCol];
-            if (nextPathItemDisplayCol < dc) pathGridEmoji += "↙️";
-            else if (nextPathItemDisplayCol > dc) pathGridEmoji += "↘️";
-            else pathGridEmoji += "⬇️";
-          }
+
+        if (currentPathItemIndex === selectedPath.length - 1) {
+          pathGridEmoji += colorEmoji + "🎯";
+        } else if (currentPathItemIndex !== -1) {
+          const nextPathItemOriginalCol = selectedPath[currentPathItemIndex + 1].col;
+          const nextPathItemDisplayCol = columnMapping[nextPathItemOriginalCol];
+          let directionEmoji = "";
+          if (nextPathItemDisplayCol < dc) directionEmoji = "↙️";
+          else if (nextPathItemDisplayCol > dc) directionEmoji = "↘️";
+          else directionEmoji = "⬇️";
+          pathGridEmoji += colorEmoji + directionEmoji;
         } else {
-          pathGridEmoji += "⬜";
+           pathGridEmoji += colorEmoji;
         }
+      } else {
+        pathGridEmoji += "⬜";
       }
-      if (r < gridRows - 1) pathGridEmoji += "\n";
+      // Optional: if (dc < gridCols - 1) pathGridEmoji += " ";
     }
+    if (r < gridRows - 1) pathGridEmoji += "\n";
+  }
 
-    const shareTitle = `Pathword Result - ${getTodayString()}`;
-    const shareTextForNative = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey (${tryCount} ${
-      tryCount === 1 ? "try" : "tries"
-    }):\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course!\n#PathwordGame #DailyPuzzle`;
-    const gameUrl = GAME_URL;
-    const fullClipboardText = `I navigated today's Pathword ${getTodayString()}! 🗺️\n\nMy Journey (${tryCount} ${
-      tryCount === 1 ? "try" : "tries"
-    }):\n${pathGridEmoji}\n\nSolved ${achievementText}\n\nChart your own course: ${gameUrl}\n#PathwordGame #DailyPuzzle #BrainTeaser`;
+  // --- Construct Share Text ---
+  const shareTitle = `Pathword: ${currentPuzzle.date}`; // Or getTodayString() if always today's
+  
+  // Main body text
+  let mainShareBody = `I navigated Pathword for ${currentPuzzle.date}! 🗺️\n\nMy Journey:\n${pathGridEmoji}\n\nSolved ${achievementText}`;
+  
+  if (streakText) {
+    mainShareBody += streakText;
+  }
 
-    gtag.event({
-      action: "share_attempted",
-      category: "Engagement",
-      label: navigator.share ? "Native Share" : "Clipboard Copy",
-    });
+  const gameUrl = GAME_URL;
+  const hashtags = "\n#PathwordGame #DailyPuzzle #BrainTeaser";
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: shareTitle,
-          text: shareTextForNative,
-          url: gameUrl,
-        });
-        setShareFeedback("Shared!"); // Or no feedback if native UI is enough
-        // setIsCopying(false) will be handled by a finally block or timeout
-      } catch (err) {
-        console.error("Error sharing:", err);
-        if (err.name !== "AbortError") {
-          // If native share fails (not due to user cancellation), fall back to clipboard
-          setShareFeedback("Share failed. Copied to clipboard instead.");
-          await copyToClipboard(fullClipboardText); // copyToClipboard will handle its own isCopying and feedback
-          return; // Exit early as copyToClipboard handles its own timeouts for isCopying
-        } else {
-          setShareFeedback(""); // User cancelled, clear any pending feedback
-        }
-      } finally {
-        // Reset isCopying after a short delay to allow native share UI to dismiss
-        // or to allow clipboard success message to show.
-        // This timeout needs to be carefully managed.
-        // If copyToClipboard was called, it handles its own timeout.
-        // If only navigator.share was used:
-        if (
-          navigator.share &&
-          !(Error.name === "AbortError" && shareFeedback.includes("Copied"))
-        ) {
-          setTimeout(() => {
-            setIsCopying(false);
-            setShareFeedback("");
-          }, 1500);
-        }
+  const fullShareText = `${mainShareBody}\n\nChart your own course: ${gameUrl}${hashtags}`;
+  // Text for native share might be slightly shorter if preferred, omitting some hashtags or the URL if it's in the URL field
+  const nativeShareText = `${mainShareBody}\n\nChart your own course!${hashtags}`;
+
+
+  gtag.event({
+    action: "share_attempted",
+    category: "Engagement",
+    label: navigator.share ? "Native Share" : "Clipboard Copy",
+  });
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: shareTitle,
+        text: nativeShareText, // Text for the native share dialog's body
+        url: gameUrl,          // URL to be shared
+      });
+      setShareFeedback("Shared!");
+    } catch (err) {
+      console.error("Error sharing:", err);
+      if (err.name !== "AbortError") {
+        setShareFeedback("Share failed. Copied to clipboard instead.");
+        await copyToClipboard(fullShareText); // Fallback to full text for clipboard
+        return;
+      } else {
+        setShareFeedback("");
       }
-    } else {
-      // Fallback to Clipboard Copy
-      await copyToClipboard(fullClipboardText);
-      // copyToClipboard will manage setIsCopying(false) via its own setTimeout
+    } finally {
+      // Reset isCopying state
+      if (navigator.share && !(Error.name === "AbortError" && shareFeedback.includes("Copied"))) {
+        setTimeout(() => { setIsCopying(false); setShareFeedback(""); }, 1500);
+      }
     }
-  };
+  } else {
+    // Fallback to Clipboard Copy using the full text
+    await copyToClipboard(fullShareText);
+  }
+};
 
   // --- UI Rendering Functions ---
   const renderGrid = () => {
