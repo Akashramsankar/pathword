@@ -78,6 +78,24 @@ const helpSlidesData = [
 // Daily puzzles data
 const dailyPuzzles = [
   {
+  date: "2025-05-27", // Set your desired date
+  grid: [
+    ["T", "B", "L", "D", "Q", "W"],  
+    ["X", "Y", "Z", "Q", "I", "J"],  
+    ["S", "C", "A", "M", "V", "L"],  
+    ["O", "E", "K", "N", "W", "H"],  
+    ["V", "A", "O", "R", "X", "M"], 
+    ["S", "T", "E", "P", "Z", "Y"]   
+  ],
+  answer: "BISHOP",
+  revealedLetter: { row: 1, col: 4, letter: "I" }, // Original col index
+  clues: [
+    { position: 3, description: "I hiss, I slither. What letter" },
+    { position: 5, description: "It's one of the vowels in the row." },
+    { position: 6, description: "Wanna start a 'party'? You literally need me." }
+  ]
+},
+  {
   date: "2025-05-26", // Set your desired date
   grid: [
     ["A", "P", "N", "B", "X", "T"], 
