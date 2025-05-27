@@ -77,6 +77,26 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "GARLIC"
+{
+  date: "2025-05-28", // Set your desired date
+  grid: [
+    ["R", "G", "X", "M", "P", "A"],  
+    ["L", "E", "Y", "I", "A", "R"],  
+    ["R", "E", "Z", "H", "O", "K"],  
+    ["O", "P", "W", "U", "V", "L"],  
+    ["V", "W", "I", "X", "Y", "Z"],  
+    ["R", "Y", "Z", "C", "S", "N"]   
+  ],
+  answer: "GARLIC",
+  revealedLetter: { row: 4, col: 2, letter: "I" }, // Original col index
+  clues: [
+    { position: 2, description: "I lead the line and still steal the spotlight. Which letter am I?" },
+    { position: 3, description: "Starts 'ride', ends 'never'. Who am I?" },
+    { position: 6, description: "I start ‘chaos’ and casually act innocent." }
+  ]
+},
+
   {
   date: "2025-05-27", // Set your desired date
   grid: [
