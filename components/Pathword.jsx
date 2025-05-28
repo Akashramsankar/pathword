@@ -89,6 +89,7 @@ const dailyPuzzles = [
     ["S", "R", "N", "E", "Z", "Y"]   
   ],
   answer: "DABBLE",
+  revealedLetter: { row: 1, col: 4, letter: "A" }, // Original col index
   clues: [
     { position: 3, description: "If you take me out of 'bold', you will just be old." },
     { position: 4, description: "I am an identical twin of the 3rd letter." },
