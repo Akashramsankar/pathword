@@ -77,6 +77,24 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "DABBLE"
+{
+  date: "2025-05-29", // Set your desired date
+  grid: [
+    ["L", "D", "E", "R", "Q", "W"],  
+    ["X", "Y", "Z", "C", "A", "Q"],  
+    ["B", "R", "I", "T", "Z", "L"],  
+    ["A", "N", "O", "P", "V", "B"],  
+    ["S", "T", "L", "R", "W", "O"],  
+    ["S", "R", "N", "E", "Z", "Y"]   
+  ],
+  answer: "DABBLE",
+  clues: [
+    { position: 3, description: "If you take me out of 'bold', you will just be old." },
+    { position: 4, description: "I am an identical twin of the 3rd letter." },
+    { position: 6, description: "I start 'everything'. Literally!" }
+  ]
+},
   // For "GARLIC"
 {
   date: "2025-05-28", // Set your desired date
