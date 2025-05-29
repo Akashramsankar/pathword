@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "NORMAL"
+{
+  date: "2025-05-30", // Set your desired date
+  grid: [
+    ["Z", "T", "N", "Q", "P", "C"],  
+    ["Y", "L", "U", "R", "H", "O"], 
+    ["X", "R", "A", "I", "L", "G"],  
+    ["W", "I", "E", "M", "N", "S"],  
+    ["A", "Z", "Y", "X", "W", "V"],  
+    ["V", "R", "Y", "S", "L", "T"]  
+  ],
+  answer: "NORMAL",
+  revealedLetter: { row: 4, col: 0, letter: "A" }, // Original col index
+  clues: [
+    { position: 2, description: "A round vowel, can also mean zero." },
+    { position: 4, description: "Looks like two mountains together!" },
+    { position: 6, description: "Starts ‘legend’, ends ‘cool’. What letter?" }
+  ]
+},
   // For "DABBLE"
 {
   date: "2025-05-29", // Set your desired date
