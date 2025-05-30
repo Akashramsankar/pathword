@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "QUIRKY"
+{
+  date: "2025-05-31", // Set your desired date
+  grid: [
+    ["T", "Q", "D", "L", "M", "Z"], 
+    ["A", "Y", "R", "U", "H", "Y"],  
+    ["I", "R", "O", "S", "T", "Q"],  
+    ["Z", "Y", "X", "Q", "W", "R"],  
+    ["V", "E", "K", "R", "T", "Y"],  
+    ["S", "P", "E", "N", "Y", "X"]  
+  ],
+  answer: "QUIRKY",
+  revealedLetter: { row: 3, col: 5, letter: "R" }, // Original col index
+  clues: [
+    { position: 2, description: "Without me, there’s no ‘you’. What letter?" },
+    { position: 3, description: "I stand tall, one line — that’s all." },
+    { position: 6, description: "'Why?'" }
+  ]
+},
   // For "NORMAL"
 {
   date: "2025-05-30", // Set your desired date
