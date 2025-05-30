@@ -1727,7 +1727,7 @@ const handleShare = async () => {
                       {userStats.streak}
                     </div>{" "}
                     <div className="text-xs uppercase text-emerald-600 font-medium tracking-wide">
-                      Path Streak
+                      Current Streak
                     </div>{" "}
                   </div>{" "}
                   <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
@@ -1763,7 +1763,7 @@ const handleShare = async () => {
                   </div>
                 </div>
                 <h3 className="text-center font-semibold mb-3 text-gray-700 text-sm">
-                  Explorer's Log{" "}
+                  Path's found {" "}
                   <span className="font-normal text-gray-500">
                     (by clues used)
                   </span>{" "}
