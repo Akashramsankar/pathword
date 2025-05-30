@@ -537,7 +537,7 @@ export default function Pathword() {
   const [columnMapping, setColumnMapping] = useState(null); // Stores mapping: originalColIndex -> displayColIndex
 
   // Constants
-  const GAME_URL = "bit.ly/pathword"; // <<< --- REPLACE WITH YOUR ACTUAL GAME URL
+  const GAME_URL = "https://akashramsankar.github.io/pathword/"; // <<< --- REPLACE WITH YOUR ACTUAL GAME URL
   const STATS_KEY = "pathwordUserStats";
   const HELP_VIEWED_KEY = "pathwordHelpViewed";
   const COLUMN_MAP_KEY_PREFIX = "pathwordColMap-"; // For localStorage
