@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // Revised For "DETECT"
+{
+  date: "2025-06-01",
+  grid: [
+    ["A", "S", "D", "Y", "G", "Z"],  
+    ["O", "R", "L", "M", "E", "Y"],  
+    ["T", "A", "P", "V", "U", "X"], 
+    ["U", "V", "W", "X", "Y", "E"],  
+    ["A", "C", "R", "N", "F", "V"],  
+    ["S", "Y", "O", "T", "L", "W"]   
+  ],
+  answer: "DETECT",
+  revealedLetter: { row: 3, col: 5, letter: "E" }, // Original col index
+   clues: [
+    { position: 2, description: "In ‘deep’, I double down. In ‘empty’, I vanish." },
+    { position: 3, description: "Hot and strong, I’m the only letter you can sip. Who am I?" },
+    { position: 6, description: "Repeats the third letter of this word!" }
+  ]
+},
   // For "QUIRKY"
 {
   date: "2025-05-31", // Set your desired date
@@ -474,7 +493,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-05-26";
+      //return "2025-06-01";
     };
 
   const findTodaysPuzzle = useCallback(() => {
