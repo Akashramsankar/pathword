@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "RACING"
+{
+  date: "2025-05-02", // Set your desired date
+  grid: [
+    ["T", "R", "W", "L", "P", "X"],  
+    ["R", "I", "Y", "H", "A", "Y"],  
+    ["C", "S", "G", "I", "F", "Z"],  
+    ["Z", "Y", "X", "V", "W", "I"],  
+    ["E", "R", "N", "V", "T", "V"],  
+    ["Y", "E", "A", "G", "S", "W"]   
+  ],
+  answer: "RACING",
+  revealedLetter: { row: 3, col: 5, letter: "I" }, // Original col index
+  clues: [
+    { position: 2, description: "The first vowel, signifies a top grade." },
+    { position: 5, description: "I start 'nothing'!" },
+    { position: 6, description: "From ‘gold’ to ‘garbage’ — I’m everywhere." }
+  ]
+},
   // Revised For "DETECT"
 {
   date: "2025-06-01",
