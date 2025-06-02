@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "CLOSET"
+{
+  date: "2025-06-03", // Set your desired date
+  grid: [
+    ["D", "B", "Z", "C", "P", "Z"],  
+    ["L", "A", "H", "Y", "R", "Y"],  
+    ["I", "N", "G", "U", "O", "X"],  
+    ["T", "S", "E", "K", "V", "W"],  
+    ["X", "Y", "Z", "W", "V", "E"],  
+    ["S", "R", "T", "Y", "M", "W"]   
+  ],
+  answer: "CLOSET",
+  revealedLetter: { row: 4, col: 5, letter: "E" }, // Original col index
+  clues: [
+    { position: 2, description: "Start of ‘laugh’, end of ‘cool’. What letter?" },
+    { position: 4, description: "Without me, ‘smile’ becomes ‘mile’. Guess me!" },
+    { position: 6, description: "A hot beverage, or a type of shirt." }
+  ]
+},
   // For "RACING"
 {
   date: "2025-06-02", // Set your desired date
