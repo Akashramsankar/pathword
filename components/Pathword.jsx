@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "WINNER"
+{
+  date: "2025-06-04", // Set your desired date
+  grid: [
+    ["A", "W", "Z", "L", "D", "M"],  
+    ["Y", "R", "V", "O", "I", "L"],  
+    ["N", "I", "X", "L", "U", "S"],  
+    ["A", "E", "W", "V", "K", "N"],  
+    ["Z", "Y", "E", "X", "W", "V"], 
+    ["Y", "S", "H", "R", "N", "A"]   
+  ],
+  answer: "WINNER",
+  revealedLetter: { row: 4, col: 2, letter: "E" }, // Original col index
+  clues: [
+    { position: 2, description: "A personal pronoun, or a single vertical line." },
+    { position: 3, description: "Often found at the end of 'sun' or 'run'." },
+    { position: 6, description: "Without me, ‘rain’ is just ‘ain’. Weird, right?" }
+  ]
+},
   // For "CLOSET"
 {
   date: "2025-06-03", // Set your desired date
