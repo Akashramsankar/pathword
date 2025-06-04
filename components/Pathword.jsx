@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "PLIGHT"
+{
+  date: "2025-06-05", // Set your desired date
+  grid: [
+    ["K", "P", "C", "B", "Z", "U"],  
+    ["A", "N", "E", "R", "Y", "L"],  
+    ["I", "O", "M", "G", "X", "R"],  
+    ["S", "T", "U", "G", "Q", "W"],  
+    ["S", "C", "H", "A", "W", "N"], 
+    ["Z", "Y", "X", "W", "T", "V"]   
+  ],
+  answer: "PLIGHT",
+  revealedLetter: { row: 5, col: 4, letter: "T" }, // Original col index
+  clues: [
+    { position: 2, description: "A tall letter, often found in 'like' or 'love'." },
+    { position: 3, description: "A personal pronoun, or stands for 'one'." },
+    { position: 5, description: "A breathy sound, or found at the start of 'hat'." },
+  ]
+},
   // For "WINNER"
 {
   date: "2025-06-04", // Set your desired date
@@ -550,7 +569,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-06-01";
+      //return "2025-06-05";
     };
 
   const findTodaysPuzzle = useCallback(() => {
