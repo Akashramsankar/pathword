@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "DIVINE" - Revised
+{
+  date: "2025-06-06",
+  grid: [
+    ["X", "T", "D", "G", "P", "Q"],  
+    ["Y", "R", "U", "L", "A", "I"],  
+    ["X", "V", "A", "C", "F", "U"], 
+    ["Z", "T", "E", "I", "K", "S"],  
+    ["N", "Z", "Y", "X", "V", "W"],  
+    ["Q", "Y", "Z", "S", "E", "T"]   
+  ],
+  answer: "DIVINE",
+  revealedLetter: { row: 4, col: 0, letter: "N" }, // Original col index
+    clues: [
+    { position: 2, description: "Roman numeral for one. Which letter?" },
+    { position: 4, description: "Repeats the second letter of this word." },
+    { position: 6, description: "The most frequent vowel in English. Who am I?" }
+  ]
+},
   // For "PLIGHT"
 {
   date: "2025-06-05", // Set your desired date
@@ -569,7 +588,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-06-05";
+      //return "2025-06-06";
     };
 
   const findTodaysPuzzle = useCallback(() => {
