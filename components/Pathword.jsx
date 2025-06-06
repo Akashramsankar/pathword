@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "BEFORE"
+{
+  date: "2025-06-07", // Set your desired date
+  grid: [
+    ["A", "B", "Y", "P", "Q", "W"],
+    ["H", "I", "R", "L", "Y", "E"],  
+    ["F", "N", "C", "D", "Z", "O"], 
+    ["I", "J", "K", "O", "X", "S"], 
+    ["T", "U", "R", "V", "W", "N"],  
+    ["Y", "Z", "X", "Q", "E", "W"]   
+  ],
+  answer: "BEFORE",
+  revealedLetter: { row: 5, col: 4, letter: "E" }, // Original col index
+  clues: [
+    { position: 2, description: "Often found at the start of 'end'." },
+    { position: 4, description: "A round vowel, or can mean 'zero'." },
+    { position: 5, description: "I chase Q and race past S. Who am I?" },
+  ]
+},
   // For "DIVINE" - Revised
 {
   date: "2025-06-06",
@@ -588,7 +607,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-06-06";
+      //return "2025-06-07";
     };
 
   const findTodaysPuzzle = useCallback(() => {
