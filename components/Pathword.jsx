@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "BOOMER" 
+{
+  date: "2025-06-08",
+  grid: [
+    ["C", "B", "Y", "W", "Z", "S"],  
+    ["Z", "Y", "X", "W", "O", "Q"],  
+    ["O", "E", "R", "G", "Y", "M"],  
+    ["A", "J", "K", "L", "U", "M"],  
+    ["P", "T", "E", "S", "X", "U"], 
+    ["N", "S", "H", "R", "Z", "Y"]   
+  ],
+  answer: "BOOMER",
+  revealedLetter: { row: 1, col: 4, letter: "O" }, // Original col index
+  clues: [
+    { position: 1, description: "A buzzing insect. Which letter?" },
+    { position: 3, description: "Repeats the second letter of this word." },
+    { position: 6, description: "I start ‘rush’, ‘risk’, and ‘reckless’. Yeah, I live fast." }
+  ]
+},
   // For "BEFORE"
 {
   date: "2025-06-07", // Set your desired date
@@ -607,7 +626,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-06-07";
+      //return "2025-06-08";
     };
 
   const findTodaysPuzzle = useCallback(() => {
