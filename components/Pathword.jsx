@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "THIRTY"
+{
+  date: "2025-06-09", // Set your desired date
+  grid: [
+    ["C", "T", "W", "P", "Q", "S"],  
+    ["A", "L", "R", "H", "X", "F"],  
+    ["I", "G", "O", "D", "Q", "M"],  
+    ["N", "O", "P", "C", "Z", "R"],  
+    ["R", "V", "T", "S", "X", "O"],  
+    ["Z", "X", "W", "Q", "Y", "F"]   
+  ],
+  answer: "THIRTY",
+  revealedLetter: { row: 5, col: 4, letter: "Y" }, // Original col index
+  clues: [
+    { position: 2, description: "No 'hurry', no 'hype', no 'hugs' without me." },
+    { position: 3, description: "I’m slim, straight, and all about myself. Narcissistic? Maybe." },
+    { position: 5, description: "Without me, there’s no 'tick' or 'tock'. 'Time' would not exist!" },
+  ]
+},
   // For "BOOMER" 
 {
   date: "2025-06-08",
@@ -626,7 +645,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-06-08";
+      //return "2025-06-09";
     };
 
   const findTodaysPuzzle = useCallback(() => {
