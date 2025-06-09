@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "ABSENT"
+{
+  date: "2025-06-10", // Set your desired date
+  grid: [
+    ["M", "V", "Z", "A", "P", "Q"], 
+    ["B", "R", "L", "O", "E", "Z"],  
+    ["N", "O", "U", "G", "S", "X"],  
+    ["H", "E", "I", "V", "L", "Y"],  
+    ["Z", "Y", "X", "Z", "X", "N"],  
+    ["G", "Y", "T", "S", "K", "W"]   
+  ],
+  answer: "ABSENT",
+  revealedLetter: { row: 4, col: 5, letter: "N" }, // Original col index
+  clues: [
+    { position: 1, description: "The first vowel, or an apple's companion." },
+    { position: 4, description: "It starts 'every' 'end'. Which letter?" },
+    { position: 6, description: "Coffee is my nemesis." }
+  ]
+},
   // For "THIRTY"
 {
   date: "2025-06-09", // Set your desired date
@@ -645,7 +664,7 @@ export default function Pathword() {
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
       return localDateString;
-      //return "2025-06-09";
+      //return "2025-06-10";
     };
 
   const findTodaysPuzzle = useCallback(() => {
