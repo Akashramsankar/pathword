@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "TRAVEL"
+{
+  date: "2025-06-11", // Set your desired date
+  grid: [
+    ["X", "Y", "T", "Z", "P", "Q"],  
+    ["H", "W", "Z", "O", "E", "R"],  
+    ["N", "A", "Y", "I", "G", "U"], 
+    ["I", "R", "Q", "V", "M", "S"],  
+    ["E", "L", "X", "T", "C", "A"],  
+    ["Y", "S", "R", "N", "L", "T"]   
+  ],
+  answer: "TRAVEL",
+  revealedLetter: { row: 0, col: 2, letter: "T" }, // Original col index
+  clues: [
+    { position: 4, description: "Looks like the Roman numeral five." },
+    { position: 5, description: "Without me 'severe' is only 3 letters. Which letter am I?"},
+    { position: 6, description: "I start 'long' and end 'tall'"}
+  ]
+},
   // For "ABSENT"
 {
   date: "2025-06-10", // Set your desired date
