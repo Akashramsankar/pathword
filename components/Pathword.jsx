@@ -701,8 +701,8 @@ export default function Pathword() {
 
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
-      //return localDateString;
-      return "2025-06-12";
+      return localDateString;
+      //return "2025-06-12";
     };
 
   const findTodaysPuzzle = useCallback(() => {
