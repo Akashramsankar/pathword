@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+  // For "IGNORE"
+{
+  date: "2025-06-12", // Set your desired date
+  grid: [
+    ["T", "D", "Z", "I", "P", "A"],  
+    ["G", "L", "R", "Y", "O", "R"],  
+    ["N", "A", "X", "U", "N", "D"],  
+    ["E", "O", "V", "P", "M", "K"],  
+    ["L", "M", "W", "T", "S", "R"],  
+    ["Z", "Y", "E", "V", "W", "X"]   
+  ],
+  answer: "IGNORE",
+  revealedLetter: { row: 5, col: 2, letter: "E" }, // Original col index
+  clues: [
+    { position: 2, description: "The 7th letter in the alphabetical order." },
+    { position: 4, description: "A round vowel, or can mean zero." },
+    { position: 5, description: "I start every 'run', 'race', and 'riot'. I’m not calm."},
+  ]
+},
   // For "TRAVEL"
 {
   date: "2025-06-11", // Set your desired date
@@ -682,8 +701,8 @@ export default function Pathword() {
 
       const localDateString = `${year}-${monthFormatted}-${dayFormatted}`;
       // console.log("Local Date String for Puzzle Matching:", localDateString); // For debugging this function
-      return localDateString;
-      //return "2025-06-10";
+      //return localDateString;
+      return "2025-06-12";
     };
 
   const findTodaysPuzzle = useCallback(() => {
