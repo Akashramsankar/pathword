@@ -77,6 +77,25 @@ const helpSlidesData = [
 ];
 // Daily puzzles data
 const dailyPuzzles = [
+    // For "BANKER"
+{
+  date: "2025-06-13", // Set your desired date
+  grid: [
+    ["D", "B", "T", "Z", "P", "Q"], 
+    ["H", "U", "R", "W", "A", "L"], 
+    ["N", "E", "F", "Y", "L", "V"], 
+    ["M", "O", "A", "X", "S", "K"],  
+    ["U", "V", "E", "W", "A", "I"], 
+    ["Z", "Y", "X", "R", "W", "V"]   
+  ],
+  answer: "BANKER",
+  revealedLetter: { row: 5, col: 3, letter: "R" }, // Original col index
+  clues: [ // Clues are for the new mechanics, not hints for the word itself
+    { position: 1, description: "A bouncy letter, or begins 'blue'." },
+    { position: 3, description: "I start every 'nap', but never in sleep." },
+    { position: 5, description: "I am the start and end of 'everyone'!" },
+  ]
+},
   // For "IGNORE"
 {
   date: "2025-06-12", // Set your desired date
@@ -1077,6 +1096,8 @@ useEffect(() => {
 
   // --- (Rest of stats, path calculation, core game logic functions remain largely the same,
   // but ensure they use ORIGINAL column indices for selectedPath and rules) ---
+
+  
 
   const saveStats = (stats) => {
     try {
