@@ -620,38 +620,31 @@ const dailyPuzzles = [
 
 
 function DateSelector({ availableDates, selectedDate, onDateChange }) {
+  // Sort dates for display, newest first if not already
   const sortedDates = [...availableDates].sort((a, b) => new Date(b) - new Date(a));
 
   const formatDateForDisplay = (dateStr) => {
-    const dateObj = new Date(dateStr + 'T00:00:00Z');
+    const dateObj = new Date(dateStr + 'T00:00:00'); // Ensure local timezone interpretation
     const today = new Date();
-    today.setUTCHours(0,0,0,0);
+    today.setHours(0,0,0,0);
     const yesterday = new Date(today);
-    yesterday.setUTCDate(today.getUTCDate() - 1);
+    yesterday.setDate(today.getDate() - 1);
 
-    const dateObjYear = dateObj.getUTCFullYear();
-    const dateObjMonth = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-    const dateObjDay = String(dateObj.getUTCDate()).padStart(2, '0');
-    const dateObjYYYYMMDD = `${dateObjYear}-${dateObjMonth}-${dateObjDay}`;
-
-    const todayYYYYMMDD = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, '0')}-${String(today.getUTCDate()).padStart(2, '0')}`;
-    const yesterdayYYYYMMDD = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
-
-    if (dateObjYYYYMMDD === todayYYYYMMDD) return "Today";
-    if (dateObjYYYYMMDD === yesterdayYYYYMMDD) return "Yesterday";
-    return dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+    if (dateObj.getTime() === today.getTime()) return "Today";
+    if (dateObj.getTime() === yesterday.getTime()) return "Yesterday";
+    return dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   return (
     <div className="my-3 md:my-4 flex justify-center items-center relative">
-      <CalendarDays className="h-5 w-5 text-gray-500 mr-2" />
+          <CalendarDays className="h-5 w-5 text-gray-500 mr-2" />
+      
       <select
         value={selectedDate}
         onChange={(e) => onDateChange(e.target.value)}
         className="appearance-none bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm block w-auto
                    py-2.5 pl-3 pr-8 leading-tight hover:border-gray-400 cursor-pointer
-                   focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500
-                   transition-colors duration-150 ease-in-out"
+                   transition-colors duration-150 ease-in-out" // Added appearance-none for custom arrow
         aria-label="Select puzzle date"
       >
         {sortedDates.map((dateStr) => (
@@ -660,8 +653,11 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           </option>
         ))}
       </select>
+      {/* Custom dropdown arrow if appearance-none is used */}
       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.14-.446 1.576 0 .436.445.408 1.197 0 1.642l-3.417 3.356c-.27.272-.63.408-.99.408s-.72-.136-.99-.408L5.516 9.19c-.408-.445-.436-1.197 0-1.642z"/></svg>
+        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.14-.446 1.576 0 .436.445.408 1.197 0 1.642l-3.417 3.356c-.27.272-.63.408-.99.408s-.72-.136-.99-.408L5.516 9.19c-.408-.445-.436-1.197 0-1.642z"/>
+        </svg>
       </div>
     </div>
   );
@@ -677,6 +673,8 @@ export default function Pathword() {
     return `${year}-${month}-${day}`;
     //return '2025-06-14';
   };
+
+  
 
   const findTodaysPuzzle = useCallback(() => {
     const todayString = getTodayString();
@@ -1013,6 +1011,11 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
         const parsedTryCount = parseInt(storedTryCount, 10);
         if (!isNaN(parsedTryCount) && parsedTryCount >= 0) {
           setTryCount(parsedTryCount);
+          if(parsedTryCount >= MAX_TRIES){
+              setGameState({ status: "failed", points: 0 });
+            setFeedbackMessage(`Max tries reached! The answer was: ${currentPuzzle.answer}`);
+            revealCorrectPath();
+          }
         } else {
           setTryCount(0); // Fallback to 0
           localStorage.setItem(tryCountStorageKey, "0"); // Correct invalid storage
@@ -1976,7 +1979,15 @@ const renderSelectedPathPreview = () => {
           </Dialog>
         </div>
       </header>
-      <DateSelector availableDates={availablePuzzleDates} selectedDate={selectedDate} onDateChange={setSelectedDate} />
+      <DateSelector
+        availableDates={availablePuzzleDates}
+        selectedDate={selectedDate}
+        onDateChange={(newDate) => {
+          // Before changing date, consider if you want to save any "in-progress" state for the current date
+          // For now, we assume changing date resets progress for the *previous* date if not submitted.
+          setSelectedDate(newDate);
+        }}
+      />
       
       <main className="flex-grow flex flex-col items-center w-full mt-4">
         {columnMapping ? renderGrid() : <div className="h-96 ...">Shuffling Path...</div>}
