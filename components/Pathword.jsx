@@ -76,6 +76,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "TREMOR"
+{
+  date: "2025-06-15", // Set your desired date
+  grid: [
+    ["A", "G", "T", "L", "P", "Y"],  
+    ["B", "H", "O", "S", "U", "R"], 
+    ["E", "C", "I", "N", "R", "W"],  
+    ["E", "A", "K", "M", "L", "V"],  
+    ["K", "O", "G", "P", "W", "A"], 
+    ["C", "H", "S", "X", "R", "Y"]   
+  ],
+  answer: "TREMOR",
+},
   // For "DESIGN"
 {
   date: "2025-06-14", // Set your desired date
