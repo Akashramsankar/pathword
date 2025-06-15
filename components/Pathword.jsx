@@ -9,6 +9,7 @@ import {
   HelpCircle,
   Share2,
   X as CloseIcon,
+  ChevronDown, // <<<< ADD THIS
   ChevronLeft,
   ChevronRight,
   CalendarDays
@@ -739,6 +740,9 @@ export default function Pathword() {
   const [currentHelpSlide, setCurrentHelpSlide] = useState(0);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
+
+  const [isStatsDistributionOpen, setIsStatsDistributionOpen] = useState(false); // Default to open
+
   const [userStats, setUserStats] = useState({
     streak: 0,
     // Solves will now track tries: { "1": 0, "2": 0, ..., "10": 0, "failed": 0 }
@@ -1833,25 +1837,47 @@ const renderSelectedPathPreview = () => {
 
     {/* "Path Tries This Game" was removed as per your UI reference - it's now in the success/fail message */}
 
-    {/* Solve Distribution by Tries */}
+    {/* Solve Distribution by Tries 
     <h3 className="text-center font-semibold mb-3 text-gray-700 text-sm">
       Solve Distribution <span className="font-normal text-gray-500">(by path tries taken)</span>
-    </h3>
-    <div className="space-y-1.5 text-sm">
-      {/* Iterate from 1 to MAX_TRIES (which is now 6) */}
-      {Array.from({ length: MAX_TRIES }, (_, i) => String(i + 1)).map((triesAttempted) => (
-        <div
-          key={triesAttempted}
-          className="flex justify-between items-center bg-slate-50 px-4 py-2.5 rounded-md border border-slate-200"
-        >
-          <span className="text-gray-600">
-            {triesAttempted}
-          </span>
-          <span className="font-semibold text-emerald-700">
-            {userStats.solvesByTries?.[triesAttempted] || 0}
-          </span>
+    </h3> */}
+    <div className="mt-6 border-t border-gray-200 pt-4"> {/* Added a separator and spacing */}
+      <button
+        onClick={() => setIsStatsDistributionOpen(!isStatsDistributionOpen)}
+        className="flex justify-between items-center w-full text-left py-2 focus:outline-none"
+        aria-expanded={isStatsDistributionOpen}
+        aria-controls="solve-distribution-content"
+      >
+        <h3 className="text-center font-semibold text-gray-700 text-sm">
+          Solve Distribution <span className="font-normal text-gray-500">(by path tries taken)</span>
+        </h3>
+        {/* Chevron icon for collapse/expand indication */}
+        {isStatsDistributionOpen ? (
+          <ChevronDown className="h-5 w-5 text-gray-500 transform transition-transform" />
+        ) : (
+          <ChevronRight className="h-5 w-5 text-gray-500 transform transition-transform" />
+        )}
+      </button>
+
+      {/* Conditionally rendered content */}
+      {isStatsDistributionOpen && (
+        <div id="solve-distribution-content" className="space-y-1.5 text-sm mt-3">
+          {Array.from({ length: MAX_TRIES }, (_, i) => String(i + 1)).map((triesAttempted) => (
+            <div
+              key={triesAttempted}
+              className="flex justify-between items-center bg-slate-50 px-4 py-2.5 rounded-md border border-slate-200"
+            >
+              <span className="text-gray-600">
+                {triesAttempted} {parseInt(triesAttempted) === 1 ? "Try" : "Tries"}:
+              </span>
+              <span className="font-semibold text-emerald-700">
+                {userStats.solvesByTries?.[triesAttempted] || 0}
+              </span>
+            </div>
+          ))}
+          
         </div>
-      ))}
+      )}
     </div>
   </div>
   <DialogFooter className="px-6 pb-6 pt-2 border-t border-gray-200">
