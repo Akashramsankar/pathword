@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "PEPPER"
+{
+  date: "2025-06-17", // Set your desired date
+  grid: [
+    ["L", "P", "G", "B", "S", "Y"],  
+    ["U", "H", "O", "T", "E", "A"],  
+    ["P", "C", "I", "N", "U", "R"],  
+    ["F", "D", "T", "K", "Q", "P"],  
+    ["L", "G", "E", "R", "W", "A"],  
+    ["C", "H", "S", "R", "T", "Y"]   
+  ],
+  answer: "PEPPER",
+},
   // For "PEOPLE"
 {
   date: "2025-06-16", // Set your desired date
