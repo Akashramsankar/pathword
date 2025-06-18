@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "TEMPLE"
+{
+  date: "2025-06-19", // Set your desired date
+  grid: [
+    ["A", "G", "K", "T", "V", "R"], 
+    ["E", "H", "O", "X", "R", "Y"], 
+    ["B", "I", "N", "S", "M", "A"], 
+    ["W", "P", "J", "O", "U", "D"],  
+    ["G", "K", "Q", "V", "A", "L"], 
+    ["H", "M", "E", "R", "W", "S"]   
+  ],
+  answer: "TEMPLE",
+},
   // For "MOUNTS"
 {
   date: "2025-06-18", // Set your desired date
