@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "CANCEL"
+{
+  date: "2025-06-22", // Set your desired date
+  grid: [
+    ["A", "G", "C", "M", "P", "Y"],  
+    ["E", "H", "M", "S", "U", "A"],  
+    ["E", "N", "I", "T", "U", "Z"],  
+    ["N", "J", "K", "C", "D", "V"],  
+    ["E", "O", "G", "R", "W", "B"],  
+    ["A", "H", "S", "X", "L", "Y"]   
+  ],
+  answer: "CANCEL",
+},
   // For "TANGLE"
 {
   date: "2025-06-21", // Set your desired date
