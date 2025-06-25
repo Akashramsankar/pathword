@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "PLACID"
+{
+  date: "2025-06-26", // Set your desired date
+  grid: [
+    ["Q", "W", "T", "P", "R", "K"],  
+    ["L", "U", "H", "O", "R", "A"],  
+    ["C", "I", "G", "Q", "A", "Y"],  
+    ["F", "C", "J", "R", "U", "V"],  
+    ["D", "E", "K", "P", "W", "I"],  
+    ["G", "H", "D", "S", "X", "Y"]   
+  ],
+  answer: "PLACID",
+},
   // For "SPIRIT"
 {
   date: "2025-06-25", // Set your desired date
