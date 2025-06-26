@@ -79,7 +79,7 @@ const helpSlidesData = [
 const dailyPuzzles = [
   // For "MATTER"
 {
-  date: "2025-06-27", // Set your desired date
+  date: "2025-06-27",
   grid: [
     ["C", "S", "M", "N", "G", "V"],  
     ["E", "H", "P", "Y", "U", "A"],  
