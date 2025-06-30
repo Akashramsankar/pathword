@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "PROMPT"
+{
+  date: "2025-07-01", // Set your desired date
+  grid: [
+    ["K", "J", "P", "O", "S", "W"],  
+    ["A", "H", "J", "L", "I", "R"],  
+    ["I", "O", "C", "Y", "U", "N"], 
+    ["M", "F", "D", "C", "T", "E"],  
+    ["G", "L", "S", "W", "P", "A"], 
+    ["C", "H", "K", "T", "Y", "V"]   
+  ],
+  answer: "PROMPT",
+},
   // For "GENOME"
 {
   date: "2025-06-30", // Set your desired date
