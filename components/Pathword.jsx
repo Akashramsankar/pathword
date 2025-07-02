@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "LIQUID"
+{
+  date: "2025-07-03", // Set your desired date
+  grid: [
+    ["A", "T", "L", "F", "S", "R"], 
+    ["C", "E", "M", "O", "I", "U"], 
+    ["Q", "C", "J", "M", "R", "T"],  
+    ["F", "E", "K", "O", "V", "U"],  
+    ["S", "I", "G", "P", "W", "A"],  
+    ["C", "H", "M", "D", "Y", "T"]   
+  ],
+  answer: "LIQUID",
+},
   // For "PERIOD"
 {
   date: "2025-07-02", // Set your desired date
