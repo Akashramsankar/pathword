@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "ACQUIT"
+{
+  date: "2025-07-07", // Set your desired date
+  grid: [
+    ["B", "A", "C", "L", "M", "N"],  
+    ["R", "D", "S", "T", "C", "E"], 
+    ["Q", "E", "R", "N", "C", "Y"],  
+    ["F", "I", "K", "O", "R", "U"],  
+    ["L", "G", "I", "S", "E", "A"],  
+    ["E", "H", "S", "T", "R", "Z"]   
+    ],
+  answer: "ACQUIT",
+},
   // For "REVEAL"
 {
   date: "2025-07-06", // Set your desired date
