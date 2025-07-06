@@ -82,7 +82,7 @@ const dailyPuzzles = [
   date: "2025-07-06", // Set your desired date
   grid: [
     ["B", "D", "R", "L", "S", "F"],  
-    ["A", "E", "M", "O", "Y", "E"], 
+    ["A", "I", "M", "O", "Y", "E"], 
     ["C", "V", "I", "N", "S", "T"],  
     ["F", "D", "J", "E", "Q", "P"],  
     ["A", "O", "G", "Y", "I", "N"],  
