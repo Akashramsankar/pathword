@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "BELIEF"
+{
+  date: "2025-07-12", // Set your desired date
+  grid: [
+    ["D", "B", "F", "H", "J", "L"],  
+    ["A", "G", "O", "R", "E", "U"],  
+    ["L", "D", "I", "N", "U", "S"],  
+    ["F", "J", "L", "O", "R", "I"],  
+    ["H", "P", "E", "S", "V", "A"],  
+    ["A", "G", "R", "F", "T", "S"]   
+  ],
+  answer: "BELIEF",
+},
   // For "DRIVER"
 {
   date: "2025-07-11", // Set your desired date
