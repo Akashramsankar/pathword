@@ -86,7 +86,7 @@ const dailyPuzzles = [
     ["C", "D", "J", "N", "U", "L"],  
     ["F", "O", "V", "T", "R", "K"],  
     ["G", "E", "P", "S", "X", "A"],  
-    ["C", "H", "R", "T", "Y", "V"]   
+    ["C", "H", "V", "T", "Y", "R"]   
   ],
   answer: "WICKET",
 },
