@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "DEFEAT"
+{
+  date: "2025-07-15", // Set your desired date
+  grid: [
+    ["A", "D", "K", "P", "S", "V"], 
+    ["R", "H", "O", "Y", "E", "U"],  
+    ["F", "C", "I", "N", "U", "A"],  
+    ["G", "J", "F", "T", "R", "E"],  
+    ["K", "G", "A", "P", "W", "B"],  
+    ["C", "H", "S", "T", "Y", "V"]   
+  ],
+  answer: "DEFEAT",
+},
   // For "WICKET"
 {
   date: "2025-07-14", // Set your desired date
