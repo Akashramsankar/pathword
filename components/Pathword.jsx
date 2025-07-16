@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "RIGOUR"
+{
+  date: "2025-07-16", // Set your desired date
+  grid: [
+    ["B", "G", "R", "M", "T", "Z"],  
+    ["A", "E", "M", "U", "I", "H"], 
+    ["G", "C", "J", "N", "V", "P"],  
+    ["F", "G", "K", "P", "L", "O"], 
+    ["L", "U", "E", "S", "R", "A"],  
+    ["C", "H", "S", "R", "T", "Y"]   
+  ],
+  answer: "RIGOUR",
+},
   // For "DEFEAT"
 {
   date: "2025-07-15", // Set your desired date
