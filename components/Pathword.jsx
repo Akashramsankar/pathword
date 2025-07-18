@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "RESCUE"
+{
+  date: "2025-07-19", // Set your desired date
+  grid: [
+    ["C", "J", "R", "N", "W", "U"],  
+    ["A", "H", "M", "N", "E", "O"], 
+    ["S", "D", "I", "N", "Z", "V"],  
+    ["F", "T", "K", "P", "A", "C"],  
+    ["E", "U", "G", "P", "W", "A"],  
+    ["D", "H", "R", "E", "T", "L"]   
+  ],
+  answer: "RESCUE",
+},
   // For "EUREKA"
 {
   date: "2025-07-18", // Set your desired date
