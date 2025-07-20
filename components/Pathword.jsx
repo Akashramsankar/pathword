@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+// For "MIGHTY"
+{
+  date: "2025-07-21", // Set your desired date
+  grid: [
+    ["D", "F", "M", "J", "R", "V"],  
+    ["A", "E", "P", "Y", "I", "U"],  
+    ["G", "C", "J", "N", "U", "R"],  
+    ["E", "D", "K", "O", "R", "H"],  
+    ["L", "T", "F", "P", "W", "A"],  
+    ["C", "J", "S", "Y", "R", "W"]   
+  ],
+  answer: "MIGHTY",
+},
 
 // For "POTENT"
 {
