@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "BOWLED"
+{
+  date: "2025-08-05", // Set your desired date
+  grid: [
+    ["A", "F", "B", "H", "L", "P"], 
+    ["L", "R", "N", "C", "U", "O"],
+    ["I", "W", "M", "R", "U", "G"], 
+    ["A", "D", "J", "E", "L", "V"],  
+    ["E", "M", "G", "O", "Q", "A"], 
+    ["P", "H", "S", "D", "T", "M"]  
+  ],
+  answer: "BOWLED",
+},
   // For "BRUTAL"
 {
   date: "2025-08-04", // Set your desired date
