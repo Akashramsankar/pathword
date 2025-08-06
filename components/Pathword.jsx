@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "BROKEN"
+{
+  date: "2025-08-07",
+  grid: [
+    ["U", "J", "B", "M", "R", "V"], 
+    ["R", "E", "N", "L", "U", "R"],  
+    ["I", "O", "P", "U", "Y", "P"], 
+    ["A", "D", "J", "K", "I", "W"],  
+    ["E", "L", "G", "S", "M", "A"],  
+    ["C", "P", "T", "R", "N", "Y"]  
+  ],
+  answer: "BROKEN",
+},
   // For "PLAYER"
 {
   date: "2025-08-06", // Set your desired date
