@@ -79,7 +79,7 @@ const helpSlidesData = [
 const dailyPuzzles = [
   // For "SUPERB"
 {
-  date: "2025-08-12", // Set your desired date
+  date: "2025-08-13", // Set your desired date
   grid: [
     ["K", "N", "S", "P", "W", "C"], 
     ["A", "H", "L", "N", "R", "U"],  
