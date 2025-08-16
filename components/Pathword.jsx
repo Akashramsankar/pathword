@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "RETURN"
+{
+  date: "2025-08-17", // Set your desired date
+  grid: [
+    ["B", "F", "R", "M", "V", "C"],
+    ["A", "H", "M", "O", "I", "E"],  
+    ["V", "T", "I", "N", "C", "Y"],  
+    ["A", "D", "E", "R", "U", "V"],  
+    ["R", "L", "G", "B", "C", "A"],  
+    ["P", "Y", "S", "N", "T", "M"]   
+  ],
+  answer: "RETURN",
+},
   // For "PRISON"
 {
   date: "2025-08-16", // Set your desired date
