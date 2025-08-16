@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "PRISON"
+{
+  date: "2025-08-16", // Set your desired date
+  grid: [
+    ["F", "J", "P", "N", "S", "V"], 
+    ["A", "H", "M", "L", "U", "R"], 
+    ["Y", "I", "E", "O", "U", "T"],  
+    ["N", "D", "J", "C", "S", "V"],  
+    ["O", "L", "G", "M", "W", "A"], 
+    ["C", "Y", "T", "N", "S", "R"]   
+  ],
+  answer: "PRISON",
+},
   // For "SILENT"
 {
   date: "2025-08-15", // Set your desired date
