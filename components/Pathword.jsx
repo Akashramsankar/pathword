@@ -77,13 +77,26 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "WRITER"
+{
+  date: "2025-08-19", // Set your desired date
+  grid: [
+    ["A", "C", "W", "N", "S", "V"], 
+    ["H", "O", "P", "U", "I", "R"],  
+    ["A", "I", "E", "N", "U", "T"], 
+    ["N", "D", "H", "S", "T", "V"],  
+    ["E", "L", "G", "O", "W", "A"],  
+    ["P", "M", "S", "R", "Y", "O"]   
+  ],
+  answer: "WRITER",
+},
   // For "LEGEND"
 {
   date: "2025-08-18", // Set your desired date
   grid: [
-    ["A", "F", "L", "M", "S", "Y"], 
-    ["B", "H", "P", "T", "X", "E"],  
-    ["Q", "G", "I", "R", "U", "Z"], 
+    ["E", "S", "L", "M", "R", "Y"], 
+    ["A", "O", "P", "Y", "I", "E"],  
+    ["Q", "G", "I", "R", "U", "T"], 
     ["F", "D", "J", "K", "E", "V"],  
     ["N", "M", "S", "P", "W", "A"], 
     ["C", "H", "T", "D", "Y", "R"] 
