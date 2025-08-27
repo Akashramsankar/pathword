@@ -77,6 +77,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "THIRST"
+{
+  date: "2025-08-28", // Set your desired date
+  grid: [
+    ["D", "C", "T", "S", "P", "A"],  
+    ["R", "O", "N", "U", "W", "H"],  
+    ["A", "I", "C", "R", "O", "L"],  
+    ["N", "D", "K", "C", "R", "U"],  
+    ["S", "G", "E", "T", "Y", "A"],  
+    ["H", "N", "M", "T", "E", "Y"]  
+  ],
+  answer: "THIRST",
+},
   // For "EVOLVE"
 {
   date: "2025-08-27", // Set your desired date
