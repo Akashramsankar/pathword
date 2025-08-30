@@ -84,6 +84,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "BACKUP"
+{
+  date: "2025-08-31", // Set your desired date
+  grid: [
+    ["D", "G", "B", "T", "S", "W"], 
+    ["R", "L", "O", "H", "U", "A"], 
+    ["P", "C", "I", "R", "N", "T"],  
+    ["O", "D", "N", "A", "K", "V"],  
+    ["U", "M", "G", "E", "A", "L"],  
+    ["D", "N", "R", "P", "T", "H"]   
+  ],
+  answer: "BACKUP",
+},
   // For "HUMBLE"
 {
   date: "2025-08-30", // Set your desired date
