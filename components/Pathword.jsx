@@ -2879,12 +2879,12 @@ const renderSelectedPathPreview = () => {
                 <HelpCircle className="h-6 w-6 text-gray-600" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white rounded-lg shadow-xl p-0 sm:max-w-lg md:max-w-xl">
+            <DialogContent className="bg-white rounded-lg shadow-xl p-0 sm:max-w-lg md:max-w-2xl">
               {" "}
               {/* Adjusted max-width */}
               <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
                 <DialogTitle className="text-lg font-semibold text-gray-900">
-                  How to Play Pathword
+                  How to Play Pathword ** NEW RULES **
                 </DialogTitle>
                 {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                 <CloseIcon className="h-5 w-5 text-gray-500 hover:text-gray-700" />
