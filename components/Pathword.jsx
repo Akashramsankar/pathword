@@ -1766,6 +1766,7 @@ export default function Pathword() {
 
 // ... (imports and other functions) ...
 
+
 const getCharCode = (char) => char.toUpperCase().charCodeAt(0);
 
 const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLettersInRow) => {
@@ -1776,21 +1777,17 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
   const selectedCode = getCharCode(selectedLetter);
   const correctCode = getCharCode(correctLetter);
 
-  // Consolidate all unique "other" options, INCLUDING the selected letter itself
-  // (if it's not the correct one), as these are all the non-green choices made from or available.
+  // Consolidate all unique "other" options that the player could have chosen.
+  // This includes the selected letter itself and all other available choices.
   const allOtherOptionChars = [...new Set(
     (otherSelectableLettersInRow || [])
       .map(s => s.toUpperCase())
-      .concat(selectedLetter.toUpperCase()) // Add selected letter to the pool of "other options"
-      .filter(s => s !== correctLetter.toUpperCase()) // Ensure correct letter is not in this pool
+      .concat(selectedLetter.toUpperCase())
+      .filter(s => s !== correctLetter.toUpperCase())
   )];
-
-  console.log("allotheroptions ",allOtherOptionChars);
-
-
-  if (allOtherOptionChars.length === 1) {
-    // Only one "other" option exists (which must be the selectedLetter).
-    // Use the simple distance/threshold logic.
+  
+  // If there are no other options, it's an edge case. Default to yellow/red based on a simple threshold.
+  if (allOtherOptionChars.length === 0) {
     const distance = Math.abs(selectedCode - correctCode);
     const maxDistForSimpleYellow = Math.max(1, Math.floor(Math.max(
         Math.abs(getCharCode('A') - correctCode),
@@ -1799,76 +1796,43 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
     return distance <= maxDistForSimpleYellow ? "yellow" : "red";
   }
 
-  // Multiple "other" options (>= 2)
-  const optionsWithDistances = allOtherOptionChars.map(char => ({
-    char: char,
-    code: getCharCode(char),
-    dist: Math.abs(getCharCode(char) - correctCode)
-  })).sort((a, b) => a.dist - b.dist); // Sort by distance: closest first
+  // Separate the "other" options into those before and after the correct letter alphabetically.
+  const lettersBefore = [];
+  const lettersAfter = [];
 
-  console.log("distance sort ",optionsWithDistances);
-
-  const selectedOptionInfo = optionsWithDistances.find(opt => opt.code === selectedCode);
-  if (!selectedOptionInfo) { // Should not happen if selectedLetter was included correctly
-      console.log("fallback");
-      return "yellow"; // Fallback
-  }
-  const selectedLetterDistance = selectedOptionInfo.dist;
-
-  console.log("selected letter distance ",selectedLetterDistance);
-
-
-  // Determine the number of letters for the "red band"
-  const numRedLetters = Math.floor(optionsWithDistances.length / 2);
-
-  console.log("number red ",numRedLetters);
-
-  // The single closest is always yellow
-  const closestYellowDistance = optionsWithDistances[0].dist;
-
-  // Identify the distances that define the red band (the N furthest)
-  // These are the last `numRedLetters` in the sorted `optionsWithDistances` array.
-  const redDistanceThresholdStart = optionsWithDistances[optionsWithDistances.length - numRedLetters].dist;
-
-  // Coloring logic:
-  if (selectedLetterDistance === closestYellowDistance) {
-    // If it's among the letters that share the absolute minimum distance
-    // (could be multiple if equidistant, e.g. L and N around M)
-    const allMinDistanceChars = optionsWithDistances.filter(opt => opt.dist === closestYellowDistance);
-    if (allMinDistanceChars.some(opt => opt.code === selectedCode)) {
-                console.log("closestYellowDistance");
-
-        return "yellow";
+  allOtherOptionChars.forEach(char => {
+    const charCode = getCharCode(char);
+    if (charCode < correctCode) {
+      lettersBefore.push(char);
+    } else if (charCode > correctCode) {
+      lettersAfter.push(char);
     }
+  });
+
+  // Find the single closest letter on the "before" side, if any.
+  let closestBefore = null;
+  if (lettersBefore.length > 0) {
+    closestBefore = lettersBefore.reduce((prev, curr) => {
+      return getCharCode(curr) > getCharCode(prev) ? curr : prev;
+    });
   }
-  
-  if (selectedLetterDistance >= redDistanceThresholdStart) {
-    // If it's among the letters that fall into the "red band" distances
-    const allMaxPortionDistanceChars = optionsWithDistances.slice(optionsWithDistances.length - numRedLetters);
-     if (allMaxPortionDistanceChars.some(opt => opt.code === selectedCode)) {
-        console.log("redDistanceThresholdStart");
-        return "red";
-    }
+
+  // Find the single closest letter on the "after" side, if any.
+  let closestAfter = null;
+  if (lettersAfter.length > 0) {
+    closestAfter = lettersAfter.reduce((prev, curr) => {
+      return getCharCode(curr) < getCharCode(prev) ? curr : prev;
+    });
   }
-  
-  // For intermediate letters:
-  // Compare to the closest "yellow" (which is closestYellowDistance)
-  // and the closest "red" (which is redDistanceThresholdStart)
-  const distToYellowBoundary = Math.abs(selectedLetterDistance - closestYellowDistance);
-  const distToRedBoundary = Math.abs(selectedLetterDistance - redDistanceThresholdStart);
 
-  console.log("distToYellowBoundary ",distToYellowBoundary);
-    console.log("distToRedBoundary ",distToRedBoundary);
-
-
-  if (distToYellowBoundary <= distToRedBoundary) {
-    console.log("final yellow ");
-    return "yellow"; // Closer to yellow boundary or equidistant
-  } else {
-        console.log("final red ");
-
-    return "red";    // Closer to red boundary
+  // Check if the selected letter is one of these two closest neighbors.
+  const selectedUpper = selectedLetter.toUpperCase();
+  if ((closestBefore && selectedUpper === closestBefore) || (closestAfter && selectedUpper === closestAfter)) {
+    return "yellow";
   }
+
+  // If it's not green and not one of the two closest neighbors, it's red.
+  return "red";
 };
 
 
