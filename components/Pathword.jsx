@@ -2634,6 +2634,24 @@ const getCellClassName = (row, originalCol) => {
             return (
               <div key={`${rowIndex}-${displayColIndex}`} className="relative flex items-center justify-center" style={{ zIndex: 1 }}>
                 {/* ... (grid lines) ... */}
+                {/* Vertical Grid Line */}
+                {displayColIndex > 0 && (
+                  <div
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-px bg-gray-200"
+                    style={{
+                      marginLeft: `calc(-${gap} / 2)`,
+                    }}
+                  />
+                )}
+                {/* Horizontal Grid Line */}
+                {rowIndex > 0 && (
+                  <div
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-px bg-gray-200"
+                    style={{
+                      marginTop: `calc(-${gap} / 2)`,
+                    }}
+                  />
+                )}
                 <button ref={(el) => setCellRef(rowIndex, originalColIndex, el)} onClick={() => handleCellSelect(rowIndex, originalColIndex, letter)}
                   disabled={(gameState.status !== "playing" && !selectedPath.some(p => p.row === rowIndex && p.col === originalColIndex)) || (gameState.status === "failed")}
                   className={`${getCellClassName(rowIndex, originalColIndex)} z-10`}
