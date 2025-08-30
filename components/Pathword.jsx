@@ -38,22 +38,29 @@ const helpSlidesData = [
     instruction: "Begin your expedition by selecting a letter from the <span class='font-semibold'>very first row</span>. <br/> If you chose the correct letter, it will turn <span class='text-green-600 font-semibold'>GREEN</span>.",
     altText: 'Illustration showing selecting a letter from the first row of the Pathword grid.'
   },
-  {
-    id: 'row-below',
-    imageUrl: '/pathword/images/help/pathword-row-below.png',
-    instruction: "If the chosen letter turns <span class='text-red-600 font-semibold'>RED</span>, it is alphabetically far from the correct letter!",
-    altText: 'Illustration showing moving to a letter in the row directly below.'
-  },
+ 
   {
     id: 'new-column',
     imageUrl: '/pathword/images/help/pathword-new-column.png',
-    instruction: "If the chosen letter turns <span class='text-yellow-500 font-semibold'>YELLOW</span>, you are getting alphabetically closer!",
+    instruction: "<span class='text-yellow-500 font-semibold'>YELLOW</span> reveals the <span class='font-semibold'>closest alphabetical neighbors</span>.<br/> Of all available letters in a row, the one immediately <span class='font-semibold'>before</span> the correct letter and the one immediately <span class='font-semibold'>after</span> will turn yellow.</br> Use them as anchors to narrow down your search!",
     altText: 'Illustration demonstrating that each letter must be from a new column.'
+  },
+  {
+    id: 'new-column-again',
+    imageUrl: '/pathword/images/help/pathword-new-column.png',
+    instruction: "You picked D and it turned <span class='text-yellow-500 font-semibold'>YELLOW</span>.</br> This means the correct letter is one of D's immediate neighbors in the available letters of the row, that is <span class='font-semibold'>P</span> or <span class='font-semibold'>B</span>",
+    altText: 'Illustration demonstrating that each letter must be from a new column.'
+  },
+   {
+    id: 'row-below',
+    imageUrl: '/pathword/images/help/pathword-row-below.png',
+    instruction: "With choices B and P, selecting P and seeing <span class='text-red-600 font-semibold'>RED</span> tells you you've gone colder.</br> Your guess is alphabetically further from the answer than other available choices.",
+    altText: 'Illustration showing moving to a letter in the row directly below.'
   },
   {
     id: 'complete-path',
     imageUrl: '/pathword/images/help/pathword-complete-path.png',
-    instruction: "The chosen letter turns <span class='text-green-600 font-semibold'>GREEN</span>, <br/> when you arrive at the correct letter for that row!",
+    instruction: "Your deduction is correct, the answer must be B! Select it, and the tile will light up <span class='text-green-600 font-semibold'>GREEN</span>, confirming you're on the right path!",
     altText: 'Illustration of a completed path forming the Pathword.'
   },
    {
