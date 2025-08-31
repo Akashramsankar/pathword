@@ -84,6 +84,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "IGNITE"
+{
+  date: "2025-09-01", // Set your desired date
+  grid: [
+    ["A", "F", "I", "U", "S", "O"], 
+    ["S", "C", "U", "M", "N", "G"],  
+    ["L", "N", "E", "R", "U", "Y"],  
+    ["O", "D", "K", "A", "I", "J"],  
+    ["T", "L", "M", "G", "S", "A"],  
+    ["S", "H", "O", "E", "T", "Y"]   
+  ],
+  answer: "IGNITE",
+},
   // For "BACKUP"
 {
   date: "2025-08-31", // Set your desired date
