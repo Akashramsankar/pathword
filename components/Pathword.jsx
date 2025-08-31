@@ -93,7 +93,7 @@ const dailyPuzzles = [
     ["P", "C", "I", "R", "N", "T"],  
     ["O", "D", "N", "A", "K", "V"],  
     ["U", "M", "G", "E", "A", "L"],  
-    ["D", "N", "R", "P", "T", "H"]   
+    ["N", "D", "R", "P", "T", "H"]   
   ],
   answer: "BACKUP",
 },
