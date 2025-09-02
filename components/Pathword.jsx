@@ -106,7 +106,7 @@ const dailyPuzzles = [
     ["L", "N", "E", "R", "U", "Y"],  
     ["O", "D", "K", "A", "I", "J"],  
     ["T", "L", "M", "G", "S", "A"],  
-    ["S", "H", "O", "E", "T", "Y"]   
+    ["S", "H", "O", "E", "Y", "T"]   
   ],
   answer: "IGNITE",
 },
