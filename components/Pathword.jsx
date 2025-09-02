@@ -84,6 +84,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "ESCAPE" (tomorrow)
+  {
+    date: "2025-09-03",
+    grid: [
+      // Row 1 — correct: E (col 2)
+      ["A", "R", "E", "H", "I", "U"],
+      // Row 2 — correct: S (col 4)
+      ["C", "N", "T", "R", "S", "M"],
+      // Row 3 — correct: C (col 1)
+      ["T", "C", "D", "S", "B", "K"],
+      // Row 4 — correct: A (col 0)
+      ["A", "B", "H", "O", "U", "R"],
+      // Row 5 — correct: P (col 3)
+      ["D", "G", "O", "P", "A", "L"],
+      // Row 6 — correct: E (col 5)
+      ["R", "S", "Y", "D", "H", "E"]
+    ],
+    answer: "ESCAPE",
+  },
   // For "SEWAGE"
 {
   date: "2025-09-02", // Set your desired date
@@ -1667,6 +1686,93 @@ const dailyPuzzles = [
 }  // Add other puzzles here
 ];
 
+function HelpExampleRow({ letters, colors, caption }) {
+  const colorClasses = {
+    green: 'bg-green-300 text-green-900',
+    yellow: 'bg-yellow-300 text-yellow-900',
+    red: 'bg-red-300 text-red-900',
+  };
+
+  const gap = "0.5rem"; // A smaller gap for the compact help example
+
+  return (
+    <div>
+      <div
+        className="bg-teal-50 rounded-lg border border-gray-300 relative flex justify-center overflow-hidden"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${letters.length}, 1fr)`,
+          gap: gap,
+          width: `calc(${letters.length} * 2.5rem + ${letters.length - 1} * ${gap})`,
+          margin: '0 auto', // Center the grid itself
+        }}
+      >
+        {letters.map((letter, index) => {
+          const isHighlighted = colors[index] && colors[index] !== 'default';
+          const cellColorClass = isHighlighted ? colorClasses[colors[index]] : 'bg-transparent text-gray-800';
+
+          return (
+            <div
+              key={index}
+              className="relative flex items-center justify-center" // Wrapper for positioning lines
+            >
+              {/* Vertical Grid Line (contained within help grid) */}
+              {index > 0 && (
+                <div
+                  className="absolute left-0 top-0 h-full w-0.5 bg-gray-300"
+                  style={{ marginLeft: `calc(-${gap} / 2)` }}
+                />
+              )}
+
+              {/* The Letter Cell */}
+              <div
+                className={`w-10 h-10 flex items-center justify-center text-xl font-bold transition-colors duration-300
+                           ${isHighlighted ? 'rounded-full scale-110 shadow-md' : ''}
+                           ${cellColorClass}`}
+              >
+                {letter}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-center text-xs text-gray-600 italic pt-3">{caption}</p>
+    </div>
+  );
+}
+
+// This component contains the carousel you already built
+function DetailedHelpCarousel({ helpSlidesData, currentHelpSlide, setCurrentHelpSlide }) {
+  return (
+    <div className="pt-4">
+      <div className="carousel-viewport relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[300px] md:max-h-[350px] mx-auto overflow-hidden rounded-lg bg-gray-100 shadow-inner mb-4">
+        <div
+          className="carousel-track flex h-full transition-transform duration-300 ease-in-out"
+          style={{ transform: `translateX(-${currentHelpSlide * 100}%)` }}
+        >
+          {helpSlidesData.map((slide) => (
+            <div key={slide.id} className="carousel-slide min-w-full h-full flex-shrink-0 flex flex-col items-center justify-center p-1">
+              <img src={slide.imageUrl} alt={slide.altText} className="max-w-full max-h-full object-contain" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="instruction-text text-center min-h-[5em] mb-4 px-4">
+        <p className="text-sm text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: helpSlidesData[currentHelpSlide]?.instruction || "" }} />
+      </div>
+      {helpSlidesData.length > 1 && (
+        <div className="flex items-center justify-between px-1">
+          <Button variant="outline" size="icon" className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40" onClick={() => setCurrentHelpSlide(prev => Math.max(0, prev - 1))} disabled={currentHelpSlide === 0} aria-label="Previous help slide"><ChevronLeft className="h-5 w-5" /></Button>
+          <div className="flex justify-center space-x-2">
+            {helpSlidesData.map((_, index) => ( <button key={`dot-${index}`} onClick={() => setCurrentHelpSlide(index)} aria-label={`Go to help slide ${index + 1}`} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 ${currentHelpSlide === index ? 'bg-teal-500 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`} /> ))}
+          </div>
+          <Button variant="outline" size="icon" className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40" onClick={() => setCurrentHelpSlide(prev => Math.min(helpSlidesData.length - 1, prev + 1))} disabled={currentHelpSlide === helpSlidesData.length - 1} aria-label="Next help slide"><ChevronRight className="h-5 w-5" /></Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function DateSelector({ availableDates, selectedDate, onDateChange }) {
   // Helpers and precomputed sets
@@ -1936,6 +2042,7 @@ export default function Pathword() {
   const [pathCoords, setPathCoords] = useState([]);
   const [currentHelpSlide, setCurrentHelpSlide] = useState(0);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [showDetailedHelp, setShowDetailedHelp] = useState(false); // New state to toggle help view
   const [isStatsOpen, setIsStatsOpen] = useState(false);
 
   const [isStatsDistributionOpen, setIsStatsDistributionOpen] = useState(false); // Default to open
@@ -3087,7 +3194,13 @@ const renderSelectedPathPreview = () => {
             open={isHelpOpen}
             onOpenChange={(open) => {
               setIsHelpOpen(open);
-              if (open) setCurrentHelpSlide(0); // Reset to first slide when dialog opens
+              if (!open) {
+                // Reset views when dialog is closed
+                setTimeout(() => { // Delay reset to avoid flicker during closing animation
+                  setShowDetailedHelp(false);
+                  setCurrentHelpSlide(0);
+                }, 200);
+              }
             }}
           >
             <DialogTrigger asChild>
@@ -3095,118 +3208,104 @@ const renderSelectedPathPreview = () => {
                 <HelpCircle className="h-6 w-6 text-gray-600" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white rounded-lg shadow-xl p-0 sm:max-w-lg md:max-w-2xl">
-              {" "}
-              {/* Adjusted max-width */}
+            <DialogContent
+              className={`bg-white rounded-lg shadow-xl p-0 max-h-[85vh] overflow-y-scroll md:max-h-none md:overflow-visible transition-all duration-300 ease-in-out scrollbar-visible
+                ${showDetailedHelp
+                  ? 'sm:max-w-xl md:max-w-2xl' // Wider for carousel
+                  : 'sm:max-w-md md:max-w-lg'             // Narrower for summary
+                }`}
+            >
               <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
-                <DialogTitle className="text-lg font-semibold text-gray-900">
-                  How to Play Pathword ** NEW RULES **
+                <DialogTitle className="text-xl font-bold tracking-tight text-gray-800">
+                  How To Play
                 </DialogTitle>
                 {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <CloseIcon className="h-5 w-5 text-gray-500 hover:text-gray-700" />
-                <span className="sr-only">Close</span>
-            </DialogClose> */}
+                  <CloseIcon className="h-5 w-5 text-gray-500 hover:text-gray-700" />
+                  <span className="sr-only">Close</span>
+                </DialogClose> */}
               </DialogHeader>
-              {/* Carousel Content */}
-              <div className="px-2 sm:px-6 py-6 text-gray-700 max-h-[75vh] md:max-h-[70vh] overflow-y-auto">
-                <div className="carousel-viewport relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[300px] md:max-h-[350px] mx-auto overflow-hidden rounded-lg bg-gray-100 shadow-inner mb-4">
-                  {" "}
-                  {/* Added aspect ratio and max-h for image area */}
-                  <div
-                    className="carousel-track flex h-full transition-transform duration-300 ease-in-out"
-                    style={{
-                      transform: `translateX(-${currentHelpSlide * 100}%)`,
-                    }}
-                  >
-                    {helpSlidesData.map((slide) => (
-                      <div
-                        key={slide.id}
-                        className="carousel-slide min-w-full h-full flex-shrink-0 flex flex-col items-center justify-center p-1"
-                      >
-                        <img
-                          src={slide.imageUrl}
-                          alt={slide.altText}
-                          className="max-w-full max-h-full object-contain" // Ensure image fits
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
-                {/* Instruction Text below image */}
-                <div className="instruction-text text-center min-h-[4em] mb-4 px-4">
-                  {" "}
-                  {/* min-h to reduce layout shift */}
-                  <p
-                    className="text-sm text-gray-700 leading-relaxed"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        helpSlidesData[currentHelpSlide]?.instruction || "",
-                    }}
-                  />
-                </div>
 
-                {/* Navigation: Arrows and Dots */}
-                {helpSlidesData.length > 1 && (
-                  <div className="flex items-center justify-between px-1">
-                    {/* Previous Button */}
+    {showDetailedHelp ? (
+      // --- DETAILED CAROUSEL VIEW ---
+      <DetailedHelpCarousel
+        helpSlidesData={helpSlidesData}
+        currentHelpSlide={currentHelpSlide}
+        setCurrentHelpSlide={setCurrentHelpSlide}
+      />
+    ) : (
+      // --- REVISED SUMMARY VIEW (Default) ---
+      <div className="px-6 text-gray-700 space-y-5 text-sm leading-relaxed">
+        <div>
+          <h4 className="font-semibold text-gray-800 mb-1.5">The Goal</h4>
+          <p>Find the hidden 6-letter word by tracing a path of letters, one per row from top to bottom. Each letter must be in a new column.</p>
+        </div>
+        <div>
+          <h4 className="font-semibold text-gray-800 mb-1.5">Color Clues</h4>
+          <p>After each guess, the color of the tile will guide you:</p>
+          <div className="space-y-4 mt-4">
+            {/* Green Example */}
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-green-400 border border-green-400 rounded flex items-center justify-center text-white font-bold text-lg"></div>
+              <p className="flex-1"><span className="font-semibold">Green:</span> Correct letter, correct spot. You must now move to the next row.</p>
+               {/* Green Example */}
+            
+            </div>
+            <HelpExampleRow
+              letters={['Z', 'P', 'B', 'Q','T','D']}
+              colors={['default','default', 'green', 'default', 'default']}
+              caption={"Here, 'B' is the correct letter for this row. You can now proceed!"}
+            />
+            {/* Yellow Example */}
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-yellow-400 border border-yellow-400 rounded flex items-center justify-center text-white font-bold text-lg"></div>
+               <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but it's an immediate alphabetical neighbor to the correct letter in that row (one before or one after).</p>
+                {/* Yellow Example */}
+
+            </div>
+            <HelpExampleRow
+              letters={['Z', 'P', 'B', 'Q','T','D']}
+              colors={['default','default','default' , 'default', 'default','yellow']}
+              caption={"You picked 'D'. It's yellow, so the correct letter is an alphabetical neighbor in the available letters. That is B (before) or P (after)."}
+            />
+            {/* Red Example (using gray like Wordle) */}
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-red-400 border border-red-400 rounded flex items-center justify-center text-white font-bold text-lg"></div>
+              <p className="flex-1"><span className="font-semibold">Red:</span> Wrong letter, and not a close neighbor.</p>
+             
+            </div>
+             {/* Red Example */}
+            <HelpExampleRow
+              letters={['Z', 'P', 'B', 'Q','T','D']}
+              colors={['default', 'default', 'default', 'red', 'default']}
+              caption={"You picked 'Q'. It's red, meaning it's not a close alphabetical neighbor. So the correct letter is neither P (before) or T (after)"}
+            />
+          </div>
+        </div>
+         {/* <Button
+            variant="link"
+            className="p-0 h-auto text-teal-600 hover:text-teal-700"
+            onClick={() => {
+                setShowDetailedHelp(true);
+                setCurrentHelpSlide(0); // Start carousel from the beginning
+            }}
+          >
+            See More Visual Examples &rarr;
+          </Button> */}
+      </div>
+    )}
+
+      {/* Scrollbar is visible on small screens via overflow-y-scroll; no overlay hint needed */}
+
+     <DialogFooter className="px-6 pb-6 pt-4 border-t border-gray-200">
+                 <DialogClose asChild>
                     <Button
-                      variant="outline"
-                      size="icon"
-                      className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                      onClick={() =>
-                        setCurrentHelpSlide((prev) => Math.max(0, prev - 1))
-                      }
-                      disabled={currentHelpSlide === 0}
-                      aria-label="Previous help slide"
+                      type="button"
+                      className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-md text-sm py-2.5"
                     >
-                      <ChevronLeft className="h-5 w-5" />
+                      {showDetailedHelp ? "Back to Game" : "Let's Play!"}
                     </Button>
-
-                    {/* Dot Indicators */}
-                    <div className="flex justify-center space-x-2">
-                      {helpSlidesData.map((_, index) => (
-                        <button
-                          key={`dot-${index}`}
-                          onClick={() => setCurrentHelpSlide(index)}
-                          aria-label={`Go to help slide ${index + 1}`}
-                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2
-                                    ${
-                                      currentHelpSlide === index
-                                        ? "bg-teal-500 scale-125"
-                                        : "bg-gray-300 hover:bg-gray-400"
-                                    }`}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Next Button */}
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="p-2 rounded-full text-teal-600 border-teal-300 hover:bg-teal-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                      onClick={() =>
-                        setCurrentHelpSlide((prev) =>
-                          Math.min(helpSlidesData.length - 1, prev + 1)
-                        )
-                      }
-                      disabled={currentHelpSlide === helpSlidesData.length - 1}
-                      aria-label="Next help slide"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <DialogFooter className="px-6 pb-6 pt-4 border-t border-gray-200">
-                <DialogClose asChild>
-                  <Button
-                    type="button"
-                    className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm py-2.5" // Themed button
-                  >
-                    Got It!
-                  </Button>
-                </DialogClose>
+                  </DialogClose>
               </DialogFooter>
             </DialogContent>
           </Dialog>
