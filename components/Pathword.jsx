@@ -84,6 +84,19 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "SEWAGE"
+{
+  date: "2025-09-02", // Set your desired date
+  grid: [
+    ["C", "G", "S", "T", "P", "W"], 
+    ["A", "H", "R", "N", "U", "E"], 
+    ["N", "W", "I", "R", "M", "L"],  
+    ["E", "C", "B", "I", "A", "V"], 
+    ["G", "L", "M", "R", "P", "B"],  
+    ["C", "H", "S", "E", "T", "Y"]   
+  ],
+  answer: "SEWAGE",
+},
   // For "IGNITE"
 {
   date: "2025-09-01", // Set your desired date
@@ -1671,29 +1684,79 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
     return dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
+  // Ensure selected item is visible when opening
+  useEffect(() => {
+    if (!open) return;
+    const el = document.getElementById(`date-opt-${selectedDate}`);
+    if (el && typeof el.scrollIntoView === 'function') {
+      el.scrollIntoView({ block: 'nearest' });
+    }
+  }, [open, selectedDate]);
+
+  const handleSelect = (dateStr) => {
+    onDateChange(dateStr);
+    setOpen(false);
+  };
+
   return (
-    <div className="my-3 md:my-4 flex justify-center items-center relative">
-          <CalendarDays className="h-5 w-5 text-gray-500 mr-2" />
-      
-      <select
-        value={selectedDate}
-        onChange={(e) => onDateChange(e.target.value)}
-        className="appearance-none bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm block w-auto
-                   py-2.5 pl-3 pr-8 leading-tight hover:border-gray-400 cursor-pointer
-                   transition-colors duration-150 ease-in-out" // Added appearance-none for custom arrow
-        aria-label="Select puzzle date"
-      >
-        {sortedDates.map((dateStr) => (
-          <option key={dateStr} value={dateStr}>
-            {formatDateForDisplay(dateStr)}
-          </option>
-        ))}
-      </select>
-      {/* Custom dropdown arrow if appearance-none is used */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-          <path d="M5.516 7.548c.436-.446 1.043-.48 1.576 0L10 10.405l2.908-2.857c.533-.48 1.14-.446 1.576 0 .436.445.408 1.197 0 1.642l-3.417 3.356c-.27.272-.63.408-.99.408s-.72-.136-.99-.408L5.516 9.19c-.408-.445-.436-1.197 0-1.642z"/>
-        </svg>
+    <div ref={containerRef} className="my-3 md:my-4 flex justify-center items-center">
+      <CalendarDays className="h-5 w-5 text-gray-500 mr-2" />
+      <div className="relative inline-block">
+        <button
+          type="button"
+          className="bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm w-35
+                     py-2.5 pl-3 pr-9 text-left hover:border-gray-400 transition-colors duration-150"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {formatDateForDisplay(selectedDate)}
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+            </svg>
+          </span>
+        </button>
+
+        {open && (
+          <ul
+            role="listbox"
+            className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg
+                       max-h-[20rem] overflow-y-auto focus:outline-none"
+            aria-label="Select puzzle date"
+          >
+            {sortedDates.map((dateStr) => {
+              const isSelected = dateStr === selectedDate;
+              return (
+                <li
+                  id={`date-opt-${dateStr}`}
+                  key={dateStr}
+                  role="option"
+                  aria-selected={isSelected}
+                  className={`px-3 py-2 text-sm cursor-pointer select-none ${
+                    isSelected ? 'bg-slate-100 text-slate-900' : 'text-gray-700 hover:bg-slate-50'
+                  }`}
+                  onClick={() => handleSelect(dateStr)}
+                >
+                  {formatDateForDisplay(dateStr)}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );
@@ -2663,7 +2726,7 @@ const getCellClassName = (row, originalCol) => {
                 {/* Vertical Grid Line */}
                 {displayColIndex > 0 && (
                   <div
-                    className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-px bg-gray-200"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-0.5 bg-gray-300"
                     style={{
                       marginLeft: `calc(-${gap} / 2)`,
                     }}
@@ -2672,7 +2735,7 @@ const getCellClassName = (row, originalCol) => {
                 {/* Horizontal Grid Line */}
                 {rowIndex > 0 && (
                   <div
-                    className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-px bg-gray-200"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-0.5 bg-gray-300"
                     style={{
                       marginTop: `calc(-${gap} / 2)`,
                     }}
