@@ -2739,7 +2739,7 @@ const getCellClassName = (row, originalCol) => {
   // const isTheRevealedCell = /* ... REMOVED ... */;
   const isSelectable = canSelectCell(row, originalCol);
 
-  let baseStyle = `w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
+  let baseStyle = `w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
   let backgroundStyle = 'bg-transparent';
   let textStyle = 'text-gray-700';
   let interactionStyle = 'cursor-default';
@@ -2828,9 +2828,9 @@ const getCellClassName = (row, originalCol) => {
     } else { await copyToClipboard(fullShareText); }
   };
 
-  const renderGrid = () => { /* Responsive grid: fits on small screens */ 
+  const renderGrid = () => { /* ... (renderGrid largely same, ensure it uses getCellClassName) ... */ 
     if (!columnMapping || !currentPuzzle.grid || currentPuzzle.grid.length === 0) return <div className="h-96 ...">Loading Grid...</div>;
-    const gridRows = currentPuzzle.grid.length; const gridCols = currentPuzzle.grid[0].length; const gap = "0.5rem";
+    const gridRows = currentPuzzle.grid.length; const gridCols = currentPuzzle.grid[0].length; const gap = "0.75rem";
     const displayGridLetters = currentPuzzle.grid.map((originalRow) => {
       const displayedRow = new Array(gridCols);
       for (let originalCol = 0; originalCol < gridCols; originalCol++) {
@@ -2839,7 +2839,7 @@ const getCellClassName = (row, originalCol) => {
       return displayedRow;
     });
     return (
-      <div
+            <div
         ref={gridRef}
         className="relative p-1 mx-auto mb-6"
         style={{
@@ -2954,25 +2954,16 @@ const renderSelectedPathPreview = () => {
 
   return (
     <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 min-h-screen flex flex-col items-center">
-      <header className="text-center flex items-center justify-between px-4 md:px-0">
-        <div className="w-16"></div>
-        <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">
-            {" "}
-            Pathword{" "}
-          </h1>
-          <p className="text-sm text-gray-600">
-            {" "}
-            Connect letters row by row to find the word.{" "}
-          </p>
-        </div>
-        <div className="flex items-center justify-end">
-          {/* Stats Dialog - Needs modification */}
-      <Dialog open={isStatsOpen} onOpenChange={(open) => { setIsStatsOpen(open); if (!open) setShowSuccessPopup(false); }}>
-        <DialogTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="View Stats"><BarChart3 className="h-6 w-6 text-gray-600" /></Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md bg-white rounded-lg shadow-xl p-0">
+      {/* Centered play area wrapper; inline-block ensures width matches contents (grid) */}
+      <div className="relative inline-block mx-auto">
+        {/* Top-right actions positioned relative to grid area */}
+        <div className="absolute right-0 top-0 flex items-center">
+          {/* Stats Dialog */}
+          <Dialog open={isStatsOpen} onOpenChange={(open) => { setIsStatsOpen(open); if (!open) setShowSuccessPopup(false); }}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="View Stats"><BarChart3 className="h-6 w-6 text-gray-600" /></Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md bg-white rounded-lg shadow-xl p-0">
   <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
     <DialogTitle className="text-lg font-semibold text-gray-900">
       {showSuccessPopup ? "Path Conquered!" : gameState.status === "failed" ? "Better Luck Next Time!" : "Your Journey Stats"}
@@ -3089,8 +3080,8 @@ const renderSelectedPathPreview = () => {
       </DialogClose>
     )}
   </DialogFooter>
-</DialogContent>
-      </Dialog>
+            </DialogContent>
+          </Dialog>
           {/* Help Dialog */}
           <Dialog
             open={isHelpOpen}
@@ -3220,8 +3211,12 @@ const renderSelectedPathPreview = () => {
             </DialogContent>
           </Dialog>
         </div>
-      </header>
-      <DateSelector
+
+        <header className="text-center px-4 md:px-0">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">Pathword</h1>
+          <p className="text-sm text-gray-600">Connect letters row by row to find the word.</p>
+        </header>
+        <DateSelector
         availableDates={availablePuzzleDates}
         selectedDate={selectedDate}
         onDateChange={(newDate) => {
@@ -3229,10 +3224,10 @@ const renderSelectedPathPreview = () => {
           // For now, we assume changing date resets progress for the *previous* date if not submitted.
           setSelectedDate(newDate);
         }}
-      />
-      
-      <main className="flex-grow flex flex-col items-center w-full mt-4">
-        {columnMapping ? renderGrid() : <div className="h-96 ...">Shuffling Path...</div>}
+        />
+        
+        <main className="flex-grow flex flex-col items-center w-full mt-4">
+          {columnMapping ? renderGrid() : <div className="h-96 ...">Shuffling Path...</div>}
 
         <div className="text-center h-12 my-2 px-4 w-full flex flex-col items-center justify-center">
             {gameState.status === "playing" && (
@@ -3263,7 +3258,7 @@ const renderSelectedPathPreview = () => {
         {renderSelectedPathPreview()}
         {/* TODO: bottom messagge and stats open */}
         {/* CLUES SECTION REMOVED */}
-      </main>
+        </main>
 
       {/* <footer className="pb-6 px-4 text-center w-full mt-auto">
         {(gameState.status === "playing" && selectedPath.length > 0) && (
@@ -3271,7 +3266,8 @@ const renderSelectedPathPreview = () => {
         )}
       </footer> */}
 
-      
+      </div>
+
       {/* ... (rest of header structure) ... */}
       
       <style jsx global>{`
