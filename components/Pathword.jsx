@@ -93,7 +93,7 @@ const dailyPuzzles = [
     ["N", "W", "I", "R", "M", "L"],  
     ["E", "C", "B", "I", "A", "V"], 
     ["G", "L", "M", "R", "P", "B"],  
-    ["C", "H", "S", "E", "T", "Y"]   
+    ["C", "H", "S", "E", "Y", "T"]   
   ],
   answer: "SEWAGE",
 },
@@ -106,7 +106,7 @@ const dailyPuzzles = [
     ["L", "N", "E", "R", "U", "Y"],  
     ["O", "D", "K", "A", "I", "J"],  
     ["T", "L", "M", "G", "S", "A"],  
-    ["S", "H", "O", "E", "Y", "T"]   
+    ["S", "H", "O", "E", "T", "Y"]   
   ],
   answer: "IGNITE",
 },
