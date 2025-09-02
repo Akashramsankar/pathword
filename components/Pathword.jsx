@@ -1669,11 +1669,14 @@ const dailyPuzzles = [
 
 
 function DateSelector({ availableDates, selectedDate, onDateChange }) {
-  // Sort dates for display, newest first if not already
-  const sortedDates = [...availableDates].sort((a, b) => new Date(b) - new Date(a));
+  // Helpers and precomputed sets
+  const availableSet = useMemo(() => new Set(availableDates), [availableDates]);
+  const monthNames = [
+    'January','February','March','April','May','June','July','August','September','October','November','December'
+  ];
 
   const formatDateForDisplay = (dateStr) => {
-    const dateObj = new Date(dateStr + 'T00:00:00'); // Ensure local timezone interpretation
+    const dateObj = new Date(dateStr + 'T00:00:00');
     const today = new Date();
     today.setHours(0,0,0,0);
     const yesterday = new Date(today);
@@ -1684,7 +1687,47 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
     return dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  const parseYMD = (s) => {
+    const [y, m, d] = s.split('-').map(Number);
+    return { y, m: m - 1, d };
+  };
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const buildYMD = (y, mZeroBased, d) => `${y}-${pad2(mZeroBased + 1)}-${pad2(d)}`;
+  const getDaysInMonth = (y, mZeroBased) => new Date(y, mZeroBased + 1, 0).getDate();
+
+  // Derive months available from availableDates (year selection removed for now)
+
+  const monthsByYear = useMemo(() => {
+    const map = new Map(); // year -> Set(monthIndex)
+    availableDates.forEach((s) => {
+      const y = Number(s.slice(0,4));
+      const m = Number(s.slice(5,7)) - 1;
+      if (!map.has(y)) map.set(y, new Set());
+      map.get(y).add(m);
+    });
+    return map; 
+  }, [availableDates]);
+
+  const daysByYearMonth = useMemo(() => {
+    const map = new Map(); // `${y}-${m}` -> Set(dayNumber)
+    availableDates.forEach((s) => {
+      const y = Number(s.slice(0,4));
+      const m = Number(s.slice(5,7)) - 1;
+      const d = Number(s.slice(8,10));
+      const key = `${y}-${m}`;
+      if (!map.has(key)) map.set(key, new Set());
+      map.get(key).add(d);
+    });
+    return map;
+  }, [availableDates]);
+
+  // UI state
   const [open, setOpen] = useState(false);
+  const [stage, setStage] = useState('month'); // 'month' | 'day'
+  const { y: selY, m: selM } = parseYMD(selectedDate);
+  const [tempYear, setTempYear] = useState(selY);
+  const [tempMonth, setTempMonth] = useState(selM);
+
   const containerRef = useRef(null);
 
   // Close on outside click
@@ -1697,18 +1740,116 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
     return () => document.removeEventListener('mousedown', onDocClick);
   }, []);
 
-  // Ensure selected item is visible when opening
+  // Reset staged selection to current when opening
   useEffect(() => {
-    if (!open) return;
-    const el = document.getElementById(`date-opt-${selectedDate}`);
-    if (el && typeof el.scrollIntoView === 'function') {
-      el.scrollIntoView({ block: 'nearest' });
+    if (open) {
+      const { y, m } = parseYMD(selectedDate);
+      setTempYear(y);
+      setTempMonth(m);
+      setStage('month');
     }
   }, [open, selectedDate]);
 
-  const handleSelect = (dateStr) => {
-    onDateChange(dateStr);
-    setOpen(false);
+  const selectDate = (y, mZero, d) => {
+    const s = buildYMD(y, mZero, d);
+    if (availableSet.has(s)) {
+      onDateChange(s);
+      setOpen(false);
+    }
+  };
+
+  // Year stage removed (only 2025 is available currently)
+
+  const renderMonthStage = () => {
+    const monthsSet = monthsByYear.get(tempYear) || new Set();
+    return (
+      <div className="p-3">
+        <div className="flex items-center mb-2">
+          <div className="text-xs font-semibold text-gray-500">Select Month</div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {monthNames.map((nm, idx) => {
+            const enabled = monthsSet.has(idx);
+            return (
+              <button
+                key={nm}
+                disabled={!enabled}
+                className={`px-2 py-2 rounded border text-sm ${
+                  enabled
+                    ? (idx === tempMonth ? 'border-teal-500 text-teal-700' : 'border-gray-200 hover:bg-slate-50')
+                    : 'border-gray-100 text-gray-300 cursor-not-allowed'
+                }`}
+                onClick={() => { if (enabled) { setTempMonth(idx); setStage('day'); } }}
+              >
+                {nm.slice(0,3)}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderDayStage = () => {
+    const key = `${tempYear}-${tempMonth}`;
+    const daysSet = daysByYearMonth.get(key) || new Set();
+    const daysInMonth = getDaysInMonth(tempYear, tempMonth);
+    const firstWeekday = new Date(tempYear, tempMonth, 1).getDay(); // 0-6 Sun-Sat
+    const weeks = [];
+    let day = 1;
+    for (let row = 0; row < 6; row++) {
+      const cells = [];
+      for (let col = 0; col < 7; col++) {
+        const cellIndex = row * 7 + col;
+        if (cellIndex < firstWeekday || day > daysInMonth) {
+          cells.push(null);
+        } else {
+          cells.push(day++);
+        }
+      }
+      weeks.push(cells);
+    }
+
+    return (
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <button className="mr-2 text-gray-500 hover:text-gray-700" aria-label="Back to months" onClick={() => setStage('month')}>
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <div className="text-xs font-semibold text-gray-500">{monthNames[tempMonth]} {tempYear}</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-7 gap-1 text-[11px] text-gray-500 mb-1">
+          {['S','M','T','W','T','F','S'].map((d, i) => (
+            <div key={`${d}-${i}`} className="text-center py-1">{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {weeks.flat().map((d, i) => {
+            if (d === null) return <div key={i} className="h-8" />;
+            const enabled = daysSet.has(d);
+            const s = buildYMD(tempYear, tempMonth, d);
+            const isSelected = s === selectedDate;
+            return (
+              <button
+                key={i}
+                disabled={!enabled}
+                onClick={() => enabled && selectDate(tempYear, tempMonth, d)}
+                className={`h-8 rounded border text-sm flex items-center justify-center ${
+                  enabled
+                    ? (isSelected ? 'border-teal-500 text-teal-700' : 'border-gray-200 hover:bg-slate-50')
+                    : 'border-gray-100 text-gray-300 cursor-not-allowed'
+                }`}
+              >
+                {d}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -1719,7 +1860,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           type="button"
           className="bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm w-35
                      py-2.5 pl-3 pr-9 text-left hover:border-gray-400 transition-colors duration-150"
-          aria-haspopup="listbox"
+          aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
@@ -1732,30 +1873,14 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
         </button>
 
         {open && (
-          <ul
-            role="listbox"
-            className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg
-                       max-h-[20rem] overflow-y-auto focus:outline-none"
+          <div
+            className="absolute z-50 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg focus:outline-none"
+            role="dialog"
             aria-label="Select puzzle date"
           >
-            {sortedDates.map((dateStr) => {
-              const isSelected = dateStr === selectedDate;
-              return (
-                <li
-                  id={`date-opt-${dateStr}`}
-                  key={dateStr}
-                  role="option"
-                  aria-selected={isSelected}
-                  className={`px-3 py-2 text-sm cursor-pointer select-none ${
-                    isSelected ? 'bg-slate-100 text-slate-900' : 'text-gray-700 hover:bg-slate-50'
-                  }`}
-                  onClick={() => handleSelect(dateStr)}
-                >
-                  {formatDateForDisplay(dateStr)}
-                </li>
-              );
-            })}
-          </ul>
+            {stage === 'month' && renderMonthStage()}
+            {stage === 'day' && renderDayStage()}
+          </div>
         )}
       </div>
     </div>
@@ -2818,25 +2943,16 @@ const renderSelectedPathPreview = () => {
 
   return (
     <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 min-h-screen flex flex-col items-center">
-      <header className="text-center flex items-center justify-between px-4 md:px-0">
-        <div className="w-16"></div>
-        <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">
-            {" "}
-            Pathword{" "}
-          </h1>
-          <p className="text-sm text-gray-600">
-            {" "}
-            Connect letters row by row to find the word.{" "}
-          </p>
-        </div>
-        <div className="flex items-center justify-end">
-          {/* Stats Dialog - Needs modification */}
-      <Dialog open={isStatsOpen} onOpenChange={(open) => { setIsStatsOpen(open); if (!open) setShowSuccessPopup(false); }}>
-        <DialogTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="View Stats"><BarChart3 className="h-6 w-6 text-gray-600" /></Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md bg-white rounded-lg shadow-xl p-0">
+      {/* Centered play area wrapper; inline-block ensures width matches contents (grid) */}
+      <div className="relative inline-block mx-auto">
+        {/* Top-right actions positioned relative to grid area */}
+        <div className="absolute right-0 top-0 flex items-center">
+          {/* Stats Dialog */}
+          <Dialog open={isStatsOpen} onOpenChange={(open) => { setIsStatsOpen(open); if (!open) setShowSuccessPopup(false); }}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="View Stats"><BarChart3 className="h-6 w-6 text-gray-600" /></Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md bg-white rounded-lg shadow-xl p-0">
   <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
     <DialogTitle className="text-lg font-semibold text-gray-900">
       {showSuccessPopup ? "Path Conquered!" : gameState.status === "failed" ? "Better Luck Next Time!" : "Your Journey Stats"}
@@ -2953,8 +3069,8 @@ const renderSelectedPathPreview = () => {
       </DialogClose>
     )}
   </DialogFooter>
-</DialogContent>
-      </Dialog>
+            </DialogContent>
+          </Dialog>
           {/* Help Dialog */}
           <Dialog
             open={isHelpOpen}
@@ -3084,8 +3200,12 @@ const renderSelectedPathPreview = () => {
             </DialogContent>
           </Dialog>
         </div>
-      </header>
-      <DateSelector
+
+        <header className="text-center px-4 md:px-0">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">Pathword</h1>
+          <p className="text-sm text-gray-600">Connect letters row by row to find the word.</p>
+        </header>
+        <DateSelector
         availableDates={availablePuzzleDates}
         selectedDate={selectedDate}
         onDateChange={(newDate) => {
@@ -3093,10 +3213,10 @@ const renderSelectedPathPreview = () => {
           // For now, we assume changing date resets progress for the *previous* date if not submitted.
           setSelectedDate(newDate);
         }}
-      />
-      
-      <main className="flex-grow flex flex-col items-center w-full mt-4">
-        {columnMapping ? renderGrid() : <div className="h-96 ...">Shuffling Path...</div>}
+        />
+        
+        <main className="flex-grow flex flex-col items-center w-full mt-4">
+          {columnMapping ? renderGrid() : <div className="h-96 ...">Shuffling Path...</div>}
 
         <div className="text-center h-12 my-2 px-4 w-full flex flex-col items-center justify-center">
             {gameState.status === "playing" && (
@@ -3127,7 +3247,7 @@ const renderSelectedPathPreview = () => {
         {renderSelectedPathPreview()}
         {/* TODO: bottom messagge and stats open */}
         {/* CLUES SECTION REMOVED */}
-      </main>
+        </main>
 
       {/* <footer className="pb-6 px-4 text-center w-full mt-auto">
         {(gameState.status === "playing" && selectedPath.length > 0) && (
@@ -3135,7 +3255,8 @@ const renderSelectedPathPreview = () => {
         )}
       </footer> */}
 
-      
+      </div>
+
       {/* ... (rest of header structure) ... */}
       
       <style jsx global>{`
