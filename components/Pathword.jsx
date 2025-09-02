@@ -2946,7 +2946,7 @@ const renderSelectedPathPreview = () => {
       {/* Centered play area wrapper; inline-block ensures width matches contents (grid) */}
       <div className="relative inline-block mx-auto">
         {/* Top-right actions positioned relative to grid area */}
-        <div className="absolute right-0 top-0 flex items-center">
+        <div className="absolute right-0 top-0 flex items-center gap-1 sm:gap-2">
           {/* Stats Dialog */}
           <Dialog open={isStatsOpen} onOpenChange={(open) => { setIsStatsOpen(open); if (!open) setShowSuccessPopup(false); }}>
             <DialogTrigger asChild>
