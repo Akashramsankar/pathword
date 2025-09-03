@@ -3212,7 +3212,7 @@ const renderSelectedPathPreview = () => {
               className={`bg-white rounded-lg shadow-xl p-0 max-h-[85vh] overflow-y-scroll md:max-h-none md:overflow-visible transition-all duration-300 ease-in-out scrollbar-visible
                 ${showDetailedHelp
                   ? 'sm:max-w-xl md:max-w-2xl' // Wider for carousel
-                  : 'sm:max-w-md md:max-w-lg'             // Narrower for summary
+                  : 'sm:max-w-xl md:max-w-2xl'             // Narrower for summary
                 }`}
             >
               <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
@@ -3235,7 +3235,7 @@ const renderSelectedPathPreview = () => {
       />
     ) : (
       // --- REVISED SUMMARY VIEW (Default) ---
-      <div className="px-6 text-gray-700 space-y-5 text-sm leading-relaxed">
+      <div className="p-4 px-6 text-gray-700 space-y-5 text-sm leading-relaxed">
         <div>
           <h4 className="font-semibold text-gray-800 mb-1.5">The Goal</h4>
           <p>Find the hidden 6-letter word by tracing a path of letters, one per row from top to bottom. Each letter must be in a new column.</p>
