@@ -84,6 +84,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "ENGINE" (tomorrow)
+  {
+    date: "2025-09-04",
+    grid: [
+      // Row 1 — E at col 2
+      ["A", "P", "E", "J", "S", "U"],
+      // Row 2 — N at col 4
+      ["V", "A", "L", "R", "N", "M"],
+      // Row 3 — G at col 5
+      ["T", "C", "P", "O", "U", "G"],
+      // Row 4 — I at col 0
+      ["I", "A", "W", "L", "S", "W"],
+      // Row 5 — N at col 3
+      ["C", "L", "Q", "N", "T", "M"],
+      // Row 6 — E at col 1
+      ["A", "E", "G", "S", "R", "Y"],
+    ],
+    answer: "ENGINE",
+  },
   // For "ESCAPE" (tomorrow)
   {
     date: "2025-09-03",
@@ -1801,6 +1820,11 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
   const buildYMD = (y, mZeroBased, d) => `${y}-${pad2(mZeroBased + 1)}-${pad2(d)}`;
   const getDaysInMonth = (y, mZeroBased) => new Date(y, mZeroBased + 1, 0).getDate();
 
+  const getTodayYMD = () => {
+    const t = new Date();
+    return buildYMD(t.getFullYear(), t.getMonth(), t.getDate());
+  };
+
   // Derive months available from availableDates (year selection removed for now)
 
   const monthsByYear = useMemo(() => {
@@ -1958,13 +1982,16 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
     );
   };
 
+  const todayYMD = getTodayYMD();
+  const showTodayShortcut = availableSet.has(todayYMD) && selectedDate !== todayYMD;
+
   return (
     <div ref={containerRef} className="my-3 md:my-4 flex justify-center items-center">
       <CalendarDays className="h-5 w-5 text-gray-500 mr-2" />
       <div className="relative inline-block">
         <button
           type="button"
-          className="bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm w-35
+          className="relative bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm w-35
                      py-2.5 pl-3 pr-9 text-left hover:border-gray-400 transition-colors duration-150"
           aria-haspopup="dialog"
           aria-expanded={open}
@@ -1979,16 +2006,33 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
         </button>
 
         {open && (
-          <div
-            className="absolute z-50 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg focus:outline-none"
-            role="dialog"
-            aria-label="Select puzzle date"
-          >
-            {stage === 'month' && renderMonthStage()}
-            {stage === 'day' && renderDayStage()}
-          </div>
+          <>
+            <div
+              className="fixed inset-0 z-40 bg-transparent"
+              aria-hidden="true"
+              onClick={() => setOpen(false)}
+            />
+            <div
+              className="absolute left-1/2 -translate-x-1/2 z-50 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg focus:outline-none"
+              role="dialog"
+              aria-label="Select puzzle date"
+            >
+              {stage === 'month' && renderMonthStage()}
+              {stage === 'day' && renderDayStage()}
+            </div>
+          </>
         )}
       </div>
+      {showTodayShortcut && (
+        <button
+          type="button"
+          onClick={() => { onDateChange(todayYMD); setOpen(false); }}
+          className="ml-3 text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
+          aria-label="Go to today's puzzle"
+        >
+          Today
+        </button>
+      )}
     </div>
   );
 }
@@ -3209,7 +3253,7 @@ const renderSelectedPathPreview = () => {
               </Button>
             </DialogTrigger>
             <DialogContent
-              className={`bg-white rounded-lg shadow-xl p-0 max-h-[85vh] overflow-y-scroll md:max-h-none md:overflow-visible transition-all duration-300 ease-in-out scrollbar-visible
+              className={`bg-white rounded-lg shadow-xl p-0 overflow-y-scroll md:max-h-none md:overflow-visible transition-all duration-300 ease-in-out scrollbar-visible
                 ${showDetailedHelp
                   ? 'sm:max-w-xl md:max-w-2xl' // Wider for carousel
                   : 'sm:max-w-xl md:max-w-2xl'             // Narrower for summary
