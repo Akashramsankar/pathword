@@ -84,6 +84,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "GLOBAL" (tomorrow)
+  {
+    date: "2025-09-05",
+    grid: [
+      // Row 1 — G at col 0
+      ["G", "B", "C", "P", "F", "S"],
+      // Row 2 — L at col 2
+      ["R", "I", "L", "O", "E", "Y"],
+      // Row 3 — O at col 5
+      ["A", "Y", "I", "E", "U", "O"],
+      // Row 4 — B at col 3
+      ["T", "U", "N", "B", "W", "L"],
+      // Row 5 — A at col 4
+      ["S", "E", "L", "R", "A", "T"],
+      // Row 6 — L at col 1
+      ["B", "L", "S", "I", "T", "Y"],
+    ],
+    answer: "GLOBAL",
+  },
   // For "ENGINE" (tomorrow)
   {
     date: "2025-09-04",
@@ -3280,7 +3299,7 @@ const renderSelectedPathPreview = () => {
       <div className="p-4 px-6 text-gray-700 space-y-5 text-sm leading-relaxed">
         <div>
           <h4 className="font-semibold text-gray-800 mb-1.5">The Goal</h4>
-          <p>Find the hidden 6-letter word by tracing a path of letters, one per row from top to bottom. Each letter must be in a new column.</p>
+          <p>To find the hidden 6-letter word, pick one letter from each row, starting at the top and going down, but make sure no two letters are from the same column.</p>
         </div>
         <div>
           <h4 className="font-semibold text-gray-800 mb-1.5">Color Clues</h4>
