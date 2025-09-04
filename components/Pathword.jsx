@@ -2385,8 +2385,6 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
         }
       }
 
-        setIsHelpOpen(true);
-
        }
   }, [currentPuzzle]); // Main data load effect depends on currentPuzzle
 
