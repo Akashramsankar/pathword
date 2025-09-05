@@ -84,6 +84,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "GOBLIN" (tomorrow)
+  {
+    date: "2025-09-06",
+    grid: [
+      // Row 1 — G at col 1
+      ["B", "G", "C", "P", "F", "S"],
+      // Row 2 — O at col 4
+      ["R", "I", "L", "E", "O", "Y"],
+      // Row 3 — B at col 0
+      ["B", "G", "I", "R", "U", "O"],
+      // Row 4 — L at col 3
+      ["C", "E", "B", "L", "S", "P"],
+      // Row 5 — I at col 5
+      ["A", "D", "E", "M", "R", "I"],
+      // Row 6 — N at col 2
+      ["R", "T", "N", "P", "Y", "S"],
+    ],
+    answer: "GOBLIN",
+  },
   // For "GLOBAL" (tomorrow)
   {
     date: "2025-09-05",
