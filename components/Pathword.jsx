@@ -84,6 +84,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "HUSTLE" (tomorrow)
+  {
+    date: "2025-09-07",
+    grid: [
+      // Row 1 — H at col 1
+      ["D", "H", "M", "Q", "T", "K"],
+      // Row 2 — U at col 4
+      ["A", "I", "O", "Y", "U", "E"],
+      // Row 3 — S at col 0
+      ["S", "F", "R", "N", "T", "M"],
+      // Row 4 — T at col 5
+      ["A", "E", "K", "H", "R", "T"],
+      // Row 5 — L at col 2
+      ["B", "D", "L", "A", "S", "R"],
+      // Row 6 — E at col 3
+      ["P", "S", "G", "E", "N", "Y"],
+    ],
+    answer: "HUSTLE",
+  },
   // For "GOBLIN" (tomorrow)
   {
     date: "2025-09-06",
@@ -1933,7 +1952,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
     return (
       <div className="p-3">
         <div className="flex items-center mb-2">
-          <div className="text-xs font-semibold text-gray-500">Select Month</div>
+          <div className="text-[11px] sm:text-xs font-semibold text-gray-500">Select Month</div>
         </div>
         <div className="grid grid-cols-3 gap-2">
           {monthNames.map((nm, idx) => {
@@ -1942,7 +1961,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
               <button
                 key={nm}
                 disabled={!enabled}
-                className={`px-2 py-2 rounded border text-sm ${
+                className={`px-2 py-1.5 sm:py-2 rounded border text-xs sm:text-sm ${
                   enabled
                     ? (idx === tempMonth ? 'border-teal-500 text-teal-700' : 'border-gray-200 hover:bg-slate-50')
                     : 'border-gray-100 text-gray-300 cursor-not-allowed'
@@ -1983,7 +2002,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
             <button className="mr-2 text-gray-500 hover:text-gray-700" aria-label="Back to months" onClick={() => setStage('month')}>
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
             <div className="text-xs font-semibold text-gray-500">{monthNames[tempMonth]} {tempYear}</div>
           </div>
@@ -1996,7 +2015,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
         </div>
         <div className="grid grid-cols-7 gap-1">
           {weeks.flat().map((d, i) => {
-            if (d === null) return <div key={i} className="h-8" />;
+            if (d === null) return <div key={i} className="h-7 sm:h-8" />;
             const enabled = daysSet.has(d);
             const s = buildYMD(tempYear, tempMonth, d);
             const isSelected = s === selectedDate;
@@ -2005,7 +2024,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
                 key={i}
                 disabled={!enabled}
                 onClick={() => enabled && selectDate(tempYear, tempMonth, d)}
-                className={`h-8 rounded border text-sm flex items-center justify-center ${
+                className={`h-7 sm:h-8 rounded border text-xs sm:text-sm flex items-center justify-center ${
                   enabled
                     ? (isSelected ? 'border-teal-500 text-teal-700' : 'border-gray-200 hover:bg-slate-50')
                     : 'border-gray-100 text-gray-300 cursor-not-allowed'
@@ -2025,19 +2044,19 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
 
   return (
     <div ref={containerRef} className="my-3 md:my-4 flex justify-center items-center">
-      <CalendarDays className="h-5 w-5 text-gray-500 mr-2" />
+      <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 mr-2" />
       <div className="relative inline-block">
         <button
           type="button"
-          className="relative bg-white border border-gray-300 text-gray-700 text-sm rounded-md shadow-sm w-35
-                     py-2.5 pl-3 pr-9 text-left hover:border-gray-400 transition-colors duration-150"
+          className="relative bg-white border border-gray-300 text-gray-700 text-xs sm:text-sm rounded-md shadow-sm w-auto min-w-0
+                     py-2 pl-2.5 pr-8 sm:py-2.5 sm:pl-3 sm:pr-9 text-left hover:border-gray-400 transition-colors duration-150"
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
           {formatDateForDisplay(selectedDate)}
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
             </svg>
           </span>
@@ -2051,7 +2070,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
               onClick={() => setOpen(false)}
             />
             <div
-              className="absolute left-1/2 -translate-x-1/2 z-50 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg focus:outline-none"
+              className="absolute left-1/2 -translate-x-1/2 z-50 mt-1 w-60 sm:w-64 bg-white border border-gray-200 rounded-md shadow-lg focus:outline-none"
               role="dialog"
               aria-label="Select puzzle date"
             >
@@ -2383,6 +2402,12 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
             }
         }
         setSelectedPath(reconstructedSolvedPath.filter(p => p.col !== -1));
+
+        if (currentPuzzle.date === getTodayString()) { // Only show auto popup for today's puzzle
+        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 1000);
+      }
+
+
     } else { // Not solved or mapping not ready
       setIsAlreadySolvedToday(false);
       setGameState(prev => ({ ...prev, status: "playing" })); // Ensure playing state
@@ -2926,7 +2951,7 @@ const getCellClassName = (row, originalCol) => {
   // const isTheRevealedCell = /* ... REMOVED ... */;
   const isSelectable = canSelectCell(row, originalCol);
 
-  let baseStyle = `w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
+  let baseStyle = `w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
   let backgroundStyle = 'bg-transparent';
   let textStyle = 'text-gray-700';
   let interactionStyle = 'cursor-default';
@@ -3028,7 +3053,7 @@ const getCellClassName = (row, originalCol) => {
     return (
             <div
         ref={gridRef}
-        className="relative p-1 mx-auto mb-6"
+        className="relative p-1 mx-auto mb-4"
         style={{
           display: "grid",
           gridTemplateRows: `repeat(${gridRows}, max-content)`,
@@ -3093,7 +3118,7 @@ const renderSelectedPathPreview = () => {
   // REMOVED: if (currentPuzzle.revealedLetter && ...) block for pathMap
 
   return (
-    <div className="flex space-x-2 mt-6 mb-6 justify-center items-start h-16">
+    <div className="flex space-x-2 mt-2 mb-2 sm:mt-2 sm:mb-4 justify-center items-start h-14 sm:h-16">
       {[...Array(pathLength)].map((_, index) => {
         const letter = pathMap[index];
         const itemInPath = selectedPath.find(p => p.row === index);
@@ -3124,7 +3149,7 @@ const renderSelectedPathPreview = () => {
         
         return (
           <div key={index} className="flex flex-col items-center">
-            <div className={`w-10 h-10 md:w-12 md:h-12 border-2 rounded-lg flex items-center justify-center text-lg md:text-xl font-semibold transition-colors duration-300 shadow ${borderColor} ${textColor} ${bgColor}`}>
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 border-2 rounded-lg flex items-center justify-center text-base sm:text-lg md:text-xl font-semibold transition-colors duration-300 shadow ${borderColor} ${textColor} ${bgColor}`}>
               {letter || ""}
             </div>
             <span className="mt-1 text-xs text-gray-500">{index + 1}</span>
@@ -3140,11 +3165,16 @@ const renderSelectedPathPreview = () => {
   const isDisplayingTodaysPuzzle = currentPuzzle.date === getTodayString();
 
   return (
-    <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 min-h-screen flex flex-col items-center">
+    <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 h-[100dvh] overflow-hidden flex flex-col items-center">
       {/* Centered play area wrapper; inline-block ensures width matches contents (grid) */}
       <div className="relative inline-block mx-auto">
         {/* Top-right actions positioned relative to grid area */}
-        <div className="absolute right-0 top-0 flex items-center">
+        
+
+        <header className="text-center px-4 md:px-0">
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">Pathword</h1>
+          {/* <p className="text-sm text-gray-600">Connect letters row by row to find the word.</p> */}
+          <div className="absolute right-0 top-0 flex items-center">
           {/* Stats Dialog */}
           <Dialog open={isStatsOpen} onOpenChange={(open) => { setIsStatsOpen(open); if (!open) setShowSuccessPopup(false); }}>
             <DialogTrigger asChild>
@@ -3153,16 +3183,23 @@ const renderSelectedPathPreview = () => {
             <DialogContent className="sm:max-w-md bg-white rounded-lg shadow-xl p-0">
   <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
     <DialogTitle className="text-lg font-semibold text-gray-900">
-      {showSuccessPopup ? "Path Conquered!" : gameState.status === "failed" ? "Better Luck Next Time!" : "Your Journey Stats"}
+      {gameState.status === "success"
+        ? "Path Conquered!"
+        : gameState.status === "failed"
+        ? "Better Luck Next Time!"
+        : "Journey Stats"}
     </DialogTitle>
     {/* Optional: Add a DialogClose button here if you want one in the header,
         otherwise the default one in DialogContent from your ui/dialog might be active */}
   </DialogHeader>
   <div className="p-6 text-gray-700">
-    {(showSuccessPopup || gameState.status === "failed") && (
+    {(gameState.status === "success" || gameState.status === "failed") && (
       <p className={`text-center text-md font-medium mb-5 ${gameState.status === "failed" ? "text-red-600" : "text-green-600"}`}>
-        {gameState.status === "failed" ? "The Pathword was:" : "Congratulations! You found:"} <span className="font-bold">{currentPuzzle.answer}</span>
-        {gameState.status === "success" && ` in ${tryCount} ${tryCount === 1 ? "try" : "tries"}!`}
+        {gameState.status === "failed" ? (
+          <>The Pathword was: <span className="font-bold">{currentPuzzle.answer}</span></>
+        ) : (
+          <>Congratulations! You found: <span className="font-bold">{currentPuzzle.answer}</span>{` in ${tryCount} ${tryCount === 1 ? "try" : "tries"}!`}</>
+        )}
       </p>
     )}
     {/* Main Stats: Streak and Paths Found */}
@@ -3249,21 +3286,15 @@ const renderSelectedPathPreview = () => {
     </div>
   </div>
   <DialogFooter className="px-6 pb-6 pt-2 border-t border-gray-200">
-    {/* Logic for Share/Close button based on game state */}
-    {(showSuccessPopup || gameState.status === "failed") && gameState.status !== "playing" ? (
-        gameState.status === "success" ? (
-            <Button onClick={handleShare} disabled={isCopying} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm py-2.5">
-                <Share2 className="h-4 w-4 mr-2" />
-                {shareFeedback ? shareFeedback : isCopying && !navigator.share ? "Copying..." : "Share Journey"}
-            </Button>
-        ) : ( // For failed state
-            <DialogClose asChild>
-                <Button type="button" className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-md text-sm py-2.5">Close</Button>
-            </DialogClose>
-        )
-    ) : ( // Default close button if not showing success/fail popup content
+    {/* Show Share when today's puzzle is solved; otherwise Close */}
+    {gameState.status === "success" && isDisplayingTodaysPuzzle ? (
+      <Button onClick={handleShare} disabled={isCopying} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm py-2.5">
+        <Share2 className="h-4 w-4 mr-2" />
+        {shareFeedback ? shareFeedback : isCopying && !navigator.share ? "Copying..." : "Share Journey"}
+      </Button>
+    ) : (
       <DialogClose asChild>
-          <Button type="button" className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-md text-sm py-2.5">Close</Button>
+        <Button type="button" className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-md text-sm py-2.5">Close</Button>
       </DialogClose>
     )}
   </DialogFooter>
@@ -3390,10 +3421,6 @@ const renderSelectedPathPreview = () => {
             </DialogContent>
           </Dialog>
         </div>
-
-        <header className="text-center px-4 md:px-0">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">Pathword</h1>
-          <p className="text-sm text-gray-600">Connect letters row by row to find the word.</p>
         </header>
         <DateSelector
         availableDates={availablePuzzleDates}
@@ -3405,23 +3432,21 @@ const renderSelectedPathPreview = () => {
         }}
         />
         
-        <main className="flex-grow flex flex-col items-center w-full mt-4">
+        <main className="flex-grow flex flex-col items-center w-full mt-4 overflow-hidden">
           {columnMapping ? renderGrid() : <div className="h-96 ...">Shuffling Path...</div>}
 
-        <div className="text-center h-12 my-2 px-4 w-full flex flex-col items-center justify-center">
+        <div className="text-center h-12 my-1 px-4 w-full flex flex-col items-center justify-center">
             {gameState.status === "playing" && (
                 <p className="text-blue-600 font-semibold text-md">
                     Tries Left: {MAX_TRIES - tryCount} / {MAX_TRIES}
                 </p>
             )}
-            {isAlreadySolvedToday && isDisplayingTodaysPuzzle && gameState.status !== "playing" && ( // Changed playing to not playing
-                <div className="flex flex-col items-center gap-2">
-                    <p className="text-green-600 font-semibold text-lg">You've already found today's Pathword: {currentPuzzle.answer}!</p>
-                    <Button onClick={() => { setShowSuccessPopup(true); setIsStatsOpen(true);}} className="bg-emerald-600 ..."><Share2/>View Stats & Share</Button>
-                </div>
+            {isAlreadySolvedToday && isDisplayingTodaysPuzzle && gameState.status !== "playing" && (
+                                <p className="text-green-600 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
+
             )}
             {isAlreadySolvedToday && !isDisplayingTodaysPuzzle && gameState.status !== "playing" && (
-                 <p className="text-green-600 font-semibold text-lg">You previously solved: {currentPuzzle.answer} (from {currentPuzzle.date})</p>
+                <p className="text-green-600 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
             )}
             {gameState.status === "success" && !isAlreadySolvedToday && !isStatsOpen && ( // If just solved
                 <p className="text-green-600 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
@@ -3435,6 +3460,18 @@ const renderSelectedPathPreview = () => {
         </div>
 
         {renderSelectedPathPreview()}
+
+        {/* {isAlreadySolvedToday && isDisplayingTodaysPuzzle && gameState.status !== "playing" && (
+          <div className="mb-1">
+            <Button
+              onClick={() => { setShowSuccessPopup(true); setIsStatsOpen(true); }}
+              className="h-8 px-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-md"
+            >
+              <Share2 className="h-3 w-3 mr-1" />
+              View Stats & Share
+            </Button>
+          </div>
+        )} */}
         {/* TODO: bottom messagge and stats open */}
         {/* CLUES SECTION REMOVED */}
         </main>
