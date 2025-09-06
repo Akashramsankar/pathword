@@ -2404,7 +2404,7 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
         setSelectedPath(reconstructedSolvedPath.filter(p => p.col !== -1));
 
         if (currentPuzzle.date === getTodayString()) { // Only show auto popup for today's puzzle
-        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 1000);
+        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 2000);
       }
 
 
@@ -2951,7 +2951,7 @@ const getCellClassName = (row, originalCol) => {
   // const isTheRevealedCell = /* ... REMOVED ... */;
   const isSelectable = canSelectCell(row, originalCol);
 
-  let baseStyle = `w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
+  let baseStyle = `w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
   let backgroundStyle = 'bg-transparent';
   let textStyle = 'text-gray-700';
   let interactionStyle = 'cursor-default';
@@ -3042,7 +3042,7 @@ const getCellClassName = (row, originalCol) => {
 
   const renderGrid = () => { /* ... (renderGrid largely same, ensure it uses getCellClassName) ... */ 
     if (!columnMapping || !currentPuzzle.grid || currentPuzzle.grid.length === 0) return <div className="h-96 ...">Loading Grid...</div>;
-    const gridRows = currentPuzzle.grid.length; const gridCols = currentPuzzle.grid[0].length; const gap = "0.75rem";
+    const gridRows = currentPuzzle.grid.length; const gridCols = currentPuzzle.grid[0].length; const gap = "0.875rem";
     const displayGridLetters = currentPuzzle.grid.map((originalRow) => {
       const displayedRow = new Array(gridCols);
       for (let originalCol = 0; originalCol < gridCols; originalCol++) {
@@ -3053,7 +3053,7 @@ const getCellClassName = (row, originalCol) => {
     return (
             <div
         ref={gridRef}
-        className="relative p-1 mx-auto mb-4"
+        className="relative p-1 mx-auto mt-2 sm:mt-3  mb-3 sm:mb-4"
         style={{
           display: "grid",
           gridTemplateRows: `repeat(${gridRows}, max-content)`,
@@ -3118,7 +3118,7 @@ const renderSelectedPathPreview = () => {
   // REMOVED: if (currentPuzzle.revealedLetter && ...) block for pathMap
 
   return (
-    <div className="flex space-x-2 mt-2 mb-2 sm:mt-2 sm:mb-4 justify-center items-start h-14 sm:h-16">
+    <div className="flex space-x-2 mt-2 sm:mt-3 mb-2 sm:mb-3 justify-center items-start h-14 sm:h-16">
       {[...Array(pathLength)].map((_, index) => {
         const letter = pathMap[index];
         const itemInPath = selectedPath.find(p => p.row === index);
@@ -3149,7 +3149,7 @@ const renderSelectedPathPreview = () => {
         
         return (
           <div key={index} className="flex flex-col items-center">
-            <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 border-2 rounded-lg flex items-center justify-center text-base sm:text-lg md:text-xl font-semibold transition-colors duration-300 shadow ${borderColor} ${textColor} ${bgColor}`}>
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 border-2 rounded-lg flex items-center justify-center text-base sm:text-lg md:text-xl font-semibold transition-colors duration-300 shadow ${borderColor} ${textColor} ${bgColor}`}>
               {letter || ""}
             </div>
             <span className="mt-1 text-xs text-gray-500">{index + 1}</span>
@@ -3432,10 +3432,10 @@ const renderSelectedPathPreview = () => {
         }}
         />
         
-        <main className="flex-grow flex flex-col items-center w-full mt-4 overflow-hidden">
+        <main className="flex-grow flex flex-col items-center w-full mt-3 sm:mt-4 overflow-hidden">
           {columnMapping ? renderGrid() : <div className="h-96 ...">Shuffling Path...</div>}
 
-        <div className="text-center h-12 my-1 px-4 w-full flex flex-col items-center justify-center">
+        <div className="text-center my-2 sm:my-3 px-4 w-full flex flex-col items-center justify-center">
             {gameState.status === "playing" && (
                 <p className="text-blue-600 font-semibold text-md">
                     Tries Left: {MAX_TRIES - tryCount} / {MAX_TRIES}
@@ -3461,17 +3461,7 @@ const renderSelectedPathPreview = () => {
 
         {renderSelectedPathPreview()}
 
-        {/* {isAlreadySolvedToday && isDisplayingTodaysPuzzle && gameState.status !== "playing" && (
-          <div className="mb-1">
-            <Button
-              onClick={() => { setShowSuccessPopup(true); setIsStatsOpen(true); }}
-              className="h-8 px-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-md"
-            >
-              <Share2 className="h-3 w-3 mr-1" />
-              View Stats & Share
-            </Button>
-          </div>
-        )} */}
+        
         {/* TODO: bottom messagge and stats open */}
         {/* CLUES SECTION REMOVED */}
         </main>
