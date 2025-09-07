@@ -2180,6 +2180,7 @@ export default function Pathword() {
     solvesByTries: Object.fromEntries(Array.from({ length: 10 }, (_, i) => [String(i + 1), 0])),
     failedSolves: 0, // Separate count for failed (ran out of tries)
     lastSolveDate: null,
+    maxStreak: 0,
   });
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
@@ -2330,11 +2331,15 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
     if (loadedStats) {
       try {
         const parsedStats = JSON.parse(loadedStats);
+        const inferredMaxStreak = (parsedStats.maxStreak === undefined || parsedStats.maxStreak === null)
+          ? (parsedStats.streak || 0)
+          : parsedStats.maxStreak;
         setUserStats({
           streak: parsedStats.streak || 0,
           solvesByTries: parsedStats.solvesByTries || Object.fromEntries(Array.from({ length: MAX_TRIES }, (_, i) => [String(i + 1), 0])),
           failedSolves: parsedStats.failedSolves || 0,
           lastSolveDate: parsedStats.lastSolveDate || null,
+          maxStreak: inferredMaxStreak,
         });
       } catch (e) { console.error("Failed to parse stats:", e); }
     }
@@ -2886,7 +2891,8 @@ const getOtherSelectableLettersInRow = (row, currentSelectedLetter, correctLette
             } else newStreak = 1;
         }
 
-        const newStats = { ...prevStats, streak: newStreak, solvesByTries: newSolvesByTries, lastSolveDate: newLastSolveDate };
+        const newMaxStreak = Math.max((prevStats.maxStreak ?? 0), (newStreak ?? 0));
+        const newStats = { ...prevStats, streak: newStreak, maxStreak: newMaxStreak, solvesByTries: newSolvesByTries, lastSolveDate: newLastSolveDate };
         saveStats(newStats);
         return newStats;
       });
@@ -3232,9 +3238,9 @@ const renderSelectedPathPreview = () => {
                 )}
               </div>
 
-              {/* Inline hero stats: Paths Found • Win % • Current Streak */}
+              {/* Inline hero stats: Paths Found • Win % • Current Streak • Max Streak */}
               <div className="px-6">
-                <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-4 gap-4 text-center">
                   <div>
                     <div className="text-4xl font-extrabold tracking-tight text-gray-900">{totalWins}</div>
                     <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Paths Found</div>
@@ -3247,13 +3253,17 @@ const renderSelectedPathPreview = () => {
                     <div className="text-4xl font-extrabold tracking-tight text-gray-900">{userStats.streak}</div>
                     <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Current Streak</div>
                   </div>
+                  <div>
+                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{(userStats.maxStreak && userStats.maxStreak > 0) ? userStats.maxStreak : (userStats.streak || 0)}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Max Streak</div>
+                  </div>
                 </div>
               </div>
 
               {/* Distribution */}
               <div className="px-6 mt-6 mb-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-gray-800">Guess Distribution</h3>
+                  <h3 className="text-sm font-extrabold font-semibold text-gray-800">Guess Distribution</h3>
                   <button
                     onClick={() => setIsStatsDistributionOpen(!isStatsDistributionOpen)}
                     className="text-gray-500 hover:text-gray-700"
