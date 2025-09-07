@@ -14,6 +14,8 @@ import {
   ChevronRight,
   CalendarDays
 } from "lucide-react";
+// Icons for celebratory UI in the stats dialog
+import { Award, Trophy, Star } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -3188,6 +3190,11 @@ const renderSelectedPathPreview = () => {
 
   const isDisplayingTodaysPuzzle = currentPuzzle.date === getTodayString();
 
+  // Derived user metrics for the stats header
+  const totalWins = Object.values(userStats.solvesByTries || {}).reduce((a, b) => a + b, 0);
+  const totalPlayed = totalWins + (userStats.failedSolves || 0);
+  const winPct = totalPlayed > 0 ? Math.round((totalWins / totalPlayed) * 100) : 0;
+
   return (
     <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 h-[100dvh] overflow-hidden flex flex-col items-center">
       {/* Centered play area wrapper; inline-block ensures width matches contents (grid) */}
@@ -3204,124 +3211,102 @@ const renderSelectedPathPreview = () => {
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="View Stats"><BarChart3 className="h-6 w-6 text-gray-600" /></Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-white rounded-lg shadow-xl p-0">
-  <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
-    <DialogTitle className="text-lg font-semibold text-gray-900">
-      {gameState.status === "success"
-        ? "Path Conquered!"
-        : gameState.status === "failed"
-        ? "Better Luck Next Time!"
-        : "Journey Stats"}
-    </DialogTitle>
-    {/* Optional: Add a DialogClose button here if you want one in the header,
-        otherwise the default one in DialogContent from your ui/dialog might be active */}
-  </DialogHeader>
-  <div className="p-6 text-gray-700">
-    {(gameState.status === "success" || gameState.status === "failed") && (
-      <p className={`text-center text-md font-medium mb-5 ${gameState.status === "failed" ? "text-red-600" : "text-green-600"}`}>
-        {gameState.status === "failed" ? (
-          <>The Pathword was: <span className="font-bold">{currentPuzzle.answer}</span></>
-        ) : (
-          <>Congratulations! You found: <span className="font-bold">{currentPuzzle.answer}</span>{` in ${tryCount} ${tryCount === 1 ? "try" : "tries"}!`}</>
-        )}
-      </p>
-    )}
-    {/* Main Stats: Streak and Paths Found */}
-    <div className="grid grid-cols-2 gap-4 mb-6">
-      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
-        <div className="text-3xl font-bold text-emerald-700">
-          {userStats.streak}
-        </div>
-        <div className="text-xs uppercase text-emerald-600 font-medium tracking-wide">
-          Current Streak
-        </div>
-      </div>
-      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
-        <div className="text-3xl font-bold text-emerald-700">
-          {Object.values(userStats.solvesByTries || {}).reduce((a, b) => a + b, 0)}
-        </div>
-        <div className="text-xs uppercase text-emerald-600 font-medium tracking-wide">
-          Paths Found
-        </div>
-      </div>
-    </div>
-     <div className="flex justify-center mb-6">
-                  {" "}
-                  {/* This flex container will center its child */}
-                  <div className="w-full max-w-[calc(50%-0.5rem)] sm:max-w-[calc(50%-0.5rem)] md:max-w-[160x]">
-                    {" "}
-                    {/* Adjust width constraint */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center w-full max-w-xs mx-auto">
-                      {" "}
-                      {/* Added max-w-xs and mx-auto for the box itself */}
-                      <div className="text-3xl font-bold text-blue-700">
-                        {gameState.status === "success" ? tryCount : "-"}
-                      </div>
-                      <div className="text-xs uppercase text-blue-600 font-medium tracking-wide">
-                        Path Tries This Game
-                      </div>
-                    </div>
+            <DialogContent className="sm:max-w-md bg-white rounded-xl shadow-2xl p-0 overflow-hidden">
+              {/* Celebrate header */}
+              <div className="px-6 pt-8 pb-6 relative">
+                {/* Festive badge */}
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 ring-8 ring-emerald-50 shadow-sm">
+                  <Star className="h-7 w-7 text-emerald-600" />
+                </div>
+                <DialogTitle className="text-center text-2xl font-extrabold tracking-tight text-gray-900">
+                  {gameState.status === "success" ? "Congratulations!" : gameState.status === "failed" ? "Statistics" : "Statistics"}
+                </DialogTitle>
+                {(gameState.status === "success" || gameState.status === "failed") && (
+                  <p className={`mt-2 text-center text-sm ${gameState.status === "failed" ? "text-red-600" : "text-gray-600"}`}>
+                    {gameState.status === "failed" ? (
+                      <>The Pathword was <span className="font-semibold text-gray-900">{currentPuzzle.answer}</span>.</>
+                    ) : (
+                      <>You found <span className="font-semibold text-gray-900">{currentPuzzle.answer}</span>{` in ${tryCount} ${tryCount === 1 ? "try" : "tries"}!`}</>
+                    )}
+                  </p>
+                )}
+              </div>
+
+              {/* Inline hero stats: Paths Found • Win % • Current Streak */}
+              <div className="px-6">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{totalWins}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Paths Found</div>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{winPct}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Win %</div>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{userStats.streak}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Current Streak</div>
                   </div>
                 </div>
+              </div>
 
-    {/* "Path Tries This Game" was removed as per your UI reference - it's now in the success/fail message */}
+              {/* Distribution */}
+              <div className="px-6 mt-6 mb-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-gray-800">Guess Distribution</h3>
+                  <button
+                    onClick={() => setIsStatsDistributionOpen(!isStatsDistributionOpen)}
+                    className="text-gray-500 hover:text-gray-700"
+                    aria-expanded={isStatsDistributionOpen}
+                    aria-controls="solve-distribution-content"
+                  >
+                    {isStatsDistributionOpen ? (
+                      <ChevronDown className="h-5 w-5" />
+                    ) : (
+                      <ChevronRight className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
 
-    {/* Solve Distribution by Tries 
-    <h3 className="text-center font-semibold mb-3 text-gray-700 text-sm">
-      Solve Distribution <span className="font-normal text-gray-500">(by path tries taken)</span>
-    </h3> */}
-    <div className="mt-6 border-t border-gray-200 pt-4"> {/* Added a separator and spacing */}
-      <button
-        onClick={() => setIsStatsDistributionOpen(!isStatsDistributionOpen)}
-        className="flex justify-between items-center w-full text-left py-2 focus:outline-none"
-        aria-expanded={isStatsDistributionOpen}
-        aria-controls="solve-distribution-content"
-      >
-        <h3 className="text-center font-semibold text-gray-700 text-sm">
-          Solve Distribution <span className="font-normal text-gray-500">(by path tries taken)</span>
-        </h3>
-        {/* Chevron icon for collapse/expand indication */}
-        {isStatsDistributionOpen ? (
-          <ChevronDown className="h-5 w-5 text-gray-500 transform transition-transform" />
-        ) : (
-          <ChevronRight className="h-5 w-5 text-gray-500 transform transition-transform" />
-        )}
-      </button>
+                {(() => {
+                  const counts = Array.from({length: MAX_TRIES}, (_,i)=> userStats.solvesByTries?.[String(i+1)] || 0);
+                  const maxCount = Math.max(1, ...counts, userStats.failedSolves || 0);
+                  return (
+                    isStatsDistributionOpen && (
+                      <div id="solve-distribution-content" className="mt-3 space-y-1.5">
+                        {counts.map((cnt, i) => {
+                          const pct = Math.max(12, (cnt / maxCount) * 100);
+                          return (
+                            <div key={`dist-${i+1}`} className="flex items-center gap-2 text-sm">
+                              <div className="w-5 text-gray-500">{i+1}</div>
+                              <div className="relative h-6 flex-1 rounded-md bg-slate-100 border border-slate-200 overflow-hidden">
+                                <div className="h-full rounded-md bg-emerald-600/80 text-white text-xs font-semibold flex items-center justify-end pr-2 transition-all" style={{ width: `${pct}%` }}>
+                                  {cnt}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        
+                      </div>
+                    )
+                  );
+                })()}
+              </div>
 
-      {/* Conditionally rendered content */}
-      {isStatsDistributionOpen && (
-        <div id="solve-distribution-content" className="space-y-1.5 text-sm mt-3">
-          {Array.from({ length: MAX_TRIES }, (_, i) => String(i + 1)).map((triesAttempted) => (
-            <div
-              key={triesAttempted}
-              className="flex justify-between items-center bg-slate-50 px-4 py-2.5 rounded-md border border-slate-200"
-            >
-              <span className="text-gray-600">
-                {triesAttempted} {parseInt(triesAttempted) === 1 ? "Try" : "Tries"}:
-              </span>
-              <span className="font-semibold text-emerald-700">
-                {userStats.solvesByTries?.[triesAttempted] || 0}
-              </span>
-            </div>
-          ))}
-          
-        </div>
-      )}
-    </div>
-  </div>
-  <DialogFooter className="px-6 pb-6 pt-2 border-t border-gray-200">
-    {/* Show Share when today's puzzle is solved; otherwise Close */}
-    {gameState.status === "success" && isDisplayingTodaysPuzzle ? (
-      <Button onClick={handleShare} disabled={isCopying} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm py-2.5">
-        <Share2 className="h-4 w-4 mr-2" />
-        {shareFeedback ? shareFeedback : isCopying && !navigator.share ? "Copying..." : "Share Journey"}
-      </Button>
-    ) : (
-      <DialogClose asChild>
-        <Button type="button" className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-md text-sm py-2.5">Close</Button>
-      </DialogClose>
-    )}
-  </DialogFooter>
+              {/* Footer actions */}
+              <DialogFooter className="px-6 pt-6 pb-6 border-t border-gray-200">
+                {gameState.status === "success" && isDisplayingTodaysPuzzle ? (
+                  <Button onClick={handleShare} disabled={isCopying} className="w-full h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-base">
+                    <Share2 className="h-5 w-5 mr-2" />
+                    {shareFeedback ? shareFeedback : isCopying && !navigator.share ? "Copying..." : "Share"}
+                  </Button>
+                ) : (
+                  <DialogClose asChild>
+                    <Button type="button" className="w-full h-10 rounded-full bg-gray-900 hover:bg-gray-800 text-white">Close</Button>
+                  </DialogClose>
+                )}
+              </DialogFooter>
             </DialogContent>
           </Dialog>
           {/* Help Dialog */}
