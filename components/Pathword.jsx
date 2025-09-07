@@ -2047,12 +2047,11 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
                 className={`h-7 sm:h-8 rounded border text-xs sm:text-sm flex items-center justify-center ${
                   enabled
                     ? (
-                        (isSolved
-                          ? 'border-green-200 bg-green-50 text-green-700'
+                        isSolved
+                          ? `border-green-200 ${isSelected ? 'border-green-600' : ''} bg-green-50 text-green-700`
                           : isFailed
-                            ? 'border-red-200 bg-red-50 text-red-700'
-                            : 'border-gray-200 hover:bg-slate-50') +
-                        (isSelected ? ' ring-1 ring-gray-500' : '')
+                            ? `border-red-200 ${isSelected ? 'border-red-500' : ''} bg-red-50 text-red-700`
+                            : (isSelected ? 'border-gray-500' : 'border-gray-200 hover:bg-slate-50')
                       )
                     : 'border-gray-100 text-gray-300 cursor-not-allowed'
                 }`}
