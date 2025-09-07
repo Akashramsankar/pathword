@@ -3279,8 +3279,8 @@ const renderSelectedPathPreview = () => {
                           return (
                             <div key={`dist-${i+1}`} className="flex items-center gap-2 text-sm">
                               <div className="w-5 text-gray-500">{i+1}</div>
-                              <div className="relative h-6 flex-1 rounded-md bg-slate-100 border border-slate-200 overflow-hidden">
-                                <div className="h-full rounded-md bg-emerald-600/80 text-white text-xs font-semibold flex items-center justify-end pr-2 transition-all" style={{ width: `${pct}%` }}>
+                              <div className="relative h-6 flex-1 overflow-hidden">
+                                <div className="h-full rounded-md bg-emerald-300/50 text-gray-500 text-xs font-semibold flex items-center justify-end pr-2 transition-all" style={{ width: `${pct}%` }}>
                                   {cnt}
                                 </div>
                               </div>
