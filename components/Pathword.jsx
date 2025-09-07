@@ -86,6 +86,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "DESIRE" (tomorrow)
+  {
+    date: "2025-09-08",
+    grid: [
+      // Row 1 — D at col 1
+      ["A", "D", "F", "S", "U", "W"],
+      // Row 2 — E at col 4
+      ["R", "L", "O", "R", "E", "Y"],
+      // Row 3 — S at col 0
+      ["S", "K", "F", "R", "B", "I"],
+      // Row 4 — I at col 5
+      ["A", "D", "E", "C", "T", "I"],
+      // Row 5 — R at col 2
+      ["B", "E", "R", "V", "U", "Y"],
+      // Row 6 — E at col 3
+      ["T", "P", "L", "E", "S", "R"],
+    ],
+    answer: "DESIRE",
+  },
   // For "HUSTLE" (tomorrow)
   {
     date: "2025-09-07",
