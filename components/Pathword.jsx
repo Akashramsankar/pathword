@@ -2026,10 +2026,10 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
             const enabled = daysSet.has(d);
             const s = buildYMD(tempYear, tempMonth, d);
             const isSelected = s === selectedDate;
-            // Determine historical status from localStorage
+            // Determine historical status from localStorage (also when selected)
             let isSolved = false;
             let isFailed = false;
-            if (enabled && !isSelected) {
+            if (enabled) {
               try {
                 isSolved = localStorage.getItem(`${SOLVED_TODAY_KEY_PREFIX}${s}`) === 'true';
                 if (!isSolved) {
@@ -2046,13 +2046,14 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
                 onClick={() => enabled && selectDate(tempYear, tempMonth, d)}
                 className={`h-7 sm:h-8 rounded border text-xs sm:text-sm flex items-center justify-center ${
                   enabled
-                    ? (isSelected
-                        ? 'border-teal-500 text-teal-700'
-                        : isSolved
+                    ? (
+                        (isSolved
                           ? 'border-green-200 bg-green-50 text-green-700'
                           : isFailed
                             ? 'border-red-200 bg-red-50 text-red-700'
-                            : 'border-gray-200 hover:bg-slate-50')
+                            : 'border-gray-200 hover:bg-slate-50') +
+                        (isSelected ? ' ring-1 ring-gray-500' : '')
+                      )
                     : 'border-gray-100 text-gray-300 cursor-not-allowed'
                 }`}
               >
@@ -3228,7 +3229,7 @@ const renderSelectedPathPreview = () => {
                   {gameState.status === "success" ? "Congratulations!" : gameState.status === "failed" ? "Statistics" : "Statistics"}
                 </DialogTitle>
                 {(gameState.status === "success" || gameState.status === "failed") && (
-                  <p className={`mt-2 text-center text-sm ${gameState.status === "failed" ? "text-red-600" : "text-gray-600"}`}>
+                  <p className={`mt-2 text-center text-sm ${gameState.status === "failed" ? "text-gray-600" : "text-gray-600"}`}>
                     {gameState.status === "failed" ? (
                       <>The Pathword was <span className="font-semibold text-gray-900">{currentPuzzle.answer}</span>.</>
                     ) : (
@@ -3242,19 +3243,19 @@ const renderSelectedPathPreview = () => {
               <div className="px-6">
                 <div className="grid grid-cols-4 gap-4 text-center">
                   <div>
-                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{totalWins}</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900">{totalWins}</div>
                     <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Paths Found</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{winPct}</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900">{winPct}</div>
                     <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Win %</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{userStats.streak}</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900">{userStats.streak}</div>
                     <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Current Streak</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-extrabold tracking-tight text-gray-900">{(userStats.maxStreak && userStats.maxStreak > 0) ? userStats.maxStreak : (userStats.streak || 0)}</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900">{(userStats.maxStreak && userStats.maxStreak > 0) ? userStats.maxStreak : (userStats.streak || 0)}</div>
                     <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Max Streak</div>
                   </div>
                 </div>
@@ -3313,7 +3314,7 @@ const renderSelectedPathPreview = () => {
                   </Button>
                 ) : (
                   <DialogClose asChild>
-                    <Button type="button" className="w-full h-10 rounded-full bg-gray-900 hover:bg-gray-800 text-white">Close</Button>
+                    <Button type="button" className="w-full h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-800 text-base">Close</Button>
                   </DialogClose>
                 )}
               </DialogFooter>
