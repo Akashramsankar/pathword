@@ -3222,7 +3222,11 @@ const renderSelectedPathPreview = () => {
               <div className="px-6 pt-8 pb-6 relative">
                 {/* Festive badge */}
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 ring-8 ring-emerald-50 shadow-sm">
-                  <Star className="h-7 w-7 text-emerald-600" />
+                  {gameState.status === "success" ? (
+                    <Star className="h-7 w-7 text-emerald-600" />
+                  ) : (
+                    <BarChart3 className="h-7 w-7 text-emerald-600" />
+                  )}
                 </div>
                 <DialogTitle className="text-center text-2xl font-extrabold tracking-tight text-gray-900">
                   {gameState.status === "success" ? "Congratulations!" : gameState.status === "failed" ? "Statistics" : "Statistics"}
