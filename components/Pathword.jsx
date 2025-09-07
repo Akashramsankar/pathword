@@ -1877,6 +1877,11 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
   const buildYMD = (y, mZeroBased, d) => `${y}-${pad2(mZeroBased + 1)}-${pad2(d)}`;
   const getDaysInMonth = (y, mZeroBased) => new Date(y, mZeroBased + 1, 0).getDate();
 
+  // Storage keys and thresholds used by the game
+  const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-";
+  const TRY_COUNT_KEY_PREFIX = "pathwordTryCount-";
+  const MAX_TRIES_CAL = 6; // Must match game's MAX_TRIES
+
   const getTodayYMD = () => {
     const t = new Date();
     return buildYMD(t.getFullYear(), t.getMonth(), t.getDate());
@@ -2019,6 +2024,19 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
             const enabled = daysSet.has(d);
             const s = buildYMD(tempYear, tempMonth, d);
             const isSelected = s === selectedDate;
+            // Determine historical status from localStorage
+            let isSolved = false;
+            let isFailed = false;
+            if (enabled && !isSelected) {
+              try {
+                isSolved = localStorage.getItem(`${SOLVED_TODAY_KEY_PREFIX}${s}`) === 'true';
+                if (!isSolved) {
+                  const tcRaw = localStorage.getItem(`${TRY_COUNT_KEY_PREFIX}${s}`);
+                  const tc = tcRaw ? parseInt(tcRaw, 10) : 0;
+                  if (!isNaN(tc) && tc >= MAX_TRIES_CAL) isFailed = true;
+                }
+              } catch (_) { /* ignore */ }
+            }
             return (
               <button
                 key={i}
@@ -2026,7 +2044,13 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
                 onClick={() => enabled && selectDate(tempYear, tempMonth, d)}
                 className={`h-7 sm:h-8 rounded border text-xs sm:text-sm flex items-center justify-center ${
                   enabled
-                    ? (isSelected ? 'border-teal-500 text-teal-700' : 'border-gray-200 hover:bg-slate-50')
+                    ? (isSelected
+                        ? 'border-teal-500 text-teal-700'
+                        : isSolved
+                          ? 'border-green-200 bg-green-50 text-green-700'
+                          : isFailed
+                            ? 'border-red-200 bg-red-50 text-red-700'
+                            : 'border-gray-200 hover:bg-slate-50')
                     : 'border-gray-100 text-gray-300 cursor-not-allowed'
                 }`}
               >
