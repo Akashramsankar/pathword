@@ -93,9 +93,9 @@ const dailyPuzzles = [
       // Row 1 — D at col 1
       ["A", "D", "F", "S", "U", "W"],
       // Row 2 — E at col 4
-      ["R", "L", "O", "R", "E", "Y"],
+      ["I", "L", "O", "R", "E", "Y"],
       // Row 3 — S at col 0
-      ["S", "K", "F", "R", "B", "I"],
+      ["S", "K", "F", "R", "B", "L"],
       // Row 4 — I at col 5
       ["A", "D", "E", "C", "T", "I"],
       // Row 5 — R at col 2
@@ -3412,7 +3412,7 @@ const renderSelectedPathPreview = () => {
             {/* Yellow Example */}
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-8 h-8 bg-yellow-400 border border-yellow-400 rounded flex items-center justify-center text-white font-bold text-lg"></div>
-               <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but it's an immediate alphabetical neighbor to the correct letter in that row (one before or one after).</p>
+               <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but it's an immediate alphabetical neighbor to the correct letter in that row (one before or one after).<br />👉 Note: The alphabet isn’t circular — Z is not close to A.</p>
                 {/* Yellow Example */}
 
             </div>
@@ -3435,7 +3435,7 @@ const renderSelectedPathPreview = () => {
             />
           </div>
         </div>
-         {/* <Button
+         <Button
             variant="link"
             className="p-0 h-auto text-teal-600 hover:text-teal-700"
             onClick={() => {
@@ -3443,14 +3443,14 @@ const renderSelectedPathPreview = () => {
                 setCurrentHelpSlide(0); // Start carousel from the beginning
             }}
           >
-            See More Visual Examples &rarr;
-          </Button> */}
+            Learn More &rarr;
+          </Button>
       </div>
     )}
 
       {/* Scrollbar is visible on small screens via overflow-y-scroll; no overlay hint needed */}
 
-     <DialogFooter className="px-6 pb-6 pt-4 border-t border-gray-200">
+     {/* <DialogFooter className="px-6 pb-6 pt-4 border-t border-gray-200">
                  <DialogClose asChild>
                     <Button
                       type="button"
@@ -3459,7 +3459,7 @@ const renderSelectedPathPreview = () => {
                       {showDetailedHelp ? "Back to Game" : "Let's Play!"}
                     </Button>
                   </DialogClose>
-              </DialogFooter>
+              </DialogFooter> */}
             </DialogContent>
           </Dialog>
         </div>
