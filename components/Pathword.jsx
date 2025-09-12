@@ -86,6 +86,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "SWIVEL" (tomorrow)
+  {
+    date: "2025-09-13",
+    grid: [
+      // Row 1 — S at col 1
+      ["A", "S", "C", "P", "U", "G"],
+      // Row 2 — W at col 4
+      ["H", "R", "N", "L", "W", "O"],
+      // Row 3 — I at col 0
+      ["I", "F", "A", "E", "T", "Y"],
+      // Row 4 — V at col 5
+      ["B", "E", "T", "C", "R", "V"],
+      // Row 5 — E at col 2
+      ["C", "G", "E", "A", "U", "R"],
+      // Row 6 — L at col 3
+      ["S", "D", "K", "L", "A", "T"],
+    ],
+    answer: "SWIVEL",
+  },
   // For "ABSORB"
 {
   date: "2025-09-12", // Set your desired date for tomorrow
@@ -3833,7 +3852,7 @@ const renderSelectedPathPreview = () => {
             >
               <DialogHeader className={`flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200`}>
                 <DialogTitle className={`text-xl font-bold tracking-tight text-gray-800`}>
-                  {showDetailedHelp ? 'Practice Round' : 'How To Play'}
+                  {showDetailedHelp ? 'Practise Round' : 'How To Play'}
                 </DialogTitle>
               {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                   <CloseIcon className="h-5 w-5 text-gray-500 hover:text-gray-700" />
@@ -3902,7 +3921,7 @@ const renderSelectedPathPreview = () => {
                 setCurrentHelpSlide(0); // Start carousel from the beginning
             }}
           >
-            Practice Round &rarr;
+            Practise Round &rarr;
           </Button>
       </div>
     )}
