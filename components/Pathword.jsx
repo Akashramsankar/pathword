@@ -86,6 +86,76 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "ABSORB"
+{
+  date: "2025-09-12", // Set your desired date for tomorrow
+  grid: [
+    ["C", "G", "A", "M", "T", "Y"], 
+    ["R", "H", "N", "I", "E", "B"],  
+    ["O", "S", "F", "Y", "I", "G"],  
+    ["E", "K", "J", "U", "O", "W"],  
+    ["R", "T", "G", "L", "S", "A"],  
+    ["S", "H", "M", "B", "T", "Y"]  
+  ],
+  answer: "ABSORB",
+},
+  // For "MOSQUE" (tomorrow)
+  {
+    date: "2025-09-11",
+    grid: [
+      // Row 1 — M at col 2
+      ["A", "G", "M", "R", "O", "S"],
+      // Row 2 — O at col 5
+      ["E", "C", "H", "Y", "U", "O"],
+      // Row 3 — S at col 1
+      ["C", "S", "L", "A", "P", "K"],
+      // Row 4 — Q at col 3
+      ["E", "I", "N", "Q", "T", "L"],
+      // Row 5 — U at col 4
+      ["A", "J", "K", "R", "U", "R"],
+      // Row 6 — E at col 0
+      ["E", "H", "M", "S", "T", "Y"],
+    ],
+    answer: "MOSQUE",
+  },
+  // For "SOCCER" (tomorrow)
+  {
+    date: "2025-09-10",
+    grid: [
+      // Row 1 — S at col 0
+      ["S", "E", "K", "P", "T", "Y"],
+      // Row 2 — O at col 2
+      ["A", "H", "O", "R", "U", "L"],
+      // Row 3 — C at col 5
+      ["D", "I", "J", "M", "R", "C"],
+      // Row 4 — C at col 3
+      ["A", "K", "E", "C", "S", "W"],
+      // Row 5 — E at col 1
+      ["T", "E", "G", "N", "A", "Y"],
+      // Row 6 — R at col 4
+      ["B", "P", "K", "O", "R", "T"],
+    ],
+    answer: "SOCCER",
+  },
+  // For "FATHER" (tomorrow)
+  {
+    date: "2025-09-09",
+    grid: [
+      // Row 1 — F at col 0
+      ["F", "D", "H", "M", "T", "Y"],
+      // Row 2 — A at col 2
+      ["O", "E", "A", "L", "U", "R"],
+      // Row 3 — T at col 5
+      ["S", "G", "C", "M", "R", "T"],
+      // Row 4 — H at col 3
+      ["B", "A", "L", "H", "T", "W"],
+      // Row 5 — E at col 1
+      ["Q", "E", "I", "N", "O", "Y"],
+      // Row 6 — R at col 4
+      ["S", "D", "K", "O", "R", "Y"],
+    ],
+    answer: "FATHER",
+  },
   // For "DESIRE" (tomorrow)
   {
     date: "2025-09-08",
@@ -1870,6 +1940,399 @@ function DetailedHelpCarousel({ helpSlidesData, currentHelpSlide, setCurrentHelp
   );
 }
 
+// Interactive tutorial embedded inside the Help dialog
+function DetailedHelpTutorial() {
+  const tutorialPuzzle = useMemo(() => (
+    dailyPuzzles.find((p) => p.date === "2025-05-23") || {
+      date: "2025-05-23",
+      grid: [["X","D","R","M","B","C"],["O","G","H","I","J","L"],["Y","A","R","C","N","G"],["Z","K","E","L","I","D"],["W","R","A","N","L","E"],["Q","E","Y","R","S","L"]],
+      answer: "MONKEY",
+    }
+  ), []);
+
+  const grid = tutorialPuzzle.grid;
+  const gridRows = grid.length;
+  const gridCols = grid[0]?.length || 0;
+
+  const gridRef = useRef(null);
+  const wrapperRef = useRef(null);
+  const cellRefs = useRef({});
+  const [selectedPath, setSelectedPath] = useState([]); // {row,col,letter,closeness}
+  const [pathCoords, setPathCoords] = useState([]);
+  const [currentRow, setCurrentRow] = useState(0);
+  const [hint, setHint] = useState("Start by selecting a letter from the first row.");
+  const [gridWidth, setGridWidth] = useState(null);
+  const [wrapperWidth, setWrapperWidth] = useState(null);
+  // Single mentor message UX; no chat thread
+  const [pulseTargets, setPulseTargets] = useState(null); // { row: number, items: { col: number, kind: 'possible' | 'eliminate' }[] }
+  const [usedCols, setUsedCols] = useState([]);
+  const [done, setDone] = useState(false);
+
+  const correctLetters = useMemo(() => tutorialPuzzle.answer.split("").map((c) => c.toUpperCase()), [tutorialPuzzle.answer]);
+
+  const setCellRef = (rowIdx, colIdx, el) => {
+    if (!cellRefs.current[rowIdx]) cellRefs.current[rowIdx] = {};
+    cellRefs.current[rowIdx][colIdx] = el;
+  };
+
+  // Keep mentor box width equal to grid width
+  useEffect(() => {
+    if (!gridRef.current) return;
+    const measure = () => {
+      try {
+        const rect = gridRef.current.getBoundingClientRect();
+        if (rect && rect.width) setGridWidth(Math.round(rect.width));
+      } catch {}
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(gridRef.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', measure);
+    };
+  }, [gridRef]);
+
+  // Track available popup width so the mentor box never overflows on small screens
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+    const measure = () => {
+      try {
+        const rect = wrapperRef.current.getBoundingClientRect();
+        if (rect && rect.width) setWrapperWidth(Math.round(rect.width));
+      } catch {}
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(wrapperRef.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', measure);
+    };
+  }, [wrapperRef]);
+
+  useEffect(() => {
+    if (!gridRef.current) { setPathCoords([]); return; }
+    // Only connect correct (green) selections, in consecutive rows.
+    const greens = [...selectedPath]
+      .filter(p => p.closeness === "green")
+      .sort((a,b) => a.row - b.row);
+    if (greens.length < 2) { setPathCoords([]); return; }
+
+    const gridRect = gridRef.current.getBoundingClientRect();
+    const coords = [];
+    const getCenter = (el) => {
+      const r = el.getBoundingClientRect();
+      return { cx: r.left + r.width/2 - gridRect.left, cy: r.top + r.height/2 - gridRect.top, w: r.width, h: r.height };
+    };
+    const getRadius = (el) => {
+      const r = el.getBoundingClientRect();
+      // Button itself is a circle; use half the size as radius
+      return Math.min(r.width, r.height) * 0.5;
+    };
+
+    for (let i = 0; i < greens.length - 1; i++) {
+      const start = greens[i];
+      const end = greens[i + 1];
+      // Connect only consecutive rows for clarity
+      if (end.row !== start.row + 1) continue;
+      const startEl = cellRefs.current[start.row]?.[start.col];
+      const endEl = cellRefs.current[end.row]?.[end.col];
+      if (!startEl || !endEl) continue;
+      const { cx: x1c, cy: y1c } = getCenter(startEl);
+      const { cx: x2c, cy: y2c } = getCenter(endEl);
+      const r1 = getRadius(startEl);
+      const r2 = getRadius(endEl);
+      const dx = x2c - x1c;
+      const dy = y2c - y1c;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const x1 = x1c + ux * r1;
+      const y1 = y1c + uy * r1;
+      const x2 = x2c - ux * r2;
+      const y2 = y2c - uy * r2;
+      coords.push({ id: `${start.row}-${start.col}-${end.row}-${end.col}`, x1, y1, x2, y2 });
+    }
+    setPathCoords(coords);
+  }, [selectedPath]);
+
+  const getOtherSelectableLettersInRow = (rowIndex, selectedLetter, correctLetter) => {
+    const choices = [];
+    for (let c = 0; c < gridCols; c++) {
+      const ch = grid[rowIndex][c];
+      const colUsedPreviously = selectedPath.some((p) => p.row < rowIndex && p.col === c);
+      if (!colUsedPreviously && ch.toUpperCase() !== selectedLetter.toUpperCase() && ch.toUpperCase() !== correctLetter.toUpperCase()) {
+        choices.push(ch);
+      }
+    }
+    return choices;
+  };
+
+  const closestNeighbourToSelected = (selected, rowLetters) => {
+    const sorted = [...rowLetters].sort((a, b) => a.localeCompare(b));
+    const idx = sorted.findIndex((l) => l.toUpperCase() === selected.toUpperCase());
+    if (idx === -1) return null;
+    const prev = idx > 0 ? sorted[idx - 1] : null;
+    const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+    if (!prev) return next;
+    if (!next) return prev;
+    const dPrev = Math.abs(prev.toUpperCase().charCodeAt(0) - selected.toUpperCase().charCodeAt(0));
+    const dNext = Math.abs(next.toUpperCase().charCodeAt(0) - selected.toUpperCase().charCodeAt(0));
+    return dPrev <= dNext ? prev : next;
+  };
+
+  // Local closeness logic mirroring the main game
+  const tutorialGetLetterCloseness = (selectedLetter, correctLetter, otherSelectableLettersInRow) => {
+    const upper = (s) => s.toUpperCase();
+    const code = (s) => upper(s).charCodeAt(0);
+    if (upper(selectedLetter) === upper(correctLetter)) return "green";
+
+    const selectedCode = code(selectedLetter);
+    const correctCode = code(correctLetter);
+
+    const allOtherOptionChars = [...new Set((otherSelectableLettersInRow || [])
+      .map(upper)
+      .concat(upper(selectedLetter))
+      .filter((s) => s !== upper(correctLetter))
+    )];
+
+    if (allOtherOptionChars.length === 0) {
+      const distance = Math.abs(selectedCode - correctCode);
+      const maxDistForSimpleYellow = Math.max(
+        1,
+        Math.floor(
+          Math.max(Math.abs(code('A') - correctCode), Math.abs(code('Z') - correctCode)) / 2
+        )
+      );
+      return distance <= maxDistForSimpleYellow ? "yellow" : "red";
+    }
+
+    const lettersBefore = [];
+    const lettersAfter = [];
+    allOtherOptionChars.forEach((char) => {
+      const charCode = char.charCodeAt(0);
+      if (charCode < correctCode) lettersBefore.push(char);
+      else if (charCode > correctCode) lettersAfter.push(char);
+    });
+
+    let closestBefore = null;
+    if (lettersBefore.length > 0) {
+      closestBefore = lettersBefore.reduce((prev, curr) => (curr.charCodeAt(0) > prev.charCodeAt(0) ? curr : prev));
+    }
+
+    let closestAfter = null;
+    if (lettersAfter.length > 0) {
+      closestAfter = lettersAfter.reduce((prev, curr) => (curr.charCodeAt(0) < prev.charCodeAt(0) ? curr : prev));
+    }
+
+    const selectedUpper = upper(selectedLetter);
+    if ((closestBefore && selectedUpper === closestBefore) || (closestAfter && selectedUpper === closestAfter)) return "yellow";
+    return "red";
+  };
+
+  const handleCellClick = (rowIndex, colIndex) => {
+    if (done || rowIndex !== currentRow) return;
+    if (usedCols.includes(colIndex)) return;
+    const letter = grid[rowIndex][colIndex];
+    const correct = correctLetters[rowIndex];
+    const others = getOtherSelectableLettersInRow(rowIndex, letter, correct);
+    const closeness = tutorialGetLetterCloseness(letter, correct, others);
+
+    setPulseTargets(null);
+
+    const newEntry = { row: rowIndex, col: colIndex, letter, closeness };
+    setSelectedPath((prev) => {
+      const withoutThisRow = prev.filter((p) => p.row !== rowIndex);
+      return [...withoutThisRow, newEntry].sort((a, b) => a.row - b.row);
+    });
+
+    if (closeness === "green") {
+      const nextUsed = [...usedCols, colIndex];
+      setUsedCols(nextUsed);
+      const nextRow = rowIndex + 1;
+      if (nextRow >= gridRows) {
+        const closing = "Great job! You’ve completed the practice round. You’re now ready to conquer more paths!";
+        setHint(closing);
+        setDone(true);
+        return;
+      }
+      // Disable this column visually for subsequent rows by marking as disabled in local state is not needed; styling is based on usedCols
+      setCurrentRow(nextRow);
+      const mentorMsg = `Nice! '${letter}' is correct for row ${rowIndex + 1}. That column is now locked — move to row ${nextRow + 1}.`;
+      setHint(mentorMsg);
+    } else if (closeness === "yellow") {
+      // Determine immediate neighbors among currently selectable letters (exclude disabled columns)
+      const available = grid[rowIndex].filter((_, c) => !usedCols.includes(c));
+      const sorted = [...available].sort((a, b) => a.localeCompare(b));
+      const idx = sorted.findIndex((l) => l.toUpperCase() === letter.toUpperCase());
+      const prev = idx > 0 ? sorted[idx - 1] : null;
+      const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+      const msgPart = [prev, next].filter(Boolean).join(" or ");
+      const mentorMsg = msgPart ? `Nice read — '${letter}' glows yellow. The correct letter here is either ${msgPart}.` : "That turned yellow — you’re close! Consider the immediate neighbors.";
+      setHint(mentorMsg);
+      // Pulse neighbor tiles as possible (green) candidates
+      const items = [];
+      for (let c = 0; c < grid[rowIndex].length; c++) {
+        if (usedCols.includes(c)) continue; // skip disabled columns
+        if (prev && grid[rowIndex][c].toUpperCase() === prev.toUpperCase()) items.push({ col: c, kind: 'possible' });
+        if (next && grid[rowIndex][c].toUpperCase() === next.toUpperCase()) items.push({ col: c, kind: 'possible' });
+      }
+      if (items.length) setPulseTargets({ row: rowIndex, items });
+    } else {
+      // Red: consider neighbors among currently selectable letters (exclude disabled columns)
+      const available = grid[rowIndex].filter((_, c) => !usedCols.includes(c));
+      const sorted = [...available].sort((a, b) => a.localeCompare(b));
+      const idx = sorted.findIndex((l) => l.toUpperCase() === letter.toUpperCase());
+      const prev = idx > 0 ? sorted[idx - 1] : null;
+      const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+      if (prev || next) {
+        const neighborsList = [prev, next].filter(Boolean).join(" and ");
+        const mentorMsg = `${letter} turned red — that rules out ${neighborsList}. Let’s try another option in this row.`;
+        setHint(mentorMsg);
+        const items = [];
+        for (let c = 0; c < grid[rowIndex].length; c++) {
+          if (usedCols.includes(c)) continue; // skip disabled columns
+          if (prev && grid[rowIndex][c].toUpperCase() === prev.toUpperCase()) items.push({ col: c, kind: 'eliminate' });
+          if (next && grid[rowIndex][c].toUpperCase() === next.toUpperCase()) items.push({ col: c, kind: 'eliminate' });
+        }
+        if (items.length) setPulseTargets({ row: rowIndex, items });
+      } else {
+        const mentorMsg = `${letter} turned red — try a different letter in this row.`;
+        setHint(mentorMsg);
+      }
+    }
+  };
+
+  const isCellDisabled = (rIdx, cIdx) => {
+    // Disable any cell not in the active row, except previously selected cells (for visuals)
+    if (rIdx !== currentRow && !selectedPath.some(p => p.row === rIdx && p.col === cIdx)) return true;
+    // Disable columns already used by any earlier green selection for the current and subsequent rows
+    if (usedCols.includes(cIdx) && rIdx >= currentRow) return true;
+    return false;
+  };
+
+  // Tile visual state lookup
+  const cellState = (rIdx, cIdx) => {
+    const found = selectedPath.find(p => p.row === rIdx && p.col === cIdx);
+    return found ? found.closeness : null;
+  };
+
+  return (
+    <div className="bg-teal-50 p-4 px-6 text-gray-700 text-sm leading-relaxed">
+      {/* <div className="mb-3 text-gray-600">Interactive tutorial for {tutorialPuzzle.date}</div> */}
+      <div ref={wrapperRef} className="mx-auto mt-2 mb-3 w-full max-w-full overflow-x-auto flex justify-center px-4">
+        <div className="inline-block shrink-0">
+          {/* Mentor message sized to grid width */}
+          <div
+            className={`rounded-md border border-gray-200 bg-white shadow-sm p-2 mb-3 w-full overflow-x-hidden ${gridWidth && wrapperWidth ? '' : 'invisible'} max-h-20 sm:max-h-24 md:max-h-28 overflow-y-auto break-words mx-auto`}
+            style={(gridWidth && wrapperWidth) ? { width: `${Math.min(gridWidth, wrapperWidth - 32)}px` } : undefined}
+          >
+            <p className="text-sm text-teal-700 leading-relaxed font-sans font-medium">{hint}</p>
+          </div>
+          <div
+            ref={gridRef}
+            className="relative p-4 inline-block"
+          style={{
+            display: "grid",
+            gridTemplateRows: `repeat(${gridRows}, max-content)`,
+            gridTemplateColumns: `repeat(${gridCols}, max-content)`,
+            gap: "0.625rem",
+            width: "fit-content",
+            maxWidth: "100%",
+          }}
+        >
+        {grid.map((rowLetters, rowIndex) => (
+          rowLetters.map((letter, colIndex) => {
+            const disabled = isCellDisabled(rowIndex, colIndex);
+            const closeness = cellState(rowIndex, colIndex);
+            const isSelectable = !disabled;
+            // Responsive circular tiles sized to avoid horizontal scroll
+            let baseStyle = `w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 flex items-center justify-center text-sm sm:text-base md:text-lg font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
+            let backgroundStyle = 'bg-transparent';
+            let textStyle = 'text-gray-700';
+            let interactionStyle = 'cursor-default';
+
+            if (closeness === 'green' || closeness === 'yellow' || closeness === 'red') {
+              backgroundStyle = closeness === 'green' ? 'bg-green-300' : closeness === 'yellow' ? 'bg-yellow-300' : 'bg-red-300';
+              backgroundStyle += ' scale-110 shadow-md';
+              textStyle = closeness === 'green' ? 'text-green-900' : closeness === 'yellow' ? 'text-yellow-900' : 'text-red-900';
+              textStyle += ' font-semibold';
+              interactionStyle = 'cursor-pointer';
+            } else if (!done) {
+              if (isSelectable) { textStyle = 'text-black hover:text-blue-600'; interactionStyle = 'cursor-pointer hover:scale-105'; }
+              else { textStyle = 'text-gray-400'; interactionStyle = 'cursor-not-allowed opacity-50'; }
+            } else {
+              textStyle = 'text-gray-400 opacity-60';
+            }
+
+            let pulseKind = null;
+            if (pulseTargets && pulseTargets.row === rowIndex && Array.isArray(pulseTargets.items)) {
+              const found = pulseTargets.items.find(it => it.col === colIndex);
+              pulseKind = found ? found.kind : null;
+            }
+
+            return (
+              <div key={`${rowIndex}-${colIndex}`} className="relative flex items-center justify-center" style={{ zIndex: 1 }}>
+                {/* Vertical Grid Line */}
+                {colIndex > 0 && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-0.5 bg-gray-300" style={{ marginLeft: `calc(-0.625rem / 2)` }} />
+                )}
+                {/* Horizontal Grid Line */}
+                {rowIndex > 0 && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-0.5 bg-gray-300" style={{ marginTop: `calc(-0.625rem / 2)` }} />
+                )}
+                <button
+                  ref={(el) => setCellRef(rowIndex, colIndex, el)}
+                  onClick={() => handleCellClick(rowIndex, colIndex)}
+                  disabled={disabled}
+                  className={`${baseStyle} ${backgroundStyle} ${textStyle} ${interactionStyle}`}
+                  aria-label={`Letter ${letter} at row ${rowIndex + 1}, column ${colIndex + 1}`}
+                >
+                  {/* Subtle pulse shading cues for tutorial guidance */}
+                  {pulseKind === 'possible' && (
+                    <>
+                      <span className="absolute inset-0 rounded-full bg-yellow-300/60" />
+                      <span className="absolute inset-0 rounded-full bg-yellow-300/40 animate-ping" />
+                    </>
+                  )}
+                  {pulseKind === 'eliminate' && (
+                    <>
+                      <span className="absolute inset-0 rounded-full bg-red-300/60" />
+                      <span className="absolute inset-0 rounded-full bg-red-300/40 animate-ping" />
+                    </>
+                  )}
+                  <span className="relative z-10">{letter}</span>
+                </button>
+              </div>
+            );
+          })
+        ))}
+        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-5" style={{ overflow: "visible" }} aria-hidden="true">
+          <defs>
+            <linearGradient id="tutorialLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style={{ stopColor: "rgb(147 197 253)", stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: "rgb(96 165 250)", stopOpacity: 1 }} />
+            </linearGradient>
+          </defs>
+          {pathCoords.map((c) => (
+            <line key={c.id} x1={c.x1} y1={c.y1} x2={c.x2} y2={c.y2} stroke="url(#tutorialLineGradient)" strokeWidth="5" strokeLinecap="round" className="transition-all duration-300 ease-in-out" />
+          ))}
+        </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* <div className="mt-3 flex items-center justify-between">
+        <span className="text-xs text-gray-500">Tutorial ignores try count and stats.</span>
+        {done && <span className="text-xs text-teal-700">Completed: MONKEY</span>}
+      </div> */}
+    </div>
+  );
+}
+
 
 function DateSelector({ availableDates, selectedDate, onDateChange }) {
   // Helpers and precomputed sets
@@ -2040,7 +2503,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">
-          {weeks.flat().map((d, i) => {
+          {weeks.flat().map((d, i) => {  
             if (d === null) return <div key={i} className="h-7 sm:h-8" />;
             const enabled = daysSet.has(d);
             const s = buildYMD(tempYear, tempMonth, d);
@@ -2191,7 +2654,7 @@ export default function Pathword() {
   const [showDetailedHelp, setShowDetailedHelp] = useState(false); // New state to toggle help view
   const [isStatsOpen, setIsStatsOpen] = useState(false);
 
-  const [isStatsDistributionOpen, setIsStatsDistributionOpen] = useState(false); // Default to open
+  const [isStatsDistributionOpen, setIsStatsDistributionOpen] = useState(true); // Default to open
 
   const [userStats, setUserStats] = useState({
     streak: 0,
@@ -3071,7 +3534,7 @@ const getCellClassName = (row, originalCol) => {
 
 
     const shareTitle = `Pathword: ${currentPuzzle.date}`;
-    let mainShareBody = `I navigated Pathword for ${currentPuzzle.date}! 🗺️\n\nMy Journey:\n${pathGridEmoji}\n\nSolved ${achievementText}`;
+    let mainShareBody = `I navigated Pathword for ${currentPuzzle.date}! 🗺️\n\nMy Path (unique for every explorer, no spoilers!):\n${pathGridEmoji}\n\nSolved ${achievementText}`;
     if (streakText) mainShareBody += streakText;
     const gameUrl = GAME_URL;
     const hashtags = "\n#PathwordGame #DailyPuzzle";
@@ -3093,7 +3556,7 @@ const getCellClassName = (row, originalCol) => {
 
   const renderGrid = () => { /* ... (renderGrid largely same, ensure it uses getCellClassName) ... */ 
     if (!columnMapping || !currentPuzzle.grid || currentPuzzle.grid.length === 0) return <div className="h-96 ...">Loading Grid...</div>;
-    const gridRows = currentPuzzle.grid.length; const gridCols = currentPuzzle.grid[0].length; const gap = "0.875rem";
+    const gridRows = currentPuzzle.grid.length; const gridCols = currentPuzzle.grid[0].length; const gap = "0.75rem";
     const displayGridLetters = currentPuzzle.grid.map((originalRow) => {
       const displayedRow = new Array(gridCols);
       for (let originalCol = 0; originalCol < gridCols; originalCol++) {
@@ -3364,15 +3827,15 @@ const renderSelectedPathPreview = () => {
             <DialogContent
               className={`bg-white rounded-lg shadow-xl p-0 overflow-y-scroll md:max-h-none md:overflow-visible transition-all duration-300 ease-in-out scrollbar-visible
                 ${showDetailedHelp
-                  ? 'sm:max-w-xl md:max-w-2xl' // Wider for carousel
-                  : 'sm:max-w-xl md:max-w-2xl'             // Narrower for summary
+                  ? 'w-auto max-w-[calc(100vw-2rem)] min-w-[min(100vw-2rem,20rem)]' // Hug content with a safe minimum
+                  : 'sm:max-w-xl md:max-w-2xl'
                 }`}
             >
-              <DialogHeader className="flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200">
-                <DialogTitle className="text-xl font-bold tracking-tight text-gray-800">
-                  How To Play
+              <DialogHeader className={`flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200`}>
+                <DialogTitle className={`text-xl font-bold tracking-tight text-gray-800`}>
+                  {showDetailedHelp ? 'Practice Round' : 'How To Play'}
                 </DialogTitle>
-                {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                   <CloseIcon className="h-5 w-5 text-gray-500 hover:text-gray-700" />
                   <span className="sr-only">Close</span>
                 </DialogClose> */}
@@ -3380,12 +3843,8 @@ const renderSelectedPathPreview = () => {
 
 
     {showDetailedHelp ? (
-      // --- DETAILED CAROUSEL VIEW ---
-      <DetailedHelpCarousel
-        helpSlidesData={helpSlidesData}
-        currentHelpSlide={currentHelpSlide}
-        setCurrentHelpSlide={setCurrentHelpSlide}
-      />
+      // --- INTERACTIVE TUTORIAL VIEW ---
+      <DetailedHelpTutorial />
     ) : (
       // --- REVISED SUMMARY VIEW (Default) ---
       <div className="p-4 px-6 text-gray-700 space-y-5 text-sm leading-relaxed">
@@ -3443,7 +3902,7 @@ const renderSelectedPathPreview = () => {
                 setCurrentHelpSlide(0); // Start carousel from the beginning
             }}
           >
-            Learn More &rarr;
+            Practice Round &rarr;
           </Button>
       </div>
     )}
