@@ -86,6 +86,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "PLEASE" (tomorrow)
+  {
+    date: "2025-09-13",
+    grid: [
+      // Row 1 — P at col 1
+      ["C", "P", "H", "W", "E", "S"],
+      // Row 2 — L at col 4
+      ["O", "M", "A", "R", "L", "Y"],
+      // Row 3 — E at col 0
+      ["E", "F", "Y", "A", "T", "O"],
+      // Row 4 — A at col 5
+      ["G", "D", "C", "N", "S", "A"],
+      // Row 5 — S at col 2
+      ["C", "G", "S", "D", "A", "Y"],
+      // Row 6 — E at col 3
+      ["S", "D", "K", "E", "R", "T"],
+    ],
+    answer: "PLEASE",
+  },
   // For "SWIVEL" (tomorrow)
   {
     date: "2025-09-13",
@@ -2690,7 +2709,7 @@ export default function Pathword() {
 
   // Constants
   const MAX_TRIES = 6;
-  const GAME_URL = "https://akashramsankar.github.io/pathword/";
+  const GAME_URL = "https://www.pathword.co";
   const STATS_KEY = "pathwordUserStats_v2"; // Changed key for new stats structure
   const HELP_VIEWED_KEY = "pathwordHelpViewed";
   const COLUMN_MAP_KEY_PREFIX = "pathwordColMap-";

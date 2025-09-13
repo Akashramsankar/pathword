@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({ // Assuming Geist_Mono is a function
 // It's best to use an environment variable for this, e.g., process.env.NEXT_PUBLIC_GA_ID
 const GA_MEASUREMENT_ID ='G-5JXQDVYBK3';
 //const GA_MEASUREMENT_ID ='';
-const siteUrl ='https://akashramsankar.github.io/pathword/'; // Your site URL
+const siteUrl ='https://www.pathword.co'; // Your site URL
 
 // --- Metadata Configuration (including Open Graph and Twitter Cards) ---
 export const metadata: Metadata = {
