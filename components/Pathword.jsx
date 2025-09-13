@@ -88,7 +88,7 @@ const helpSlidesData = [
 const dailyPuzzles = [
   // For "PLEASE" (tomorrow)
   {
-    date: "2025-09-13",
+    date: "2025-09-14",
     grid: [
       // Row 1 — P at col 1
       ["C", "P", "H", "W", "E", "S"],
