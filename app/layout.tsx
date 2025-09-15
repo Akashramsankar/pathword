@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${siteUrl}/images/og-image.png`, // Create this image in public/images/
-        width: 1158,
-        height: 1462,
+        width: 1200,
+        height: 600,
         alt: 'Pathword Game Board Preview',
       },
     ],
@@ -51,9 +51,9 @@ export const metadata: Metadata = {
   // --- Twitter Card Metadata ---
   twitter: {
     card: 'summary_large_image',
-    title: 'Pathword - Word Puzzle Game',
+    title: 'Pathword - Daily Word Puzzle Game',
     description: 'Navigate the grid daily to find the hidden Pathword!',
-    images: [`${siteUrl}/images/og-image2.png?v=1`], // Cache-busting query for Twitter
+    images: [`${siteUrl}/images/og-image.png?v=1`], // Cache-busting query for Twitter
   },
    // If you want to ensure relative paths in metadata are resolved correctly,
    // especially if not using full URLs for images (though full URLs are safer for OG/Twitter).
