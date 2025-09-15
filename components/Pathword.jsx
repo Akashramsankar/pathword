@@ -86,6 +86,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "JUMBLE" (tomorrow)
+  {
+    date: "2025-09-16",
+    grid: [
+      // Row 1 — J at col 1
+      ["Q", "J", "E", "B", "T", "Y"],
+      // Row 2 — U at col 4
+      ["A", "E", "H", "O", "U", "I"],
+      // Row 3 — M at col 0
+      ["M", "F", "N", "I", "S", "B"],
+      // Row 4 — B at col 5
+      ["D", "G", "O", "P", "R", "B"],
+      // Row 5 — L at col 2
+      ["C", "G", "L", "O", "U", "A"],
+      // Row 6 — E at col 3
+      ["R", "D", "K", "E", "R", "T"],
+    ],
+    answer: "JUMBLE",
+  },
   // For "CAMERA" (tomorrow)
   {
     date: "2025-09-15",
