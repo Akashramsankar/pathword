@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: 'Pathword',
     images: [
       {
-        url: `${siteUrl}/images/og-image.png`, // Create this image in public/images/
+        url: `${siteUrl}/images/og-image-preview.png`, // Create this image in public/images/
         width: 1200,
         height: 600,
         alt: 'Pathword Game Board Preview',
