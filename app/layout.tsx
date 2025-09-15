@@ -26,7 +26,7 @@ const siteUrl ='https://www.pathword.co'; // Your site URL
 export const metadata: Metadata = {
   // --- Basic Metadata ---
   title: 'Pathword - Daily Word Puzzle',
-  description: 'Navigate the grid, find the hidden word! A new Pathword puzzle daily.',
+  //description: 'Navigate the grid, find the hidden word! A new Pathword puzzle daily.',
   // Ensures absolute URLs resolve correctly for metadata (Twitter/OG crawlers)
   metadataBase: new URL(siteUrl),
 
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Pathword - Daily Word Puzzle Game',
-    description: 'Navigate the grid daily to find the hidden Pathword!',
+    //description: 'Navigate the grid daily to find the hidden Pathword!',
     images: [`${siteUrl}/images/og-image-preview.png`], // Cache-busting query for Twitter
   },
    // If you want to ensure relative paths in metadata are resolved correctly,

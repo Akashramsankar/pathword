@@ -95,9 +95,9 @@ const dailyPuzzles = [
       // Row 2 — U at col 4
       ["A", "E", "H", "O", "U", "I"],
       // Row 3 — M at col 0
-      ["M", "F", "N", "I", "S", "B"],
+      ["M", "F", "N", "I", "B", "S"],
       // Row 4 — B at col 5
-      ["D", "G", "O", "P", "R", "B"],
+      ["D", "O", "G", "P", "R", "B"],
       // Row 5 — L at col 2
       ["C", "G", "L", "O", "U", "A"],
       // Row 6 — E at col 3
