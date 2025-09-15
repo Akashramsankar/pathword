@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Pathword - Daily Word Puzzle Game',
     description: 'Navigate the grid daily to find the hidden Pathword!',
-    images: [`${siteUrl}/images/og-image.png?v=1`], // Cache-busting query for Twitter
+    images: [`${siteUrl}/images/og-image-preview.png`], // Cache-busting query for Twitter
   },
    // If you want to ensure relative paths in metadata are resolved correctly,
    // especially if not using full URLs for images (though full URLs are safer for OG/Twitter).
