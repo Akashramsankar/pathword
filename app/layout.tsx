@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   // --- Basic Metadata ---
   title: 'Pathword - Daily Word Puzzle',
   description: 'Navigate the grid, find the hidden word! A new Pathword puzzle daily.',
+  // Ensures absolute URLs resolve correctly for metadata (Twitter/OG crawlers)
+  metadataBase: new URL(siteUrl),
 
   // --- Open Graph Metadata ---
   openGraph: {
@@ -49,9 +51,9 @@ export const metadata: Metadata = {
   // --- Twitter Card Metadata ---
   twitter: {
     card: 'summary_large_image',
-    title: 'Pathword - Daily Word Puzzle Game',
+    title: 'Pathword - Word Puzzle Game',
     description: 'Navigate the grid daily to find the hidden Pathword!',
-    images: [`${siteUrl}/images/og-image2.png`], // Uses same image as Open Graph
+    images: [`${siteUrl}/images/og-image2.png?v=1`], // Cache-busting query for Twitter
   },
    // If you want to ensure relative paths in metadata are resolved correctly,
    // especially if not using full URLs for images (though full URLs are safer for OG/Twitter).
