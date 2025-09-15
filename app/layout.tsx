@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: siteUrl,
     title: 'Pathword - Daily Word Puzzle Game',
-    description: 'Challenge yourself with today\'s Pathword! Can you find the hidden word?',
+    //description: 'Challenge yourself with today\'s Pathword! Can you find the hidden word?',
     siteName: 'Pathword',
     images: [
       {
