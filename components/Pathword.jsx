@@ -3594,9 +3594,9 @@ const getCellClassName = (row, originalCol) => {
     let mainShareBody = `I navigated Pathword for ${currentPuzzle.date}! 🗺️\n\nMy Path (unique for every explorer, no spoilers!):\n${pathGridEmoji}\n\nSolved ${achievementText}`;
     if (streakText) mainShareBody += streakText;
     const gameUrl = GAME_URL;
-    const hashtags = "\n#PathwordGame #DailyPuzzle";
-    const fullShareText = `${mainShareBody}\n\nChart your own course: ${gameUrl}${hashtags}`;
-    const nativeShareText = `${mainShareBody}\n\nChart your own course!${hashtags}`;
+    //const hashtags = "\n#PathwordGame #DailyPuzzle";
+    const fullShareText = `${mainShareBody}\n\nChart your own course: ${gameUrl}`;
+    const nativeShareText = `${mainShareBody}\n\nChart your own course!`;
 
    gtag.event({
     action: "share_attempted",
