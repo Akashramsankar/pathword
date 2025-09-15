@@ -2246,8 +2246,13 @@ function DetailedHelpTutorial() {
       const idx = sorted.findIndex((l) => l.toUpperCase() === letter.toUpperCase());
       const prev = idx > 0 ? sorted[idx - 1] : null;
       const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
-      const msgPart = [prev, next].filter(Boolean).join(" or ");
-      const mentorMsg = msgPart ? `Nice read — '${letter}' glows yellow. The correct letter here is either ${msgPart}.` : "That turned yellow — you’re close! Consider the immediate neighbors.";
+      const candidates = [prev, next].filter(Boolean);
+      let mentorMsg = "That turned yellow — you’re close! Consider the immediate neighbors.";
+      if (candidates.length === 2) {
+        mentorMsg = `Nice read — '${letter}' glows yellow. The correct letter here is either ${candidates[0]} or ${candidates[1]}.`;
+      } else if (candidates.length === 1) {
+        mentorMsg = `Nice read — '${letter}' glows yellow. The correct letter here is ${candidates[0]}.`;
+      }
       setHint(mentorMsg);
       // Pulse neighbor tiles as possible (green) candidates
       const items = [];
