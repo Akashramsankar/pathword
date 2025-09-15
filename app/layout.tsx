@@ -35,14 +35,14 @@ export const metadata: Metadata = {
     title: 'Pathword - Daily Word Puzzle Game',
     description: 'Challenge yourself with today\'s Pathword! Can you find the hidden word?',
     siteName: 'Pathword',
-    // images: [
-    //   {
-    //     url: `${siteUrl}/images/og-image.png`, // Create this image in public/images/
-    //     width: 1200,
-    //     height: 630,
-    //     alt: 'Pathword Game Board Preview',
-    //   },
-    // ],
+    images: [
+      {
+        url: `${siteUrl}/images/og-image.png`, // Create this image in public/images/
+        width: 1158,
+        height: 1462,
+        alt: 'Pathword Game Board Preview',
+      },
+    ],
     locale: 'en_US',
   },
 
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Pathword - Daily Word Puzzle Game',
     description: 'Navigate the grid daily to find the hidden Pathword!',
-    // images: [`${siteUrl}/images/twitter-card-image.png`], // Create this image in public/images/ (can be same as OG)
+    images: [`${siteUrl}/images/og-image.png`], // Uses same image as Open Graph
   },
    // If you want to ensure relative paths in metadata are resolved correctly,
    // especially if not using full URLs for images (though full URLs are safer for OG/Twitter).
