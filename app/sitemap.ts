@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next'
 
+export const dynamic = 'force-static'
+
 const siteUrl = 'https://www.pathword.co'
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -13,4 +15,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 }
-
