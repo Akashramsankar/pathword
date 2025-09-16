@@ -26,16 +26,24 @@ const siteUrl ='https://www.pathword.co'; // Your site URL
 export const metadata: Metadata = {
   // --- Basic Metadata ---
   title: 'Pathword - Daily Word Puzzle',
-  //description: 'Navigate the grid, find the hidden word! A new Pathword puzzle daily.',
+  description: "Pathword is a free, daily word puzzle game. Chart a path through a letter grid to uncover the hidden word. New Pathword every day!",
   // Ensures absolute URLs resolve correctly for metadata (Twitter/OG crawlers)
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: siteUrl,
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 
   // --- Open Graph Metadata ---
   openGraph: {
     type: 'website',
     url: siteUrl,
     title: 'Pathword - Daily Word Puzzle Game',
-    //description: 'Challenge yourself with today\'s Pathword! Can you find the hidden word?',
+    description: "Challenge yourself with today's Pathword! Can you find the hidden word?",
     siteName: 'Pathword',
     images: [
       {
@@ -52,7 +60,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Pathword - Daily Word Puzzle Game',
-    //description: 'Navigate the grid daily to find the hidden Pathword!',
+    description: 'Navigate the grid daily to find the hidden Pathword!',
     images: [`${siteUrl}/images/og-image-preview.png`], // Cache-busting query for Twitter
   },
    // If you want to ensure relative paths in metadata are resolved correctly,
@@ -70,6 +78,40 @@ export default function RootLayout({
     <html lang="en">
       <head>
           <>
+            {/* Structured Data: WebSite */}
+            <Script id="ld-json-website" type="application/ld+json"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'WebSite',
+                  name: 'Pathword',
+                  url: siteUrl,
+                  inLanguage: 'en',
+                  potentialAction: {
+                    '@type': 'PlayAction',
+                    target: siteUrl,
+                  },
+                }),
+              }}
+            />
+            {/* Structured Data: Game */}
+            <Script id="ld-json-game" type="application/ld+json"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  '@context': 'https://schema.org',
+                  '@type': 'Game',
+                  name: 'Pathword',
+                  url: siteUrl,
+                  applicationCategory: 'Game',
+                  gamePlatform: 'Web',
+                  gameGenre: ['Puzzle', 'Word'],
+                  description: "Pathword is a free, daily word puzzle game where you chart a path through letters to reveal a hidden word.",
+                  image: `${siteUrl}/images/og-image-preview.png`,
+                }),
+              }}
+            />
             <Script
               strategy="afterInteractive"
               src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
