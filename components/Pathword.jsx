@@ -2535,6 +2535,22 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
     return map;
   }, [availableDates]);
 
+  const sortedAvailableDatesAsc = useMemo(
+    () => [...availableDates].sort((a, b) => new Date(a) - new Date(b)),
+    [availableDates]
+  );
+
+  const selectedIndex = useMemo(
+    () => sortedAvailableDatesAsc.indexOf(selectedDate),
+    [sortedAvailableDatesAsc, selectedDate]
+  );
+
+  const prevAvailableDate = selectedIndex > 0 ? sortedAvailableDatesAsc[selectedIndex - 1] : null;
+  const nextAvailableDate =
+    selectedIndex >= 0 && selectedIndex < sortedAvailableDatesAsc.length - 1
+      ? sortedAvailableDatesAsc[selectedIndex + 1]
+      : null;
+
   // UI state
   const [open, setOpen] = useState(false);
   const [stage, setStage] = useState('month'); // 'month' | 'day'
@@ -2543,6 +2559,15 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
   const [tempMonth, setTempMonth] = useState(selM);
 
   const containerRef = useRef(null);
+
+  const handleArrowChange = useCallback(
+    (targetDate) => {
+      if (!targetDate) return;
+      onDateChange(targetDate);
+      setOpen(false);
+    },
+    [onDateChange, setOpen]
+  );
 
   // Close on outside click
   useEffect(() => {
@@ -2687,9 +2712,21 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
 
   const todayYMD = getTodayYMD();
   const showTodayShortcut = availableSet.has(todayYMD) && selectedDate !== todayYMD;
+  const showNavigationArrows = selectedDate !== todayYMD && selectedIndex !== -1;
 
   return (
     <div ref={containerRef} className="my-3 md:my-4 flex justify-center items-center">
+      {showNavigationArrows && (
+        <button
+          type="button"
+          onClick={() => handleArrowChange(prevAvailableDate)}
+          disabled={!prevAvailableDate}
+          className="mr-2 rounded-full p-1 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:hover:text-gray-300"
+          aria-label="Go to previous available puzzle date"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      )}
       <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 mr-2" />
       <div className="relative inline-block">
         <button
@@ -2726,6 +2763,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           </>
         )}
       </div>
+      
       {showTodayShortcut && (
         <button
           type="button"
@@ -2734,6 +2772,17 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           aria-label="Go to today's puzzle"
         >
           Today
+        </button>
+      )}
+      {showNavigationArrows && (
+        <button
+          type="button"
+          onClick={() => handleArrowChange(nextAvailableDate)}
+          disabled={!nextAvailableDate}
+          className="ml-2 rounded-full text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:hover:text-gray-300"
+          aria-label="Go to next available puzzle date"
+        >
+          <ChevronRight className="h-4 w-4" />
         </button>
       )}
     </div>
