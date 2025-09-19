@@ -86,6 +86,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "RIDDLE" (tomorrow)
+  {
+    date: "2025-09-20",
+    grid: [
+      // Row 1 — R at col 1
+      ["A", "R", "J", "N", "T", "W"],
+      // Row 2 — I at col 3
+      ["Y", "N", "E", "I", "O", "H"],
+      // Row 3 — D at col 0
+      ["D", "H", "P", "M", "V", "U"],
+      // Row 4 — D at col 4
+      ["K", "L", "E", "T", "D", "A"],
+      // Row 5 — L at col 2
+      ["F", "R", "L", "O", "W", "I"],
+      // Row 6 — E at col 5
+      ["G", "N", "S", "T", "Y", "E"],
+    ],
+    answer: "RIDDLE",
+  },
   // For "MARINE" (tomorrow)
   {
     date: "2025-09-19",
@@ -4037,8 +4056,7 @@ const renderSelectedPathPreview = () => {
       <div className="p-4 px-6 text-gray-700 space-y-5 text-sm leading-relaxed">
         <div>
           <h4 className="font-semibold text-gray-800 mb-1.5">The Goal</h4>
-          <p>To find the hidden 6-letter word, pick one letter from each row, starting at the top and going down, but make sure no two letters are from the same column.</p>
-        </div>
+          <p>To find the hidden 6-letter word, pick one letter from each row, starting at the top and going down, but make sure no two letters are from the same column. You have 6 tries to find your path.</p>        </div>
         <div>
           <h4 className="font-semibold text-gray-800 mb-1.5">Color Clues</h4>
           <p>After each guess, the color of the tile will guide you:</p>
