@@ -86,6 +86,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "MEADOW" (tomorrow)
+  {
+    date: "2025-09-21",
+    grid: [
+      // Row 1 — M at col 1
+      ["C", "M", "R", "T", "X", "J"],
+      // Row 2 — E at col 3
+      ["Y", "G", "H", "E", "O", "C"],
+      // Row 3 — A at col 4
+      ["C", "H", "N", "T", "A", "Z"],
+      // Row 4 — D at col 0
+      ["D", "G", "S", "R", "T", "L"],
+      // Row 5 — O at col 5
+      ["F", "H", "I", "S", "Y", "O"],
+      // Row 6 — W at col 2
+      ["C", "J", "W", "P", "R", "H"],
+    ],
+    answer: "MEADOW",
+  },
   // For "RIDDLE" (tomorrow)
   {
     date: "2025-09-20",
@@ -3735,12 +3754,12 @@ const getCellClassName = (row, originalCol) => {
                 } else pathGridEmoji += "🟩";
             } else pathGridEmoji += "⬜";
         }
-        if (r < gridRows - 1) pathGridEmoji += "\n";
+        if (r < gridRows - 1) pathGridEmoji += "\n\n";
     }
 
 
     const shareTitle = `Pathword: ${currentPuzzle.date}`;
-    let mainShareBody = `I navigated Pathword for ${currentPuzzle.date}! 🗺️\n\nMy Path (unique for every explorer, no spoilers!):\n${pathGridEmoji}\n\nSolved ${achievementText}`;
+    let mainShareBody = `I navigated Pathword for ${currentPuzzle.date}! 🗺️\n\nMy Path (unique for every explorer, no spoilers!):\n\n${pathGridEmoji}\n\nSolved ${achievementText}`;
     if (streakText) mainShareBody += streakText;
     const gameUrl = GAME_URL;
     //const hashtags = "\n#PathwordGame #DailyPuzzle";
