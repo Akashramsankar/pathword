@@ -25,7 +25,7 @@ const siteUrl ='https://www.pathword.co'; // Your site URL
 // --- Metadata Configuration (including Open Graph and Twitter Cards) ---
 export const metadata: Metadata = {
   // --- Basic Metadata ---
-  title: 'Pathword - Daily Word Puzzle',
+  title: 'Pathword - Daily Word Puzzle Game',
   description: "Pathword is a free, daily word puzzle game. Chart a path through a letter grid to uncover the hidden word. New Pathword every day!",
   // Ensures absolute URLs resolve correctly for metadata (Twitter/OG crawlers)
   metadataBase: new URL(siteUrl),
@@ -55,6 +55,16 @@ export const metadata: Metadata = {
     ],
     locale: 'en_US',
   },
+
+  keywords: [
+    'Pathword',
+    'word game',
+    'word puzzle',
+    'daily puzzle',
+    'letter game',
+    'path game',
+    'word challenge',
+  ],
 
   // --- Twitter Card Metadata ---
   twitter: {
