@@ -3,8 +3,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowRight,
   BarChart3,
   HelpCircle,
   Share2,
@@ -14,7 +16,8 @@ import {
   ChevronRight,
   CalendarDays,
   Moon,
-  Sun
+  Sun,
+  MousePointerClick
 } from "lucide-react";
 // Icons for celebratory UI in the stats dialog
 import { Award, Trophy, Star } from "lucide-react";
@@ -88,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "HEAVEN" (tomorrow)
+  {
+    date: "2025-09-22",
+    grid: [
+      // Row 1 — H at col 1
+      ["A", "H", "F", "Q", "U", "Z"],
+      // Row 2 — E at col 3
+      ["Y", "K", "O", "E", "T", "I"],
+      // Row 3 — A at col 0
+      ["A", "G", "N", "R", "Y", "U"],
+      // Row 4 — V at col 5
+      ["D", "F", "T", "J", "S", "V"],
+      // Row 5 — E at col 2
+      ["L", "T", "E", "S", "A", "O"],
+      // Row 6 — N at col 4
+      ["C", "G", "L", "P", "N", "Y"],
+    ],
+    answer: "HEAVEN",
+  },
   // For "MEADOW" (tomorrow)
   {
     date: "2025-09-21",
@@ -2926,6 +2948,7 @@ export default function Pathword() {
   const [isAlreadySolvedToday, setIsAlreadySolvedToday] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [pathCoords, setPathCoords] = useState([]);
+  const [lineDrawProgress, setLineDrawProgress] = useState([]);
   const [currentHelpSlide, setCurrentHelpSlide] = useState(0);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showDetailedHelp, setShowDetailedHelp] = useState(false); // New state to toggle help view
@@ -2956,11 +2979,26 @@ export default function Pathword() {
   const TRY_COUNT_KEY_PREFIX = "pathwordTryCount-";
   const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-";
   const THEME_PREFERENCE_KEY = "pathword-theme";
+  const SEGMENT_DRAW_DURATION_MS = 450;
+  const SEGMENT_DRAW_DELAY_MS = 140;
 
   const gridRef = useRef(null);
   const cellRefs = useRef({});
   const feedbackTimeoutRef = useRef(null);
   const isInitialMount = useRef(true);
+  const hasAnimatedSolutionRef = useRef(false);
+  const lineAnimationFrameRef = useRef({ start: null, end: null });
+
+  const cancelLineAnimationFrames = useCallback(() => {
+    const { start, end } = lineAnimationFrameRef.current || {};
+    if (start !== null && start !== undefined) {
+      cancelAnimationFrame(start);
+    }
+    if (end !== null && end !== undefined) {
+      cancelAnimationFrame(end);
+    }
+    lineAnimationFrameRef.current = { start: null, end: null };
+  }, []);
 
   const applyThemeClasses = useCallback((mode) => {
     if (typeof document === "undefined") return;
@@ -3098,15 +3136,18 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
       // Reset game state for the new puzzle
       setSelectedPath([]);
       setPathCoords([]);
+      setLineDrawProgress([]);
       setFeedbackMessage("");
       if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
       setGameState({ status: "playing", points: 0 });
       setTryCount(1); // Start at try 1 for a new puzzle
       setIncrementTryOnNextSelection(false);
+      hasAnimatedSolutionRef.current = false;
+      cancelLineAnimationFrames();
       // isAlreadySolvedToday will be determined by the main data loading effect below
       isInitialMount.current = false;
     }
-  }, [selectedDate]);
+  }, [selectedDate, cancelLineAnimationFrames]);
 
   useEffect(
     () => () => {
@@ -3321,12 +3362,14 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
             y1 = cy1 + ny * cellRadius;
           const x2 = cx2 - nx * cellRadius,
             y2 = cy2 - ny * cellRadius;
+          const segmentLength = Math.hypot(x2 - x1, y2 - y1);
           newCoords.push({
             x1,
             y1,
             x2,
             y2,
             id: `${startCellKey}_${endCellKey}`,
+            segmentLength,
           });
         }
       }
@@ -3337,6 +3380,54 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
     if (gridRef.current) resizeObserver.observe(gridRef.current);
     return () => resizeObserver.disconnect();
   }, [selectedPath, columnMapping]); // Ensure columnMapping is a dependency
+
+  useEffect(() => {
+    if (!pathCoords.length) {
+      setLineDrawProgress([]);
+      cancelLineAnimationFrames();
+      return;
+    }
+
+    const answerLength = currentPuzzle?.answer?.length || 0;
+    const fullPathSegmentCount = Math.max(answerLength - 1, 0);
+    const hasFullPath = fullPathSegmentCount > 0 && pathCoords.length >= fullPathSegmentCount;
+    const shouldAnimateSolution = gameState.status === "success" && hasFullPath;
+
+    if (!shouldAnimateSolution) {
+      setLineDrawProgress(pathCoords.map(() => 1));
+      return;
+    }
+
+    if (hasAnimatedSolutionRef.current) {
+      setLineDrawProgress(pathCoords.map(() => 1));
+      return;
+    }
+
+    cancelLineAnimationFrames();
+    const zeros = pathCoords.map(() => 0);
+    const ones = pathCoords.map(() => 1);
+    setLineDrawProgress(zeros);
+    lineAnimationFrameRef.current.start = requestAnimationFrame(() => {
+      lineAnimationFrameRef.current.end = requestAnimationFrame(() => {
+        setLineDrawProgress(ones);
+      });
+    });
+    hasAnimatedSolutionRef.current = true;
+
+    return () => {
+      cancelLineAnimationFrames();
+    };
+  }, [pathCoords, gameState.status, currentPuzzle?.answer, cancelLineAnimationFrames]);
+
+  useEffect(() => {
+    if (gameState.status !== "success") {
+      hasAnimatedSolutionRef.current = false;
+    }
+  }, [gameState.status, currentPuzzle?.date]);
+
+  useEffect(() => () => {
+    cancelLineAnimationFrames();
+  }, [cancelLineAnimationFrames]);
 
 
   const saveStats = (stats) => { /* ... (saveStats remains same) ... */ try {localStorage.setItem(STATS_KEY, JSON.stringify(stats));} catch(e){console.error("Failed to save stats", e)} };
@@ -3930,7 +4021,30 @@ const getCellClassName = (row, originalCol) => {
               <stop offset="100%" style={{ stopColor: gameState.status === "success" || gameState.status === "failed" ? "rgb(74 222 128)" : "rgb(96 165 250)", stopOpacity: 1 }} />
             </linearGradient>
           </defs>
-          {pathCoords.map((coords) => <line key={coords.id} x1={coords.x1} y1={coords.y1} x2={coords.x2} y2={coords.y2} stroke="url(#lineGradient)" strokeWidth="5" strokeLinecap="round" className="transition-all duration-300 ease-in-out" />)}
+          {pathCoords.map((coords, index) => {
+            const dashArray = coords.segmentLength || Math.hypot(coords.x2 - coords.x1, coords.y2 - coords.y1);
+            const progress = lineDrawProgress[index] ?? 1;
+            const dashOffset = dashArray > 0 ? Math.max(dashArray * (1 - progress), 0) : 0;
+            const shouldAnimateSolution = gameState.status === "success" && hasAnimatedSolutionRef.current;
+            return (
+              <line
+                key={coords.id}
+                x1={coords.x1}
+                y1={coords.y1}
+                x2={coords.x2}
+                y2={coords.y2}
+                stroke="url(#lineGradient)"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeDasharray={dashArray}
+                strokeDashoffset={dashOffset}
+                style={shouldAnimateSolution ? {
+                  transition: `stroke-dashoffset ${SEGMENT_DRAW_DURATION_MS}ms ease-out`,
+                  transitionDelay: `${index * SEGMENT_DRAW_DELAY_MS}ms`
+                } : undefined}
+              />
+            );
+          })}
         </svg>
       </div>);
   };
@@ -4218,16 +4332,38 @@ const renderSelectedPathPreview = () => {
             />
           </div>
         </div>
-         <Button
+        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 animate-bounce">
+           
+            <Button
+              variant="link"
+              className="p-0 h-auto text-teal-600 hover:text-teal-700 dark:text-emerald-300 dark:hover:text-emerald-200"
+              onClick={() => {
+                  setShowDetailedHelp(true);
+                  setCurrentHelpSlide(0); // Start carousel from the beginning
+              }}
+            >
+              Practice Round
+               <span
+              aria-hidden="true"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-inner"
+            >
+              <MousePointerClick className="h-4 w-4" />
+            </span> 
+            </Button>
+             
+           
+          </div>
+          <Button
             variant="link"
-            className="p-0 h-auto text-teal-600 hover:text-teal-700 dark:text-emerald-300 dark:hover:text-emerald-200"
-            onClick={() => {
-                setShowDetailedHelp(true);
-                setCurrentHelpSlide(0); // Start carousel from the beginning
-            }}
+            asChild
+            className="p-0 h-auto text-teal-600 hover:text-teal-700 dark:text-emerald-300 dark:hover:text-emerald-200 sm:self-end"
           >
-            Practise Round &rarr;
+            <Link href="/blog" aria-label="Open the Pathword blog for more tips">
+              Pathword Blog &rarr;
+            </Link>
           </Button>
+        </div>
       </div>
     )}
 
