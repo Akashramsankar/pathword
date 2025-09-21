@@ -2808,7 +2808,16 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           <ChevronLeft className="h-4 w-4" />
         </button>
       )}
-      <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-slate-300 mr-2" />
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="mr-2 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-300 dark:hover:text-slate-200 dark:focus-visible:ring-offset-slate-900"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label="Toggle puzzle date selector"
+      >
+        <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-current" />
+      </button>
       <div className="relative inline-block">
         <button
           type="button"
