@@ -12,7 +12,9 @@ import {
   ChevronDown, // <<<< ADD THIS
   ChevronLeft,
   ChevronRight,
-  CalendarDays
+  CalendarDays,
+  Moon,
+  Sun
 } from "lucide-react";
 // Icons for celebratory UI in the stats dialog
 import { Award, Trophy, Star } from "lucide-react";
@@ -2026,9 +2028,9 @@ const dailyPuzzles = [
 
 function HelpExampleRow({ letters, colors, caption }) {
   const colorClasses = {
-    green: 'bg-green-300 text-green-900',
-    yellow: 'bg-yellow-300 text-yellow-900',
-    red: 'bg-red-300 text-red-900',
+    green: 'bg-green-300 dark:bg-emerald-500/70 text-green-900 dark:text-emerald-50 border border-transparent',
+    yellow: 'bg-yellow-300 dark:bg-amber-400/70 text-yellow-900 dark:text-amber-100 border border-transparent',
+    red: 'bg-red-300 dark:bg-rose-500/70 text-red-900 dark:text-rose-50 border border-transparent',
   };
 
   const gap = "0.5rem"; // A smaller gap for the compact help example
@@ -2036,45 +2038,43 @@ function HelpExampleRow({ letters, colors, caption }) {
   return (
     <div>
       <div
-        className="bg-teal-50 rounded-lg border border-gray-300 relative flex justify-center overflow-hidden"
+        className="bg-teal-50 dark:bg-slate-950/60 rounded-lg border border-gray-300 dark:border-slate-700 relative flex justify-center overflow-hidden transition-colors"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${letters.length}, 1fr)`,
           gap: gap,
           width: `calc(${letters.length} * 2.5rem + ${letters.length - 1} * ${gap})`,
           margin: '0 auto', // Center the grid itself
+          padding: '0.2rem',
         }}
       >
         {letters.map((letter, index) => {
           const isHighlighted = colors[index] && colors[index] !== 'default';
-          const cellColorClass = isHighlighted ? colorClasses[colors[index]] : 'bg-transparent text-gray-800';
+          const cellColorClass = isHighlighted
+            ? `${colorClasses[colors[index]]} rounded-full`
+            : 'text-gray-800 dark:text-slate-100';
 
           return (
             <div
               key={index}
               className="relative flex items-center justify-center" // Wrapper for positioning lines
             >
-              {/* Vertical Grid Line (contained within help grid) */}
               {index > 0 && (
                 <div
-                  className="absolute left-0 top-0 h-full w-0.5 bg-gray-300"
+                  className="absolute left-0 top-0 h-full w-0.5 bg-gray-300 dark:bg-slate-700/70"
                   style={{ marginLeft: `calc(-${gap} / 2)` }}
                 />
               )}
-
-              {/* The Letter Cell */}
-              <div
-                className={`w-10 h-10 flex items-center justify-center text-xl font-bold transition-colors duration-300
-                           ${isHighlighted ? 'rounded-full scale-110 shadow-md' : ''}
-                           ${cellColorClass}`}
+              <span
+                className={`text-xl font-bold transition-colors duration-300 ${cellColorClass} ${isHighlighted ? 'px-2.5 py-1.25 scale-105 shadow-sm' : ''}`}
               >
                 {letter}
-              </div>
+              </span>
             </div>
           );
         })}
       </div>
-      <p className="text-center text-xs text-gray-600 italic pt-3">{caption}</p>
+      <p className="text-center text-xs text-gray-600 dark:text-slate-300 italic pt-3 transition-colors">{caption}</p>
     </div>
   );
 }
@@ -2138,6 +2138,7 @@ function DetailedHelpTutorial() {
   const [pulseTargets, setPulseTargets] = useState(null); // { row: number, items: { col: number, kind: 'possible' | 'eliminate' }[] }
   const [usedCols, setUsedCols] = useState([]);
   const [done, setDone] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const correctLetters = useMemo(() => tutorialPuzzle.answer.split("").map((c) => c.toUpperCase()), [tutorialPuzzle.answer]);
 
@@ -2145,6 +2146,15 @@ function DetailedHelpTutorial() {
     if (!cellRefs.current[rowIdx]) cellRefs.current[rowIdx] = {};
     cellRefs.current[rowIdx][colIdx] = el;
   };
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const updateTheme = () => setIsDarkMode(document.documentElement.classList.contains("dark"));
+    updateTheme();
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   // Keep mentor box width equal to grid width
   useEffect(() => {
@@ -2397,20 +2407,20 @@ function DetailedHelpTutorial() {
   };
 
   return (
-    <div className="bg-teal-50 p-4 px-6 text-gray-700 text-sm leading-relaxed">
+    <div className="bg-teal-50 dark:bg-slate-950/60 p-4 px-6 text-gray-700 dark:text-slate-200 text-sm leading-relaxed transition-colors duration-300">
       {/* <div className="mb-3 text-gray-600">Interactive tutorial for {tutorialPuzzle.date}</div> */}
       <div ref={wrapperRef} className="mx-auto mt-2 mb-3 w-full max-w-full overflow-x-auto flex justify-center px-4">
         <div className="inline-block shrink-0">
           {/* Mentor message sized to grid width */}
           <div
-            className={`rounded-md border border-gray-200 bg-white shadow-sm p-2 mb-3 w-full overflow-x-hidden ${gridWidth && wrapperWidth ? '' : 'invisible'} max-h-20 sm:max-h-24 md:max-h-28 overflow-y-auto break-words mx-auto`}
+            className={`rounded-md border border-gray-200 dark:border-slate-700/80 bg-white dark:bg-slate-950/80 shadow-sm p-2 mb-3 w-full overflow-x-hidden ${gridWidth && wrapperWidth ? '' : 'invisible'} max-h-20 sm:max-h-24 md:max-h-28 overflow-y-auto break-words mx-auto transition-colors`}
             style={(gridWidth && wrapperWidth) ? { width: `${Math.min(gridWidth, wrapperWidth - 32)}px` } : undefined}
           >
-            <p className="text-sm text-teal-700 leading-relaxed font-sans font-medium">{hint}</p>
+            <p className="text-sm text-teal-700 dark:text-emerald-200 leading-relaxed font-sans font-medium">{hint}</p>
           </div>
           <div
             ref={gridRef}
-            className="relative p-4 inline-block"
+            className="relative p-4 inline-block rounded-2xl bg-white dark:bg-slate-950/40 border border-gray-100 dark:border-slate-800/80 shadow-inner transition-colors"
           style={{
             display: "grid",
             gridTemplateRows: `repeat(${gridRows}, max-content)`,
@@ -2427,21 +2437,32 @@ function DetailedHelpTutorial() {
             const isSelectable = !disabled;
             // Responsive circular tiles sized to avoid horizontal scroll
             let baseStyle = `w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 flex items-center justify-center text-sm sm:text-base md:text-lg font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
-            let backgroundStyle = 'bg-transparent';
-            let textStyle = 'text-gray-700';
+            let backgroundStyle = 'bg-transparent dark:bg-transparent';
+            let textStyle = 'text-gray-700 dark:text-slate-200';
             let interactionStyle = 'cursor-default';
 
             if (closeness === 'green' || closeness === 'yellow' || closeness === 'red') {
-              backgroundStyle = closeness === 'green' ? 'bg-green-300' : closeness === 'yellow' ? 'bg-yellow-300' : 'bg-red-300';
+              backgroundStyle = closeness === 'green'
+                ? 'bg-green-300 dark:bg-emerald-500/70'
+                : closeness === 'yellow'
+                  ? 'bg-yellow-300 dark:bg-amber-400/70'
+                  : 'bg-red-300 dark:bg-rose-500/70';
               backgroundStyle += ' scale-110 shadow-md';
-              textStyle = closeness === 'green' ? 'text-green-900' : closeness === 'yellow' ? 'text-yellow-900' : 'text-red-900';
+              textStyle = closeness === 'green'
+                ? 'text-green-900 dark:text-emerald-50'
+                : closeness === 'yellow'
+                  ? 'text-yellow-900 dark:text-amber-100'
+                  : 'text-red-900 dark:text-rose-50';
               textStyle += ' font-semibold';
               interactionStyle = 'cursor-pointer';
             } else if (!done) {
-              if (isSelectable) { textStyle = 'text-black hover:text-blue-600'; interactionStyle = 'cursor-pointer hover:scale-105'; }
-              else { textStyle = 'text-gray-400'; interactionStyle = 'cursor-not-allowed opacity-50'; }
+              if (isSelectable) {
+                textStyle = 'text-black dark:text-emerald-100 hover:text-blue-600 dark:hover:text-sky-300';
+                interactionStyle = 'cursor-pointer hover:scale-105';
+              }
+              else { textStyle = 'text-gray-400 dark:text-slate-600'; interactionStyle = 'cursor-not-allowed opacity-50'; }
             } else {
-              textStyle = 'text-gray-400 opacity-60';
+              textStyle = 'text-gray-400 dark:text-slate-500 opacity-60';
             }
 
             let pulseKind = null;
@@ -2454,11 +2475,11 @@ function DetailedHelpTutorial() {
               <div key={`${rowIndex}-${colIndex}`} className="relative flex items-center justify-center" style={{ zIndex: 1 }}>
                 {/* Vertical Grid Line */}
                 {colIndex > 0 && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-0.5 bg-gray-300" style={{ marginLeft: `calc(-0.625rem / 2)` }} />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-0.5 bg-gray-300 dark:bg-slate-700" style={{ marginLeft: `calc(-0.625rem / 2)` }} />
                 )}
                 {/* Horizontal Grid Line */}
                 {rowIndex > 0 && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-0.5 bg-gray-300" style={{ marginTop: `calc(-0.625rem / 2)` }} />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-0.5 bg-gray-300 dark:bg-slate-700" style={{ marginTop: `calc(-0.625rem / 2)` }} />
                 )}
                 <button
                   ref={(el) => setCellRef(rowIndex, colIndex, el)}
@@ -2470,14 +2491,14 @@ function DetailedHelpTutorial() {
                   {/* Subtle pulse shading cues for tutorial guidance */}
                   {pulseKind === 'possible' && (
                     <>
-                      <span className="absolute inset-0 rounded-full bg-yellow-300/60" />
-                      <span className="absolute inset-0 rounded-full bg-yellow-300/40 animate-ping" />
+                      <span className="absolute inset-0 rounded-full bg-yellow-300/60 dark:bg-amber-300/60" />
+                      <span className="absolute inset-0 rounded-full bg-yellow-300/40 dark:bg-amber-300/40 animate-ping" />
                     </>
                   )}
                   {pulseKind === 'eliminate' && (
                     <>
-                      <span className="absolute inset-0 rounded-full bg-red-300/60" />
-                      <span className="absolute inset-0 rounded-full bg-red-300/40 animate-ping" />
+                      <span className="absolute inset-0 rounded-full bg-red-300/60 dark:bg-rose-400/60" />
+                      <span className="absolute inset-0 rounded-full bg-red-300/40 dark:bg-rose-400/40 animate-ping" />
                     </>
                   )}
                   <span className="relative z-10">{letter}</span>
@@ -2488,13 +2509,27 @@ function DetailedHelpTutorial() {
         ))}
         <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-5" style={{ overflow: "visible" }} aria-hidden="true">
           <defs>
-            <linearGradient id="tutorialLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient id="tutorialLineGradientLight" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" style={{ stopColor: "rgb(147 197 253)", stopOpacity: 1 }} />
               <stop offset="100%" style={{ stopColor: "rgb(96 165 250)", stopOpacity: 1 }} />
             </linearGradient>
+            <linearGradient id="tutorialLineGradientDark" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style={{ stopColor: "rgb(134 239 172)", stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: "rgb(74 222 128)", stopOpacity: 1 }} />
+            </linearGradient>
           </defs>
           {pathCoords.map((c) => (
-            <line key={c.id} x1={c.x1} y1={c.y1} x2={c.x2} y2={c.y2} stroke="url(#tutorialLineGradient)" strokeWidth="5" strokeLinecap="round" className="transition-all duration-300 ease-in-out" />
+            <line
+              key={c.id}
+              x1={c.x1}
+              y1={c.y1}
+              x2={c.x2}
+              y2={c.y2}
+              stroke={isDarkMode ? "url(#tutorialLineGradientDark)" : "url(#tutorialLineGradientLight)"}
+              strokeWidth="5"
+              strokeLinecap="round"
+              className="transition-all duration-300 ease-in-out"
+            />
           ))}
         </svg>
           </div>
@@ -2640,9 +2675,9 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
   const renderMonthStage = () => {
     const monthsSet = monthsByYear.get(tempYear) || new Set();
     return (
-      <div className="p-3">
+      <div className="p-3 transition-colors duration-200">
         <div className="flex items-center mb-2">
-          <div className="text-[11px] sm:text-xs font-semibold text-gray-500">Select Month</div>
+          <div className="text-[11px] sm:text-xs font-semibold text-gray-500 dark:text-slate-300">Select Month</div>
         </div>
         <div className="grid grid-cols-3 gap-2">
           {monthNames.map((nm, idx) => {
@@ -2651,10 +2686,14 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
               <button
                 key={nm}
                 disabled={!enabled}
-                className={`px-2 py-1.5 sm:py-2 rounded border text-xs sm:text-sm ${
+                className={`px-2 py-1.5 sm:py-2 rounded border text-xs sm:text-sm transition-colors duration-150 ${
                   enabled
-                    ? (idx === tempMonth ? 'border-teal-500 text-teal-700' : 'border-gray-200 hover:bg-slate-50')
-                    : 'border-gray-100 text-gray-300 cursor-not-allowed'
+                    ? (
+                        idx === tempMonth
+                          ? 'border-teal-500 text-teal-700 dark:border-emerald-400 dark:text-emerald-200 dark:bg-emerald-500/15'
+                          : 'border-gray-200 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800/60'
+                      )
+                    : 'border-gray-100 text-gray-300 cursor-not-allowed dark:border-slate-800 dark:text-slate-600'
                 }`}
                 onClick={() => { if (enabled) { setTempMonth(idx); setStage('day'); } }}
               >
@@ -2688,17 +2727,17 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
     }
 
     return (
-      <div className="p-3">
+      <div className="p-3 transition-colors duration-200">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
-            <button className="mr-2 text-gray-500 hover:text-gray-700" aria-label="Back to months" onClick={() => setStage('month')}>
+            <button className="mr-2 text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Back to months" onClick={() => setStage('month')}>
               <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
-            <div className="text-xs font-semibold text-gray-500">{monthNames[tempMonth]} {tempYear}</div>
+            <div className="text-xs font-semibold text-gray-500 dark:text-slate-300">{monthNames[tempMonth]} {tempYear}</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-1 text-[11px] text-gray-500 mb-1">
+        <div className="grid grid-cols-7 gap-1 text-[11px] text-gray-500 dark:text-slate-400 mb-1">
           {['S','M','T','W','T','F','S'].map((d, i) => (
             <div key={`${d}-${i}`} className="text-center py-1">{d}</div>
           ))}
@@ -2722,22 +2761,26 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
                 }
               } catch (_) { /* ignore */ }
             }
+            const baseClasses = 'h-7 sm:h-8 rounded border text-xs sm:text-sm flex items-center justify-center transition-colors duration-150';
+            let stateClasses;
+            if (!enabled) {
+              stateClasses = 'border-gray-100 text-gray-300 cursor-not-allowed dark:border-slate-800 dark:text-slate-600';
+            } else if (isSolved) {
+              stateClasses = `border-green-200 dark:border-emerald-500/50 bg-green-50 dark:bg-emerald-500/15 text-green-700 dark:text-emerald-200${isSelected ? ' border-green-600 dark:border-emerald-400' : ''}`;
+            } else if (isFailed) {
+              stateClasses = `border-red-200 dark:border-rose-500/50 bg-red-50 dark:bg-rose-500/15 text-red-700 dark:text-rose-200${isSelected ? ' border-red-500 dark:border-rose-400' : ''}`;
+            } else if (isSelected) {
+              stateClasses = 'border-gray-500 bg-slate-50 text-gray-800 dark:border-slate-300 dark:bg-slate-800 dark:text-slate-100';
+            } else {
+              stateClasses = 'border-gray-200 hover:bg-slate-50 text-gray-700 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800/60';
+            }
+
             return (
               <button
                 key={i}
                 disabled={!enabled}
                 onClick={() => enabled && selectDate(tempYear, tempMonth, d)}
-                className={`h-7 sm:h-8 rounded border text-xs sm:text-sm flex items-center justify-center ${
-                  enabled
-                    ? (
-                        isSolved
-                          ? `border-green-200 ${isSelected ? 'border-green-600' : ''} bg-green-50 text-green-700`
-                          : isFailed
-                            ? `border-red-200 ${isSelected ? 'border-red-500' : ''} bg-red-50 text-red-700`
-                            : (isSelected ? 'border-gray-500' : 'border-gray-200 hover:bg-slate-50')
-                      )
-                    : 'border-gray-100 text-gray-300 cursor-not-allowed'
-                }`}
+                className={`${baseClasses} ${stateClasses}`}
               >
                 {d}
               </button>
@@ -2759,24 +2802,24 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           type="button"
           onClick={() => handleArrowChange(prevAvailableDate)}
           disabled={!prevAvailableDate}
-          className="mr-2 rounded-full p-1 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:hover:text-gray-300"
+          className="mr-2 rounded-full p-1 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:hover:text-gray-300 dark:text-slate-400 dark:hover:text-slate-200 dark:disabled:text-slate-700"
           aria-label="Go to previous available puzzle date"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
       )}
-      <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 mr-2" />
+      <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 dark:text-slate-300 mr-2" />
       <div className="relative inline-block">
         <button
           type="button"
           className="relative bg-white border border-gray-300 text-gray-700 text-xs sm:text-sm rounded-md shadow-sm w-auto min-w-0
-                     py-2 pl-2.5 pr-8 sm:py-2.5 sm:pl-3 sm:pr-9 text-left hover:border-gray-400 transition-colors duration-150"
+                     py-2 pl-2.5 pr-8 sm:py-2.5 sm:pl-3 sm:pr-9 text-left hover:border-gray-400 transition-colors duration-150 dark:bg-slate-950/70 dark:border-slate-700 dark:text-slate-100 dark:hover:border-emerald-500/50"
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
           {formatDateForDisplay(selectedDate)}
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-slate-400">
             <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
             </svg>
@@ -2791,7 +2834,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
               onClick={() => setOpen(false)}
             />
             <div
-              className="absolute left-1/2 -translate-x-1/2 z-50 mt-1 w-60 sm:w-64 bg-white border border-gray-200 rounded-md shadow-lg focus:outline-none"
+              className="absolute left-1/2 -translate-x-1/2 z-50 mt-1 w-60 sm:w-64 bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-700 rounded-md shadow-lg focus:outline-none"
               role="dialog"
               aria-label="Select puzzle date"
             >
@@ -2806,7 +2849,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
         <button
           type="button"
           onClick={() => { onDateChange(todayYMD); setOpen(false); }}
-          className="ml-3 text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
+          className="ml-3 text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2 dark:text-slate-400 dark:hover:text-slate-200"
           aria-label="Go to today's puzzle"
         >
           Today
@@ -2817,7 +2860,7 @@ function DateSelector({ availableDates, selectedDate, onDateChange }) {
           type="button"
           onClick={() => handleArrowChange(nextAvailableDate)}
           disabled={!nextAvailableDate}
-          className="ml-2 rounded-full text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:hover:text-gray-300"
+          className="ml-2 rounded-full p-1 text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:hover:text-gray-300 dark:text-slate-400 dark:hover:text-slate-200 dark:disabled:text-slate-700"
           aria-label="Go to next available puzzle date"
         >
           <ChevronRight className="h-4 w-4" />
@@ -2893,6 +2936,7 @@ export default function Pathword() {
   const [isCopying, setIsCopying] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [columnMapping, setColumnMapping] = useState(null);
+  const [theme, setTheme] = useState("light");
 
   // Constants
   const MAX_TRIES = 6;
@@ -2902,11 +2946,45 @@ export default function Pathword() {
   const COLUMN_MAP_KEY_PREFIX = "pathwordColMap-";
   const TRY_COUNT_KEY_PREFIX = "pathwordTryCount-";
   const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-";
+  const THEME_PREFERENCE_KEY = "pathword-theme";
 
   const gridRef = useRef(null);
   const cellRefs = useRef({});
   const feedbackTimeoutRef = useRef(null);
   const isInitialMount = useRef(true);
+
+  const applyThemeClasses = useCallback((mode) => {
+    if (typeof document === "undefined") return;
+    document.documentElement.classList.toggle("dark", mode === "dark");
+    document.documentElement.style.colorScheme = mode;
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedTheme = window.localStorage.getItem(THEME_PREFERENCE_KEY);
+    if (storedTheme === "dark" || storedTheme === "light") {
+      setTheme(storedTheme);
+      applyThemeClasses(storedTheme);
+      return;
+    }
+
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const resolvedTheme = prefersDark ? "dark" : "light";
+    setTheme(resolvedTheme);
+    applyThemeClasses(resolvedTheme);
+  }, [applyThemeClasses]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const nextTheme = prev === "dark" ? "light" : "dark";
+      applyThemeClasses(nextTheme);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(THEME_PREFERENCE_KEY, nextTheme);
+      }
+      return nextTheme;
+    });
+  }, [applyThemeClasses]);
 
   const availablePuzzleDates = useMemo(() => {
     const todayStr = getTodayString();
@@ -3691,32 +3769,33 @@ const getCellClassName = (row, originalCol) => {
   const isSelectable = canSelectCell(row, originalCol);
 
   let baseStyle = `w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-medium rounded-full relative transition-all duration-300 ease-in-out z-10`;
-  let backgroundStyle = 'bg-transparent';
-  let textStyle = 'text-gray-700';
+  let backgroundStyle = 'bg-transparent dark:bg-transparent';
+  let textStyle = 'text-gray-700 dark:text-slate-200';
   let interactionStyle = 'cursor-default';
 
   if (isPartOfDisplayedSolvedPath && (gameState.status === "success" || gameState.status === "failed")) {
-      backgroundStyle = 'bg-green-300 scale-110 shadow-md'; textStyle = 'text-green-900 font-semibold';
+      backgroundStyle = 'bg-green-300 dark:bg-emerald-500/60 scale-110 shadow-md';
+      textStyle = 'text-green-900 dark:text-emerald-50 font-semibold';
   } else if (isSelected && pathItem) {
-      if (pathItem.closeness === "green") backgroundStyle = 'bg-green-300';
-      else if (pathItem.closeness === "yellow") backgroundStyle = 'bg-yellow-300';
-      else if (pathItem.closeness === "red") backgroundStyle = 'bg-red-300';
-      else backgroundStyle = 'bg-blue-300'; // Should ideally not happen
+      if (pathItem.closeness === "green") backgroundStyle = 'bg-green-300 dark:bg-emerald-500/70';
+      else if (pathItem.closeness === "yellow") backgroundStyle = 'bg-yellow-300 dark:bg-amber-400/70';
+      else if (pathItem.closeness === "red") backgroundStyle = 'bg-red-300 dark:bg-rose-500/70';
+      else backgroundStyle = 'bg-blue-300 dark:bg-sky-500/70'; // Should ideally not happen
       backgroundStyle += ' scale-110 shadow-md';
-      textStyle = pathItem.closeness === "green" ? 'text-green-900' : 
-                  pathItem.closeness === "yellow" ? 'text-yellow-900' :
-                  pathItem.closeness === "red" ? 'text-red-900' : 'text-blue-900';
+      textStyle = pathItem.closeness === "green" ? 'text-green-900 dark:text-emerald-50' : 
+                  pathItem.closeness === "yellow" ? 'text-yellow-900 dark:text-amber-100' :
+                  pathItem.closeness === "red" ? 'text-red-900 dark:text-rose-50' : 'text-blue-900 dark:text-sky-50';
       textStyle += ' font-semibold';
       interactionStyle = 'cursor-pointer';
   // REMOVED: else if (isTheRevealedCell && !isSelected) { ... } block
   } else if (gameState.status === 'playing') {
       if (isSelectable) {
-          textStyle = 'text-black hover:text-blue-600'; interactionStyle = 'cursor-pointer hover:scale-105';
+          textStyle = 'text-black dark:text-emerald-100 hover:text-blue-600 dark:hover:text-sky-300'; interactionStyle = 'cursor-pointer hover:scale-105';
       } else {
-          textStyle = 'text-gray-400'; interactionStyle = 'cursor-not-allowed opacity-50';
+          textStyle = 'text-gray-400 dark:text-slate-600'; interactionStyle = 'cursor-not-allowed opacity-50';
       }
   } else { 
-      textStyle = 'text-gray-400 opacity-60';
+      textStyle = 'text-gray-400 dark:text-slate-600 opacity-60';
   }
   return `${baseStyle} ${backgroundStyle} ${textStyle} ${interactionStyle}`;
 };
@@ -3813,7 +3892,7 @@ const getCellClassName = (row, originalCol) => {
                 {/* Vertical Grid Line */}
                 {displayColIndex > 0 && (
                   <div
-                    className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-0.5 bg-gray-300"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-[120%] w-0.5 bg-gray-300 dark:bg-slate-600"
                     style={{
                       marginLeft: `calc(-${gap} / 2)`,
                     }}
@@ -3822,7 +3901,7 @@ const getCellClassName = (row, originalCol) => {
                 {/* Horizontal Grid Line */}
                 {rowIndex > 0 && (
                   <div
-                    className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-0.5 bg-gray-300"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-0.5 bg-gray-300 dark:bg-slate-600"
                     style={{
                       marginTop: `calc(-${gap} / 2)`,
                     }}
@@ -3864,26 +3943,26 @@ const renderSelectedPathPreview = () => {
         // const isRevealedSlot = /* ... REMOVED ... */;
         const isSelected = !!itemInPath;
 
-        let borderColor = "border-gray-300";
-        let textColor = "text-gray-400";
-        let bgColor = "bg-gray-50";
+        let borderColor = "border-gray-300 dark:border-slate-600";
+        let textColor = "text-gray-400 dark:text-slate-400";
+        let bgColor = "bg-gray-50 dark:bg-slate-800/70";
 
         if (gameState.status === "success" || gameState.status === "failed") {
             if (isSelected && itemInPath?.letter === currentPuzzle.answer[index]) {
-                borderColor="border-green-400"; textColor="text-green-700"; bgColor="bg-green-50";
+                borderColor="border-green-400 dark:border-emerald-500/60"; textColor="text-green-700 dark:text-emerald-200"; bgColor="bg-green-50 dark:bg-emerald-500/10";
             }
         } else if (letter) { // Game is playing
             if (isSelected && itemInPath) {
-                if (itemInPath.closeness === "green") { borderColor="border-green-400";textColor="text-green-700";bgColor="bg-green-50"; }
-                else if (itemInPath.closeness === "yellow") { borderColor="border-yellow-400";textColor="text-yellow-700";bgColor="bg-yellow-50"; }
-                else if (itemInPath.closeness === "red") { borderColor="border-red-400";textColor="text-red-700";bgColor="bg-red-50"; }
+                if (itemInPath.closeness === "green") { borderColor="border-green-400 dark:border-emerald-500/60";textColor="text-green-700 dark:text-emerald-200";bgColor="bg-green-50 dark:bg-emerald-500/10"; }
+                else if (itemInPath.closeness === "yellow") { borderColor="border-yellow-400 dark:border-amber-400/60";textColor="text-yellow-700 dark:text-amber-200";bgColor="bg-yellow-50 dark:bg-amber-400/10"; }
+                else if (itemInPath.closeness === "red") { borderColor="border-red-400 dark:border-rose-500/60";textColor="text-red-700 dark:text-rose-200";bgColor="bg-red-50 dark:bg-rose-500/10"; }
                 // REMOVED: else if (isRevealedSlot) { ... }
-                else { textColor="text-gray-800"; } // If simply in pathMap but not current selectedPath with closeness (e.g. before this change)
+                else { textColor="text-gray-800 dark:text-slate-200"; } // If simply in pathMap but not current selectedPath with closeness (e.g. before this change)
             } else { // Letter in pathMap but not currently part of `selectedPath` (e.g. after backtrack)
-                textColor="text-gray-800";
+                textColor="text-gray-800 dark:text-slate-300";
             }
         } else { // Empty slot
-            borderColor="border-gray-200";
+            borderColor="border-gray-200 dark:border-slate-700";
         }
         
         return (
@@ -3891,7 +3970,7 @@ const renderSelectedPathPreview = () => {
             <div className={`w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 border-2 rounded-lg flex items-center justify-center text-base sm:text-lg md:text-xl font-semibold transition-colors duration-300 shadow ${borderColor} ${textColor} ${bgColor}`}>
               {letter || ""}
             </div>
-            <span className="mt-1 text-xs text-gray-500">{index + 1}</span>
+            <span className="mt-1 text-xs text-gray-500 dark:text-slate-400">{index + 1}</span>
           </div>
         );
       })}
@@ -3909,41 +3988,53 @@ const renderSelectedPathPreview = () => {
   const winPct = totalPlayed > 0 ? Math.round((totalWins / totalPlayed) * 100) : 0;
 
   return (
-    <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 h-[100dvh] overflow-hidden flex flex-col items-center">
+    <div className="max-w-full mx-auto p-4 md:p-6 font-sans bg-teal-50 dark:bg-gradient-to-b dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-gray-900 dark:text-slate-100 h-[100dvh] overflow-hidden flex flex-col items-center transition-colors duration-300">
       {/* Centered play area wrapper; inline-block ensures width matches contents (grid) */}
       <div className="relative inline-block mx-auto">
         {/* Top-right actions positioned relative to grid area */}
         
 
         <header className="text-center px-4 md:px-0">
-          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 tracking-tight mb-1">Pathword</h1>
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 dark:text-emerald-200 tracking-tight mb-1 transition-colors">Pathword</h1>
           {/* <p className="text-sm text-gray-600">Connect letters row by row to find the word.</p> */}
+          <div className="absolute left-0 top-0 flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-pressed={theme === "dark"}
+              className="h-10 w-10 text-gray-600 hover:text-teal-600 dark:text-slate-200 dark:hover:text-emerald-300 transition-colors"
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+          </div>
           <div className="absolute right-0 top-0 flex items-center">
           {/* Stats Dialog */}
           <Dialog open={isStatsOpen} onOpenChange={(open) => { setIsStatsOpen(open); if (!open) setShowSuccessPopup(false); }}>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="View Stats"><BarChart3 className="h-6 w-6 text-gray-600" /></Button>
+              <Button variant="ghost" size="icon" aria-label="View Stats"><BarChart3 className="h-6 w-6 text-gray-600 dark:text-slate-200" /></Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-white rounded-xl shadow-2xl p-0 overflow-hidden">
+            <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 dark:text-slate-100 rounded-xl shadow-2xl p-0 overflow-hidden border border-emerald-500/10 dark:border-emerald-400/20 transition-colors">
               {/* Celebrate header */}
               <div className="px-6 pt-8 pb-6 relative">
                 {/* Festive badge */}
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 ring-8 ring-emerald-50 shadow-sm">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 ring-8 ring-emerald-50 shadow-sm dark:bg-emerald-500/15 dark:ring-emerald-400/10 transition-colors">
                   {gameState.status === "success" ? (
-                    <Star className="h-7 w-7 text-emerald-600" />
+                    <Star className="h-7 w-7 text-emerald-600 dark:text-emerald-200" />
                   ) : (
-                    <BarChart3 className="h-7 w-7 text-emerald-600" />
+                    <BarChart3 className="h-7 w-7 text-emerald-600 dark:text-emerald-200" />
                   )}
                 </div>
-                <DialogTitle className="text-center text-2xl font-extrabold tracking-tight text-gray-900">
+                <DialogTitle className="text-center text-2xl font-extrabold tracking-tight text-gray-900 dark:text-slate-100">
                   {gameState.status === "success" ? "Congratulations!" : gameState.status === "failed" ? "Statistics" : "Statistics"}
                 </DialogTitle>
                 {(gameState.status === "success" || gameState.status === "failed") && (
-                  <p className={`mt-2 text-center text-sm ${gameState.status === "failed" ? "text-gray-600" : "text-gray-600"}`}>
+                  <p className={`mt-2 text-center text-sm ${gameState.status === "failed" ? "text-gray-600 dark:text-slate-300" : "text-gray-600 dark:text-slate-300"}`}>
                     {gameState.status === "failed" ? (
-                      <>The Pathword was <span className="font-semibold text-gray-900">{currentPuzzle.answer}</span>.</>
+                      <>The Pathword was <span className="font-semibold text-gray-900 dark:text-emerald-200">{currentPuzzle.answer}</span>.</>
                     ) : (
-                      <>You found <span className="font-semibold text-gray-900">{currentPuzzle.answer}</span>{` in ${tryCount} ${tryCount === 1 ? "try" : "tries"}!`}</>
+                      <>You found <span className="font-semibold text-gray-900 dark:text-emerald-200">{currentPuzzle.answer}</span>{` in ${tryCount} ${tryCount === 1 ? "try" : "tries"}!`}</>
                     )}
                   </p>
                 )}
@@ -3953,20 +4044,20 @@ const renderSelectedPathPreview = () => {
               <div className="px-6">
                 <div className="grid grid-cols-4 gap-4 text-center">
                   <div>
-                    <div className="text-4xl font-bold tracking-tight text-gray-900">{totalWins}</div>
-                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Paths Found</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900 dark:text-emerald-200">{totalWins}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-slate-400">Paths Found</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-bold tracking-tight text-gray-900">{winPct}</div>
-                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Win %</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900 dark:text-emerald-200">{winPct}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-slate-400">Win %</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-bold tracking-tight text-gray-900">{userStats.streak}</div>
-                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Current Streak</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900 dark:text-emerald-200">{userStats.streak}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-slate-400">Current Streak</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-bold tracking-tight text-gray-900">{(userStats.maxStreak && userStats.maxStreak > 0) ? userStats.maxStreak : (userStats.streak || 0)}</div>
-                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">Max Streak</div>
+                    <div className="text-4xl font-bold tracking-tight text-gray-900 dark:text-emerald-200">{(userStats.maxStreak && userStats.maxStreak > 0) ? userStats.maxStreak : (userStats.streak || 0)}</div>
+                    <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-slate-400">Max Streak</div>
                   </div>
                 </div>
               </div>
@@ -3974,10 +4065,10 @@ const renderSelectedPathPreview = () => {
               {/* Distribution */}
               <div className="px-6 mt-6 mb-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-extrabold font-semibold text-gray-800">Guess Distribution</h3>
+                  <h3 className="text-sm font-extrabold font-semibold text-gray-800 dark:text-slate-100">Guess Distribution</h3>
                   <button
                     onClick={() => setIsStatsDistributionOpen(!isStatsDistributionOpen)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200"
                     aria-expanded={isStatsDistributionOpen}
                     aria-controls="solve-distribution-content"
                   >
@@ -3999,9 +4090,9 @@ const renderSelectedPathPreview = () => {
                           const pct = Math.max(12, (cnt / maxCount) * 100);
                           return (
                             <div key={`dist-${i+1}`} className="flex items-center gap-2 text-sm">
-                              <div className="w-5 text-gray-500">{i+1}</div>
+                              <div className="w-5 text-gray-500 dark:text-slate-400">{i+1}</div>
                               <div className="relative h-6 flex-1 overflow-hidden">
-                                <div className="h-full rounded-md bg-emerald-300/50 text-gray-500 text-xs font-semibold flex items-center justify-end pr-2 transition-all" style={{ width: `${pct}%` }}>
+                                <div className="h-full rounded-md bg-emerald-300/50 dark:bg-emerald-400/20 text-gray-500 dark:text-emerald-200 text-xs font-semibold flex items-center justify-end pr-2 transition-all" style={{ width: `${pct}%` }}>
                                   {cnt}
                                 </div>
                               </div>
@@ -4016,7 +4107,7 @@ const renderSelectedPathPreview = () => {
               </div>
 
               {/* Footer actions */}
-              <DialogFooter className="px-6 pt-6 pb-6 border-t border-gray-200">
+              <DialogFooter className="px-6 pt-6 pb-6 border-t border-gray-200 dark:border-slate-700/80">
                 {gameState.status === "success" && isDisplayingTodaysPuzzle ? (
                   <Button onClick={handleShare} disabled={isCopying} className="w-full h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-base">
                     <Share2 className="h-5 w-5 mr-2" />
@@ -4024,7 +4115,7 @@ const renderSelectedPathPreview = () => {
                   </Button>
                 ) : (
                   <DialogClose asChild>
-                    <Button type="button" className="w-full h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-800 text-base">Close</Button>
+                    <Button type="button" className="w-full h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 text-base">Close</Button>
                   </DialogClose>
                 )}
               </DialogFooter>
@@ -4046,18 +4137,18 @@ const renderSelectedPathPreview = () => {
           >
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Help">
-                <HelpCircle className="h-6 w-6 text-gray-600" />
+                <HelpCircle className="h-6 w-6 text-gray-600 dark:text-slate-200" />
               </Button>
             </DialogTrigger>
             <DialogContent
-              className={`bg-white rounded-lg shadow-xl p-0 overflow-y-scroll md:max-h-none md:overflow-visible transition-all duration-300 ease-in-out scrollbar-visible
+              className={`bg-white dark:bg-slate-900 dark:text-slate-100 rounded-lg shadow-xl p-0 overflow-y-scroll md:max-h-none md:overflow-visible transition-all duration-300 ease-in-out scrollbar-visible
                 ${showDetailedHelp
                   ? 'w-auto max-w-[calc(100vw-2rem)] min-w-[min(100vw-2rem,20rem)]' // Hug content with a safe minimum
                   : 'sm:max-w-xl md:max-w-2xl'
                 }`}
             >
-              <DialogHeader className={`flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200`}>
-                <DialogTitle className={`text-xl font-bold tracking-tight text-gray-800`}>
+              <DialogHeader className={`flex flex-row justify-between items-center px-6 pt-5 pb-4 border-b border-gray-200 dark:border-slate-700/80`}>
+                <DialogTitle className={`text-xl font-bold tracking-tight text-gray-800 dark:text-slate-100`}>
                   {showDetailedHelp ? 'Practise Round' : 'How To Play'}
                 </DialogTitle>
               {/* <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
@@ -4072,17 +4163,17 @@ const renderSelectedPathPreview = () => {
       <DetailedHelpTutorial />
     ) : (
       // --- REVISED SUMMARY VIEW (Default) ---
-      <div className="p-4 px-6 text-gray-700 space-y-5 text-sm leading-relaxed">
+      <div className="p-4 px-6 text-gray-700 dark:text-slate-300 space-y-5 text-sm leading-relaxed">
         <div>
-          <h4 className="font-semibold text-gray-800 mb-1.5">The Goal</h4>
+          <h4 className="font-semibold text-gray-800 dark:text-slate-100 mb-1.5">The Goal</h4>
           <p>To find the hidden 6-letter word, pick one letter from each row, starting at the top and going down, but make sure no two letters are from the same column. You have 6 tries to find your path.</p>        </div>
         <div>
-          <h4 className="font-semibold text-gray-800 mb-1.5">Color Clues</h4>
+          <h4 className="font-semibold text-gray-800 dark:text-slate-100 mb-1.5">Color Clues</h4>
           <p>After each guess, the color of the tile will guide you:</p>
           <div className="space-y-4 mt-4">
             {/* Green Example */}
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-green-400 border border-green-400 rounded flex items-center justify-center text-white font-bold text-lg"></div>
+              <div className="flex-shrink-0 w-8 h-8 bg-green-400 border border-green-400 rounded flex items-center justify-center text-white font-bold text-lg dark:bg-emerald-500 dark:border-emerald-400 dark:text-emerald-50 transition-colors"></div>
               <p className="flex-1"><span className="font-semibold">Green:</span> Correct letter, correct spot. You must now move to the next row.</p>
                {/* Green Example */}
             
@@ -4094,7 +4185,7 @@ const renderSelectedPathPreview = () => {
             />
             {/* Yellow Example */}
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-yellow-400 border border-yellow-400 rounded flex items-center justify-center text-white font-bold text-lg"></div>
+              <div className="flex-shrink-0 w-8 h-8 bg-yellow-400 border border-yellow-400 rounded flex items-center justify-center text-white font-bold text-lg dark:bg-amber-400 dark:border-amber-300 dark:text-amber-950 transition-colors"></div>
                <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but it's an immediate alphabetical neighbor to the correct letter in that row (one before or one after).<br />👉 Note: The alphabet isn’t circular — Z is not close to A.</p>
                 {/* Yellow Example */}
 
@@ -4106,7 +4197,7 @@ const renderSelectedPathPreview = () => {
             />
             {/* Red Example (using gray like Wordle) */}
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-red-400 border border-red-400 rounded flex items-center justify-center text-white font-bold text-lg"></div>
+              <div className="flex-shrink-0 w-8 h-8 bg-red-400 border border-red-400 rounded flex items-center justify-center text-white font-bold text-lg dark:bg-rose-500 dark:border-rose-400 dark:text-rose-50 transition-colors"></div>
               <p className="flex-1"><span className="font-semibold">Red:</span> Wrong letter, and not a close neighbor.</p>
              
             </div>
@@ -4120,7 +4211,7 @@ const renderSelectedPathPreview = () => {
         </div>
          <Button
             variant="link"
-            className="p-0 h-auto text-teal-600 hover:text-teal-700"
+            className="p-0 h-auto text-teal-600 hover:text-teal-700 dark:text-emerald-300 dark:hover:text-emerald-200"
             onClick={() => {
                 setShowDetailedHelp(true);
                 setCurrentHelpSlide(0); // Start carousel from the beginning
@@ -4162,25 +4253,25 @@ const renderSelectedPathPreview = () => {
 
         <div className="text-center my-2 sm:my-3 px-4 w-full flex flex-col items-center justify-center">
             {gameState.status === "playing" && (
-                <p className="text-blue-600 font-semibold text-md">
-                    Tries Left: {MAX_TRIES - tryCount} / {MAX_TRIES}
+                <p className="text-blue-600 dark:text-sky-300 font-semibold text-md">
+                    Path Tries Left: {MAX_TRIES - tryCount} / {MAX_TRIES}
                 </p>
             )}
             {isAlreadySolvedToday && isDisplayingTodaysPuzzle && gameState.status !== "playing" && (
-                                <p className="text-green-600 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
+                                <p className="text-green-600 dark:text-emerald-300 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
 
             )}
             {isAlreadySolvedToday && !isDisplayingTodaysPuzzle && gameState.status !== "playing" && (
-                <p className="text-green-600 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
+                <p className="text-green-600 dark:text-emerald-300 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
             )}
             {gameState.status === "success" && !isAlreadySolvedToday && !isStatsOpen && ( // If just solved
                 <p className="text-green-600 font-semibold text-lg animate-pulse">Success! Word found: {currentPuzzle.answer}</p>
             )}
             {gameState.status === "failed" && (
-                <p className="text-red-600 font-semibold text-md">{feedbackMessage}</p> // feedbackMessage will contain the "Max tries..."
+                <p className="text-red-600 dark:text-rose-300 font-semibold text-md">{feedbackMessage}</p> // feedbackMessage will contain the "Max tries..."
             )}
             {gameState.status === "playing" && feedbackMessage && ( // Only show incorrect path if playing
-                 <p className="text-red-600 font-semibold text-md">{feedbackMessage}</p>
+                 <p className="text-red-600 dark:text-rose-300 font-semibold text-md">{feedbackMessage}</p>
             )}
         </div>
 
