@@ -91,6 +91,46 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  
+  // For "NUMBER" (tomorrow)
+  {
+    date: "2025-09-24",
+    grid: [
+      // Row 1 — N at col 0
+      ["N", "I", "J", "S", "W", "T"],
+      // Row 2 — U at col 4
+      ["C", "A", "L", "Q", "U", "Y"],
+      // Row 3 — M at col 2
+      ["A", "I", "M", "P", "E", "V"],
+      // Row 4 — B at col 5
+      ["D", "T", "L", "E", "Q", "B"],
+      // Row 5 — E at col 1
+      ["C", "E", "H", "A", "T", "R"],
+      // Row 6 — R at col 3
+      ["F", "K", "P", "R", "W", "Y"],
+    ],
+    answer: "NUMBER",
+  },
+  // For "SCHOOL" (tomorrow)
+  {
+    date: "2025-09-23",
+    grid: [
+      // Row 1 — S at col 1
+      ["A", "S", "I", "K", "O", "X"],
+      // Row 2 — C at col 3
+      ["B", "U", "G", "C", "T", "Z"],
+      // Row 3 — H at col 0
+      ["H", "K", "N", "R", "E", "L"],
+      // Row 4 — O at col 5
+      ["D", "G", "A", "R", "N", "O"],
+      // Row 5 — O at col 2
+      ["C", "H", "O", "S", "W", "A"],
+      // Row 6 — L at col 4
+      ["F", "J", "T", "S", "L", "Y"],
+    ],
+    answer: "SCHOOL",
+  },
+  
   // For "HEAVEN" (tomorrow)
   {
     date: "2025-09-22",
@@ -4354,7 +4394,7 @@ const renderSelectedPathPreview = () => {
              
            
           </div>
-          <Button
+          {/* <Button
             variant="link"
             asChild
             className="p-0 h-auto text-teal-600 hover:text-teal-700 dark:text-emerald-300 dark:hover:text-emerald-200 sm:self-end"
@@ -4362,7 +4402,7 @@ const renderSelectedPathPreview = () => {
             <Link href="/blog" aria-label="Open the Pathword blog for more tips">
               Pathword Blog &rarr;
             </Link>
-          </Button>
+          </Button> */}
         </div>
       </div>
     )}
