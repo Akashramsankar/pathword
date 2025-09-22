@@ -3305,7 +3305,7 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
         setSelectedPath(reconstructedSolvedPath.filter(p => p.col !== -1));
 
         if (currentPuzzle.date === getTodayString()) { // Only show auto popup for today's puzzle
-        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 2500);
+        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 3000);
       }
 
 
@@ -3836,7 +3836,7 @@ const getOtherSelectableLettersInRow = (row, currentSelectedLetter, correctLette
       const solvedTodayStorageKey = `${SOLVED_TODAY_KEY_PREFIX}${currentPuzzle.date}`;
       localStorage.setItem(solvedTodayStorageKey, "true");
       if (isSolvingTodaysPuzzle) { // Only show auto popup for today's puzzle
-        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 2000);
+        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 3000);
       }
     } else { // Incorrect path
       if (tryCount > MAX_TRIES) {
@@ -4012,6 +4012,12 @@ const getCellClassName = (row, originalCol) => {
       }
       return displayedRow;
     });
+    const isLineSolvedState = gameState.status === "success" || gameState.status === "failed";
+    const solvedLineStart = theme === "dark" ? "rgba(16, 185, 129, 0.85)" : "rgb(134 239 172)";
+    const solvedLineEnd = theme === "dark" ? "rgba(16, 185, 129, 0.85)" : "rgb(74 222 128)";
+    const activeLineStart = isLineSolvedState ? solvedLineStart : "rgb(147 197 253)";
+    const activeLineEnd = isLineSolvedState ? solvedLineEnd : "rgb(96 165 250)";
+
     return (
             <div
         ref={gridRef}
@@ -4061,8 +4067,8 @@ const getCellClassName = (row, originalCol) => {
         <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-5" style={{ overflow: "visible" }} aria-hidden="true">
           <defs>
             <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style={{ stopColor: gameState.status === "success" || gameState.status === "failed" ? "rgb(134 239 172)" : "rgb(147 197 253)", stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: gameState.status === "success" || gameState.status === "failed" ? "rgb(74 222 128)" : "rgb(96 165 250)", stopOpacity: 1 }} />
+              <stop offset="0%" style={{ stopColor: activeLineStart, stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: activeLineEnd, stopOpacity: 1 }} />
             </linearGradient>
           </defs>
           {pathCoords.map((coords, index) => {
