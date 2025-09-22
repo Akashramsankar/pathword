@@ -3019,25 +3019,20 @@ export default function Pathword() {
   const TRY_COUNT_KEY_PREFIX = "pathwordTryCount-";
   const SOLVED_TODAY_KEY_PREFIX = "pathwordSolved-";
   const THEME_PREFERENCE_KEY = "pathword-theme";
-  const SEGMENT_DRAW_DURATION_MS = 450;
-  const SEGMENT_DRAW_DELAY_MS = 140;
+  const SEGMENT_DRAW_DURATION_MS = 300;
+  const SEGMENT_DRAW_INITIAL_PAUSE_MS = 400;
+  const SEGMENT_DRAW_STAGGER_MS = 400;
 
   const gridRef = useRef(null);
   const cellRefs = useRef({});
   const feedbackTimeoutRef = useRef(null);
   const isInitialMount = useRef(true);
   const hasAnimatedSolutionRef = useRef(false);
-  const lineAnimationFrameRef = useRef({ start: null, end: null });
+  const lineAnimationTimeoutsRef = useRef([]);
 
-  const cancelLineAnimationFrames = useCallback(() => {
-    const { start, end } = lineAnimationFrameRef.current || {};
-    if (start !== null && start !== undefined) {
-      cancelAnimationFrame(start);
-    }
-    if (end !== null && end !== undefined) {
-      cancelAnimationFrame(end);
-    }
-    lineAnimationFrameRef.current = { start: null, end: null };
+  const clearLineAnimationTimeouts = useCallback(() => {
+    lineAnimationTimeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
+    lineAnimationTimeoutsRef.current = [];
   }, []);
 
   const applyThemeClasses = useCallback((mode) => {
@@ -3183,11 +3178,11 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
       setTryCount(1); // Start at try 1 for a new puzzle
       setIncrementTryOnNextSelection(false);
       hasAnimatedSolutionRef.current = false;
-      cancelLineAnimationFrames();
+      clearLineAnimationTimeouts();
       // isAlreadySolvedToday will be determined by the main data loading effect below
       isInitialMount.current = false;
     }
-  }, [selectedDate, cancelLineAnimationFrames]);
+  }, [selectedDate, clearLineAnimationTimeouts]);
 
   useEffect(
     () => () => {
@@ -3310,7 +3305,7 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
         setSelectedPath(reconstructedSolvedPath.filter(p => p.col !== -1));
 
         if (currentPuzzle.date === getTodayString()) { // Only show auto popup for today's puzzle
-        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 2000);
+        setTimeout(() => { setShowSuccessPopup(true); setIsStatsOpen(true); }, 2500);
       }
 
 
@@ -3424,7 +3419,7 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
   useEffect(() => {
     if (!pathCoords.length) {
       setLineDrawProgress([]);
-      cancelLineAnimationFrames();
+      clearLineAnimationTimeouts();
       return;
     }
 
@@ -3434,30 +3429,39 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
     const shouldAnimateSolution = gameState.status === "success" && hasFullPath;
 
     if (!shouldAnimateSolution) {
+      clearLineAnimationTimeouts();
       setLineDrawProgress(pathCoords.map(() => 1));
       return;
     }
 
     if (hasAnimatedSolutionRef.current) {
+      clearLineAnimationTimeouts();
       setLineDrawProgress(pathCoords.map(() => 1));
       return;
     }
 
-    cancelLineAnimationFrames();
-    const zeros = pathCoords.map(() => 0);
-    const ones = pathCoords.map(() => 1);
-    setLineDrawProgress(zeros);
-    lineAnimationFrameRef.current.start = requestAnimationFrame(() => {
-      lineAnimationFrameRef.current.end = requestAnimationFrame(() => {
-        setLineDrawProgress(ones);
-      });
-    });
     hasAnimatedSolutionRef.current = true;
+    clearLineAnimationTimeouts();
+
+    const zeros = pathCoords.map(() => 0);
+    setLineDrawProgress(zeros);
+
+    pathCoords.forEach((_, index) => {
+      const timeoutId = window.setTimeout(() => {
+        setLineDrawProgress((prev) => {
+          const hasValidPrev = Array.isArray(prev) && prev.length === pathCoords.length;
+          const updated = hasValidPrev ? [...prev] : pathCoords.map(() => 0);
+          updated[index] = 1;
+          return updated;
+        });
+      }, SEGMENT_DRAW_INITIAL_PAUSE_MS + index * SEGMENT_DRAW_STAGGER_MS);
+      lineAnimationTimeoutsRef.current.push(timeoutId);
+    });
 
     return () => {
-      cancelLineAnimationFrames();
+      clearLineAnimationTimeouts();
     };
-  }, [pathCoords, gameState.status, currentPuzzle?.answer, cancelLineAnimationFrames]);
+  }, [pathCoords, gameState.status, currentPuzzle?.answer, clearLineAnimationTimeouts]);
 
   useEffect(() => {
     if (gameState.status !== "success") {
@@ -3466,8 +3470,8 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
   }, [gameState.status, currentPuzzle?.date]);
 
   useEffect(() => () => {
-    cancelLineAnimationFrames();
-  }, [cancelLineAnimationFrames]);
+    clearLineAnimationTimeouts();
+  }, [clearLineAnimationTimeouts]);
 
 
   const saveStats = (stats) => { /* ... (saveStats remains same) ... */ try {localStorage.setItem(STATS_KEY, JSON.stringify(stats));} catch(e){console.error("Failed to save stats", e)} };
@@ -4063,9 +4067,12 @@ const getCellClassName = (row, originalCol) => {
           </defs>
           {pathCoords.map((coords, index) => {
             const dashArray = coords.segmentLength || Math.hypot(coords.x2 - coords.x1, coords.y2 - coords.y1);
-            const progress = lineDrawProgress[index] ?? 1;
-            const dashOffset = dashArray > 0 ? Math.max(dashArray * (1 - progress), 0) : 0;
             const shouldAnimateSolution = gameState.status === "success" && hasAnimatedSolutionRef.current;
+            const hasCustomProgress = lineDrawProgress[index] !== undefined;
+            const fallbackProgress = gameState.status === "success" && !hasAnimatedSolutionRef.current ? 0 : 1;
+            const progress = hasCustomProgress ? lineDrawProgress[index] : fallbackProgress;
+            const dashOffset = dashArray > 0 ? Math.max(dashArray * (1 - progress), 0) : 0;
+            const shouldTransition = shouldAnimateSolution && progress > 0;
             return (
               <line
                 key={coords.id}
@@ -4078,9 +4085,8 @@ const getCellClassName = (row, originalCol) => {
                 strokeLinecap="round"
                 strokeDasharray={dashArray}
                 strokeDashoffset={dashOffset}
-                style={shouldAnimateSolution ? {
-                  transition: `stroke-dashoffset ${SEGMENT_DRAW_DURATION_MS}ms ease-out`,
-                  transitionDelay: `${index * SEGMENT_DRAW_DELAY_MS}ms`
+                style={shouldTransition ? {
+                  transition: `stroke-dashoffset ${SEGMENT_DRAW_DURATION_MS}ms ease-out`
                 } : undefined}
               />
             );
