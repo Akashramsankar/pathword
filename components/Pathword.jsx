@@ -4384,7 +4384,7 @@ const renderSelectedPathPreview = () => {
             />
           </div>
         </div>
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2 animate-bounce">
            
             <Button
@@ -4406,15 +4406,15 @@ const renderSelectedPathPreview = () => {
              
            
           </div>
-          {/* <Button
+          <Button
             variant="link"
             asChild
-            className="p-0 h-auto text-teal-600 hover:text-teal-700 dark:text-emerald-300 dark:hover:text-emerald-200 sm:self-end"
+            className="p-0 h-auto text-teal-600 hover:text-teal-700 dark:text-emerald-300 dark:hover:text-emerald-200"
           >
             <Link href="/blog" aria-label="Open the Pathword blog for more tips">
               Pathword Blog &rarr;
             </Link>
-          </Button> */}
+          </Button> 
         </div>
       </div>
     )}
