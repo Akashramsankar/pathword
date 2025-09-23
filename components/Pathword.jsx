@@ -4361,7 +4361,7 @@ const renderSelectedPathPreview = () => {
             {/* Yellow Example */}
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-8 h-8 bg-yellow-400 border border-yellow-400 rounded flex items-center justify-center text-white font-bold text-lg dark:bg-amber-400 dark:border-amber-300 dark:text-amber-950 transition-colors"></div>
-               <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but it's an immediate alphabetical neighbor to the correct letter in that row (one before or one after).<br />👉 Note: The alphabet isn’t circular — Z is not close to A.</p>
+               <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but it's an alphabetical neighbor within the letters in the same row (either before or after the correct letter).<br />👉 Note: The alphabetical order isn’t circular — Z is not close to A.</p>
                 {/* Yellow Example */}
 
             </div>
