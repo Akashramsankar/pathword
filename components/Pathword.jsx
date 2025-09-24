@@ -91,7 +91,26 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
-  
+  // For "MALICE" (tomorrow)
+  {
+    date: "2025-09-25",
+    grid: [
+      // Row 1 — M at col 1
+      ["B", "M", "Q", "T", "I", "F"],
+      // Row 2 — A at col 4
+      ["E", "H", "Y", "N", "A", "U"],
+      // Row 3 — L at col 0
+      ["L", "F", "N", "I", "B", "X"],
+      // Row 4 — I at col 5
+      ["C", "G", "L", "T", "S", "I"],
+      // Row 5 — C at col 2
+      ["A", "J", "C", "G", "V", "T"],
+      // Row 6 — E at col 3
+      ["F", "N", "H", "E", "R", "Y"],
+    ],
+    answer: "MALICE",
+  },
+
   // For "NUMBER" (tomorrow)
   {
     date: "2025-09-24",
@@ -4361,26 +4380,26 @@ const renderSelectedPathPreview = () => {
             {/* Yellow Example */}
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-8 h-8 bg-yellow-400 border border-yellow-400 rounded flex items-center justify-center text-white font-bold text-lg dark:bg-amber-400 dark:border-amber-300 dark:text-amber-950 transition-colors"></div>
-               <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but it's an alphabetical neighbor within the letters in the same row (either before or after the correct letter).<br />👉 Note: The alphabetical order isn’t circular — Z is not close to A.</p>
+               <p className="flex-1"><span className="font-semibold">Yellow:</span> Wrong letter, but you have come closer. If you arrange the row’s letters in alphabetical order, the correct letter is either the one just before or just after your guess.<br />👉 Note: The alphabetical order isn’t circular — Z is not close to A.</p>
                 {/* Yellow Example */}
 
             </div>
             <HelpExampleRow
               letters={['Z', 'P', 'B', 'Q','T','D']}
               colors={['default','default','default' , 'default', 'default','yellow']}
-              caption={"You picked 'D'. It's yellow, so the correct letter is an alphabetical neighbor in the available letters. That is B (before) or P (after)."}
+              caption={"You picked 'D'. It's yellow, so the correct letter is an alphabetical neighbor in the available letters. When arranged in order (B, D, P, Q, T, Z), the neighbors of D are B (before) and P (after)."}
             />
             {/* Red Example (using gray like Wordle) */}
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-8 h-8 bg-red-400 border border-red-400 rounded flex items-center justify-center text-white font-bold text-lg dark:bg-rose-500 dark:border-rose-400 dark:text-rose-50 transition-colors"></div>
-              <p className="flex-1"><span className="font-semibold">Red:</span> Wrong letter, and not a close neighbor.</p>
+              <p className="flex-1"><span className="font-semibold">Red:</span> Wrong letter, and so are its immediate alphabetical neighbors in this row. All three can be eliminated.</p>
              
             </div>
              {/* Red Example */}
             <HelpExampleRow
               letters={['Z', 'P', 'B', 'Q','T','D']}
               colors={['default', 'default', 'default', 'red', 'default']}
-              caption={"You picked 'Q'. It's red, meaning it's not a close alphabetical neighbor. So the correct letter is neither P (before) or T (after)"}
+              caption={"You picked 'Q'. It's red, meaning it's also not a close alphabetical neighbor. When arranged in order (B, D, P, Q, T, Z), the neighbors of Q are P (before) and T (after). So we can eliminate all three letters Q, P and T."}
             />
           </div>
         </div>
