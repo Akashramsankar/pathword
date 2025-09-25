@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "RENDER" (tomorrow)
+  {
+    date: "2025-09-26",
+    grid: [
+      // Row 1 — R at col 2
+      ["B", "F", "R", "M", "T", "Y"],
+      // Row 2 — E at col 4
+      ["A", "H", "K", "Y", "E", "O"],
+      // Row 3 — N at col 0
+      ["N", "F", "J", "S", "U", "V"],
+      // Row 4 — D at col 5
+      ["B", "O", "K", "E", "T", "D"],
+      // Row 5 — E at col 1
+      ["C", "E", "I", "A", "V", "T"],
+      // Row 6 — R at col 3
+      ["G", "L", "P", "R", "W", "Y"],
+    ],
+    answer: "RENDER",
+  },
   // For "MALICE" (tomorrow)
   {
     date: "2025-09-25",
