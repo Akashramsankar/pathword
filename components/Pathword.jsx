@@ -91,22 +91,60 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // // For "MATURE" (tomorrow)
+  // {
+  //   date: "2025-09-28",
+  //   grid: [
+  //     // Row 1 — M at col 0
+  //     ["M", "C", "H", "T", "V", "Y"],
+  //     // Row 2 — A at col 4
+  //     ["C", "G", "L", "R", "A", "X"],
+  //     // Row 3 — T at col 1
+  //     ["B", "T", "H", "Q", "W", "Z"],
+  //     // Row 4 — U at col 5
+  //     ["C", "G", "K", "O", "S", "U"],
+  //     // Row 5 — R at col 2
+  //     ["A", "J", "R", "P", "V", "Y"],
+  //     // Row 6 — E at col 3
+  //     ["F", "H", "L", "E", "R", "W"],
+  //   ],
+  //   answer: "MATURE",
+  // },
+  // For "TRAUMA" (tomorrow)
+  {
+    date: "2025-09-27",
+    grid: [
+      // Row 1 — T at col 1
+      ["A", "T", "J", "C", "U", "S"],
+      // Row 2 — R at col 4
+      ["E", "J", "Y", "H", "R", "N"],
+      // Row 3 — A at col 0
+      ["A", "H", "I", "G", "V", "Y"],
+      // Row 4 — U at col 5
+      ["D", "F", "K", "I", "S", "U"],
+      // Row 5 — M at col 2
+      ["C", "H", "M", "T", "A", "T"],
+      // Row 6 — A at col 3
+      ["E", "L", "R", "A", "S", "Y"],
+    ],
+    answer: "TRAUMA",
+  },
   // For "RENDER" (tomorrow)
   {
     date: "2025-09-26",
     grid: [
       // Row 1 — R at col 2
-      ["B", "F", "R", "M", "T", "Y"],
+      ["B", "H", "R", "M", "T", "Y"],
       // Row 2 — E at col 4
-      ["A", "H", "K", "Y", "E", "O"],
+      ["A", "C", "H", "L", "E", "W"],
       // Row 3 — N at col 0
-      ["N", "F", "J", "S", "U", "V"],
+      ["N", "F", "J", "R", "U", "X"],
       // Row 4 — D at col 5
-      ["B", "O", "K", "E", "T", "D"],
+      ["B", "G", "K", "O", "T", "D"],
       // Row 5 — E at col 1
-      ["C", "E", "I", "A", "V", "T"],
+      ["C", "E", "I", "P", "V", "Z"],
       // Row 6 — R at col 3
-      ["G", "L", "P", "R", "W", "Y"],
+      ["G", "L", "Q", "R", "W", "Y"],
     ],
     answer: "RENDER",
   },
