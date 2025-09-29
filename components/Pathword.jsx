@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "GUITAR" (tomorrow)
+  {
+    date: "2025-09-30",
+    grid: [
+      // Row 1 — G at col 2
+      ["B", "D", "G", "N", "T", "Z"],
+      // Row 2 — U at col 4
+      ["Y", "H", "L", "R", "U", "A"],
+      // Row 3 — I at col 1
+      ["E", "I", "M", "Q", "V", "Z"],
+      // Row 4 — T at col 3
+      ["C", "G", "K", "T", "S", "M"],
+      // Row 5 — A at col 0
+      ["A", "F", "C", "P", "V", "L"],
+      // Row 6 — R at col 5
+      ["B", "D", "J", "R", "Y", "R"],
+    ],
+    answer: "GUITAR",
+  },
   // For "PUZZLE" (tomorrow)
   {
     date: "2025-09-29",
