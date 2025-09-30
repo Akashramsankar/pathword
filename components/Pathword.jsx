@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "GLANCE" (tomorrow)
+  {
+    date: "2025-10-01",
+    grid: [
+      // Row 1 — G at col 1
+      ["C", "G", "J", "P", "I", "W"],
+      // Row 2 — L at col 4
+      ["A", "H", "N", "R", "L", "Y"],
+      // Row 3 — A at col 0
+      ["A", "F", "Y", "U", "M", "P"],
+      // Row 4 — N at col 5
+      ["D", "H", "L", "R", "V", "N"],
+      // Row 5 — C at col 2
+      ["A", "G", "C", "D", "T", "Y"],
+      // Row 6 — E at col 3
+      ["B", "J", "L", "E", "R", "S"],
+    ],
+    answer: "GLANCE",
+  },
   // For "GUITAR" (tomorrow)
   {
     date: "2025-09-30",
@@ -3289,8 +3308,8 @@ const getLetterCloseness = (selectedLetter, correctLetter, otherSelectableLetter
       setFeedbackMessage("");
       if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
       setGameState({ status: "playing", points: 0 });
-      setTryCount(1); // Start at try 1 for a new puzzle
-      setIncrementTryOnNextSelection(false);
+      setTryCount(0);
+      setIncrementTryOnNextSelection(true);
       hasAnimatedSolutionRef.current = false;
       clearLineAnimationTimeouts();
       // isAlreadySolvedToday will be determined by the main data loading effect below
