@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "DOLLAR" (tomorrow)
+  {
+    date: "2025-10-04",
+    grid: [
+      // Row 1 — D at col 1
+      ["A", "D", "G", "N", "S", "W"],
+      // Row 2 — O at col 4
+      ["R", "H", "Y", "H", "O", "U"],
+      // Row 3 — L at col 0
+      ["L", "F", "N", "R", "U", "X"],
+      // Row 4 — L at col 5
+      ["C", "G", "I", "A", "V", "L"],
+      // Row 5 — A at col 2
+      ["D", "H", "A", "E", "W", "T"],
+      // Row 6 — R at col 3
+      ["F", "K", "M", "R", "U", "Y"],
+    ],
+    answer: "DOLLAR",
+  },
   // For "ENTICE" (tomorrow)
   {
     date: "2025-10-03",
