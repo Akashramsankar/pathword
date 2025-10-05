@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "FLIMSY" (tomorrow)
+  {
+    date: "2025-10-06",
+    grid: [
+      // Row 1 — F at col 1
+      ["B", "F", "K", "Q", "V", "Z"],
+      // Row 2 — L at col 4
+      ["R", "G", "Y", "P", "L", "W"],
+      // Row 3 — I at col 0
+      ["I", "M", "A", "R", "W", "Y"],
+      // Row 4 — M at col 5
+      ["D", "G", "N", "R", "U", "M"],
+      // Row 5 — S at col 2
+      ["A", "H", "S", "C", "V", "Y"],
+      // Row 6 — Y at col 3
+      ["C", "L", "T", "Y", "R", "P"],
+    ],
+    answer: "FLIMSY",
+  },
   // For "AGENCY" (tomorrow)
   {
     date: "2025-10-05",
