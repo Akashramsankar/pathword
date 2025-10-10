@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "TENANT" (tomorrow)
+  {
+    date: "2025-10-11",
+    grid: [
+      // Row 1 — T at col 1
+      ["B", "T", "H", "R", "U", "Y"],
+      // Row 2 — E at col 4
+      ["Y", "G", "H", "R", "E", "N"],
+      // Row 3 — N at col 0
+      ["N", "F", "P", "M", "V", "X"],
+      // Row 4 — A at col 5
+      ["D", "H", "T", "S", "U", "A"],
+      // Row 5 — N at col 2
+      ["A", "G", "N", "C", "T", "Y"],
+      // Row 6 — T at col 3
+      ["C", "J", "L", "T", "S", "R"],
+    ],
+    answer: "TENANT",
+  },
   // For "RATHER" (tomorrow)
   {
     date: "2025-10-10",
