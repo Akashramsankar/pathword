@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "GALAXY" (tomorrow)
+  {
+    date: "2025-10-14",
+    grid: [
+      // Row 1 — G at col 5
+      ["R", "Z", "A", "Q", "J", "G"],
+      // Row 2 — A at col 4
+      ["H", "U", "Y", "W", "A", "T"],
+      // Row 3 — L at col 3
+      ["S", "C", "M", "L", "E", "Z"],
+      // Row 4 — A at col 2
+      ["O", "L", "A", "E", "P", "G"],
+      // Row 5 — X at col 1
+      ["C", "X", "P", "K", "J", "U"],
+      // Row 6 — Y at col 0
+      ["Y", "O", "C", "F", "P", "K"],
+    ],
+    answer: "GALAXY",
+  },
   // For "UNREAL" (tomorrow)
   {
     date: "2025-10-13",
