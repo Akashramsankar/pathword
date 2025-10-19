@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "LAVISH" (tomorrow)
+  {
+    date: "2025-10-20",
+    grid: [
+      // Row 1 — L at col 1
+      ["E", "L", "M", "G", "B", "W"],
+      // Row 2 — A at col 4
+      ["N", "P", "I", "Y", "A", "O"],
+      // Row 3 — V at col 0
+      ["V", "C", "X", "U", "O", "M"],
+      // Row 4 — I at col 5
+      ["P", "J", "E", "A", "L", "I"],
+      // Row 5 — S at col 2
+      ["X", "K", "S", "C", "W", "P"],
+      // Row 6 — H at col 3
+      ["O", "S", "M", "H", "T", "Y"],
+    ],
+    answer: "LAVISH",
+  },
   // For "VOYAGE" (tomorrow)
   {
     date: "2025-10-19",
