@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "THRONE" (tomorrow)
+  {
+    date: "2025-10-25",
+    grid: [
+      // Row 1 — T at col 1
+      ["X", "T", "M", "J", "C", "F"],
+      // Row 2 — H at col 4
+      ["W", "L", "Y", "R", "H", "C"],
+      // Row 3 — R at col 0
+      ["R", "V", "A", "Y", "L", "U"],
+      // Row 4 — O at col 5
+      ["S", "C", "A", "E", "Q", "O"],
+      // Row 5 — N at col 2
+      ["H", "A", "N", "W", "O", "D"],
+      // Row 6 — E at col 3
+      ["L", "R", "S", "E", "N", "Y"],
+    ],
+    answer: "THRONE",
+  },
   // For "AUTUMN" (tomorrow)
   {
     date: "2025-10-24",
