@@ -106,7 +106,7 @@ const dailyPuzzles = [
       // Row 5 — N at col 2
       ["H", "A", "N", "W", "O", "D"],
       // Row 6 — E at col 3
-      ["L", "R", "S", "E", "N", "Y"],
+      ["L", "S", "R", "E", "N", "Y"],
     ],
     answer: "THRONE",
   },
