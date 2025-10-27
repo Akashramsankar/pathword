@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "GROOVY" (tomorrow)
+  {
+    date: "2025-10-28",
+    grid: [
+      // Row 1 — G at col 1
+      ["A", "G", "N", "C", "X", "A"],
+      // Row 2 — R at col 4
+      ["Y", "K", "E", "O", "R", "H"],
+      // Row 3 — O at col 0
+      ["O", "V", "U", "I", "L", "Y"],
+      // Row 4 — O at col 5
+      ["X", "J", "W", "U", "M", "O"],
+      // Row 5 — V at col 2
+      ["M", "L", "V", "S", "K", "D"],
+      // Row 6 — Y at col 3
+      ["R", "O", "N", "Y", "S", "T"],
+    ],
+    answer: "GROOVY",
+  },
   // For "PODIUM" (tomorrow)
   {
     date: "2025-10-27",
