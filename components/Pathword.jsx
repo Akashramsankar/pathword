@@ -91,12 +91,31 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "CLUTCH" (tomorrow)
+  {
+    date: "2025-10-29",
+    grid: [
+      // Row 1 — C at col 1
+      ["H", "C", "W", "P", "Q", "R"],
+      // Row 2 — L at col 4
+      ["Y", "U", "H", "A", "L", "E"],
+      // Row 3 — U at col 0
+      ["U", "Y", "I", "O", "E", "V"],
+      // Row 4 — T at col 5
+      ["R", "Q", "N", "M", "V", "T"],
+      // Row 5 — C at col 2
+      ["R", "K", "C", "T", "P", "A"],
+      // Row 6 — H at col 3
+      ["E", "T", "R", "H", "Y", "S"],
+    ],
+    answer: "CLUTCH",
+  },
   // For "GROOVY" (tomorrow)
   {
     date: "2025-10-28",
     grid: [
       // Row 1 — G at col 1
-      ["A", "G", "N", "C", "X", "A"],
+      ["A", "G", "N", "C", "X", "T"],
       // Row 2 — R at col 4
       ["Y", "K", "E", "O", "R", "H"],
       // Row 3 — O at col 0
