@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "REVOLT" (tomorrow)
+  {
+    date: "2025-10-30",
+    grid: [
+      // Row 1 — R at col 1
+      ["T", "R", "X", "N", "I", "A"],
+      // Row 2 — E at col 4
+      ["Y", "S", "L", "U", "E", "O"],
+      // Row 3 — V at col 0
+      ["V", "I", "N", "T", "D", "H"],
+      // Row 4 — O at col 5
+      ["D", "Z", "E", "N", "B", "O"],
+      // Row 5 — L at col 2
+      ["T", "R", "L", "K", "H", "Q"],
+      // Row 6 — T at col 3
+      ["S", "W", "Y", "T", "O", "M"],
+    ],
+    answer: "REVOLT",
+  },
   // For "CLUTCH" (tomorrow)
   {
     date: "2025-10-29",
