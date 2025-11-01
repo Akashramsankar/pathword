@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "HYBRID" (tomorrow)
+  {
+    date: "2025-11-02",
+    grid: [
+      // Row 1 — H at col 1
+      ["J", "H", "A", "C", "U", "Y"],
+      // Row 2 — Y at col 4
+      ["I", "D", "E", "R", "Y", "P"],
+      // Row 3 — B at col 0
+      ["B", "F", "P", "E", "D", "M"],
+      // Row 4 — R at col 5
+      ["L", "C", "A", "O", "U", "R"],
+      // Row 5 — I at col 2
+      ["Q", "Y", "I", "P", "X", "A"],
+      // Row 6 — D at col 3
+      ["H", "J", "E", "D", "R", "T"],
+    ],
+    answer: "HYBRID",
+  },
   // For "NEPHEW" (tomorrow)
   {
     date: "2025-11-01",
