@@ -91,6 +91,44 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "NEPHEW" (tomorrow)
+  {
+    date: "2025-11-01",
+    grid: [
+      // Row 1 — N at col 1
+      ["V", "N", "B", "Q", "E", "Z"],
+      // Row 2 — E at col 4
+      ["U", "D", "Y", "H", "E", "A"],
+      // Row 3 — P at col 0
+      ["P", "Q", "I", "E", "B", "S"],
+      // Row 4 — H at col 5
+      ["G", "I", "T", "P", "D", "H"],
+      // Row 5 — E at col 2
+      ["C", "A", "E", "U", "N", "Q"],
+      // Row 6 — W at col 3
+      ["K", "M", "Y", "W", "P", "R"],
+    ],
+    answer: "NEPHEW",
+  },
+  // For "RESUME" (tomorrow)
+  {
+    date: "2025-10-31",
+    grid: [
+      // Row 1 — R at col 1
+      ["B", "R", "P", "M", "U", "Y"],
+      // Row 2 — E at col 4
+      ["U", "V", "Y", "A", "E", "H"],
+      // Row 3 — S at col 0
+      ["S", "W", "P", "R", "G", "B"],
+      // Row 4 — U at col 5
+      ["D", "V", "C", "I", "P", "U"],
+      // Row 5 — M at col 2
+      ["B", "S", "M", "L", "A", "O"],
+      // Row 6 — E at col 3
+      ["S", "M", "G", "E", "K", "C"],
+    ],
+    answer: "RESUME",
+  },
   // For "REVOLT" (tomorrow)
   {
     date: "2025-10-30",
