@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "CLIMAX" (tomorrow)
+  {
+    date: "2025-11-03",
+    grid: [
+      // Row 1 — C at col 1
+      ["M", "C", "K", "L", "B", "Q"],
+      // Row 2 — L at col 4
+      ["U", "S", "Y", "A", "L", "H"],
+      // Row 3 — I at col 0
+      ["I", "G", "U", "Y", "O", "P"],
+      // Row 4 — M at col 5
+      ["A", "C", "F", "V", "R", "M"],
+      // Row 5 — A at col 2
+      ["X", "O", "A", "B", "E", "R"],
+      // Row 6 — X at col 3
+      ["T", "S", "W", "X", "F", "J"],
+    ],
+    answer: "CLIMAX",
+  },
   // For "HYBRID" (tomorrow)
   {
     date: "2025-11-02",
