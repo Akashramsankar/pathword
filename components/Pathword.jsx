@@ -91,6 +91,44 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "IMPACT" (tomorrow)
+  {
+    date: "2025-11-05",
+    grid: [
+      // Row 1 — I at col 1
+      ["B", "I", "D", "F", "E", "L"],
+      // Row 2 — M at col 4
+      ["A", "P", "N", "D", "M", "R"],
+      // Row 3 — P at col 0
+      ["P", "Z", "B", "M", "C", "I"],
+      // Row 4 — A at col 5
+      ["J", "R", "O", "L", "G", "A"],
+      // Row 5 — C at col 2
+      ["O", "S", "C", "R", "L", "V"],
+      // Row 6 — T at col 3
+      ["Y", "I", "G", "T", "F", "L"],
+    ],
+    answer: "IMPACT",
+  },
+  // For "ETHNIC" (tomorrow)
+  {
+    date: "2025-11-04",
+    grid: [
+      // Row 1 — E at col 1
+      ["I", "E", "J", "Q", "V", "Z"],
+      // Row 2 — T at col 4
+      ["V", "X", "U", "R", "T", "B"],
+      // Row 3 — H at col 0
+      ["H", "Y", "A", "E", "W", "R"],
+      // Row 4 — N at col 5
+      ["Z", "P", "I", "Y", "S", "N"],
+      // Row 5 — I at col 2
+      ["N", "X", "I", "A", "O", "D"],
+      // Row 6 — C at col 3
+      ["S", "P", "V", "C", "N", "G"],
+    ],
+    answer: "ETHNIC",
+  },
   // For "CLIMAX" (tomorrow)
   {
     date: "2025-11-03",
