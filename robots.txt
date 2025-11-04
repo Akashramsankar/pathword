@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://www.pathword.co
+Sitemap: https://www.pathword.co/sitemap.xml
