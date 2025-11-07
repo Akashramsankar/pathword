@@ -91,6 +91,57 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "EMBARK"
+  {
+    date: "2025-11-08",
+    grid: [
+      // Row 1 — E at col 1
+      ["B", "E", "J", "P", "U", "Z"],
+      // Row 2 — M at col 4
+      ["D", "H", "L", "Q", "M", "R"],
+      // Row 3 — B at col 0
+      ["B", "I", "A", "M", "W", "E"],
+      // Row 4 — A at col 3
+      ["F", "U", "O", "A", "R", "L"],
+      // Row 5 — R at col 5
+      ["G", "L", "P", "T", "W", "R"],
+      // Row 6 — K at col 2
+      ["H", "S", "K", "V", "Y", "L"],
+    ],
+    answer: "EMBARK",
+  },
+  // For "PILLAR"
+  {
+    date: "2025-11-07",
+    grid: [
+      // Row 1 — P at col 2
+      ["C", "H", "P", "T", "X", "U"],
+      // Row 2 — I at col 4
+      ["N", "A", "L", "Y", "I", "O"],
+      // Row 3 — L at col 1
+      ["D", "L", "O", "S", "W", "C"],
+      // Row 4 — L at col 0
+      ["L", "R", "G", "T", "A", "Y"],
+      // Row 5 — A at col 3
+      ["B", "G", "H", "A", "O", "E"],
+      // Row 6 — R at col 5
+      ["C", "Y", "M", "S", "V", "R"],
+    ],
+    answer: "PILLAR",
+  },
+  // For "NUANCE"
+{
+  date: "2025-11-06", // Set your desired date for tomorrow
+  grid: [
+    ["A", "G", "N", "O", "S", "Z"],  // N(0,2) - N1. Spread: B,G,M,N,S,Y
+    ["I", "H", "P", "Y", "E", "U"],  // U(1,5) - Spread: C,H,P,T,U,X
+    ["B", "A", "C", "R", "V", "Z"],  // A(2,1) - Spread: A,I,Q,R,V,Z
+    ["T", "D", "J", "M", "N", "E"],  // N(3,4) - N2. Spread: D,E,F,J,K,N
+    ["C", "L", "G", "S", "W", "O"],  // C(4,0) - Spread: C,G,L,O,S,W (Distractor 'O')
+    ["D", "H", "R", "E", "T", "Y"]   // E(5,3) - Spread: D,E,H,R,T,Y
+  ],
+  answer: "NUANCE",
+},
   // For "IMPACT" (tomorrow)
   {
     date: "2025-11-05",
