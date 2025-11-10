@@ -91,6 +91,63 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "IRONIC"
+  {
+    date: "2025-11-11",
+    grid: [
+      // Row 1 — I at col 1
+      ["D", "I", "J", "Q", "U", "W"],
+      // Row 2 — R at col 4
+      ["H", "G", "S", "M", "R", "N"],
+      // Row 3 — O at col 0
+      ["O", "E", "R", "S", "W", "A"],
+      // Row 4 — N at col 3
+      ["A", "F", "L", "N", "T", "P"],
+      // Row 5 — I at col 5
+      ["C", "G", "E", "R", "V", "I"],
+      // Row 6 — C at col 2
+      ["H", "L", "C", "P", "S", "Y"],
+    ],
+    answer: "IRONIC",
+  },
+  // For "CANDID"
+  {
+    date: "2025-11-10",
+    grid: [
+      // Row 1 — C at col 1
+      ["I", "C", "G", "M", "T", "Z"],
+      // Row 2 — A at col 4
+      ["H", "V", "L", "N", "A", "Y"],
+      // Row 3 — N at col 0
+      ["N", "E", "I", "O", "U", "Z"],
+      // Row 4 — D at col 3
+      ["B", "F", "K", "D", "R", "C"],
+      // Row 5 — I at col 5
+      ["C", "G", "Y", "P", "T", "I"],
+      // Row 6 — D at col 2
+      ["H", "M", "D", "S", "W", "Z"],
+    ],
+    answer: "CANDID",
+  },
+  // For "VISION"
+  {
+    date: "2025-11-09",
+    grid: [
+      // Row 1 — V at col 4
+      ["C", "H", "Q", "S", "V", "Y"],
+      // Row 2 — I at col 1
+      ["Y", "I", "O", "H", "W", "A"],
+      // Row 3 — S at col 5
+      ["B", "G", "K", "P", "T", "S"],
+      // Row 4 — I at col 3
+      ["E", "J", "U", "I", "R", "X"],
+      // Row 5 — O at col 0
+      ["O", "D", "T", "R", "V", "Y"],
+      // Row 6 — N at col 2
+      ["A", "K", "N", "T", "Y", "S"],
+    ],
+    answer: "VISION",
+  },
   // For "EMBARK"
   {
     date: "2025-11-08",
