@@ -91,6 +91,25 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "VERBAL"
+  {
+    date: "2025-11-12",
+    grid: [
+      // Row 1 — V at col 4
+      ["B", "G", "L", "R", "V", "Z"],
+      // Row 2 — E at col 1
+      ["I", "E", "Y", "O", "S", "H"],
+      // Row 3 — R at col 5
+      ["S", "J", "I", "Q", "U", "R"],
+      // Row 4 — B at col 2
+      ["C", "H", "B", "O", "P", "W"],
+      // Row 5 — A at col 0
+      ["A", "G", "L", "E", "F", "R"],
+      // Row 6 — L at col 3
+      ["C", "M", "O", "L", "S", "Y"],
+    ],
+    answer: "VERBAL",
+  },
   // For "IRONIC"
   {
     date: "2025-11-11",
