@@ -91,6 +91,82 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "REGIME"
+  {
+    date: "2025-11-16",
+    grid: [
+      // Row 1 — R at col 3
+      ["A", "J", "Q", "R", "V", "Z"],
+      // Row 2 — E at col 0
+      ["E", "H", "M", "U", "O", "Y"],
+      // Row 3 — G at col 4
+      ["C", "F", "K", "P", "G", "V"],
+      // Row 4 — I at col 1
+      ["N", "I", "A", "S", "X", "O"],
+      // Row 5 — M at col 5
+      ["D", "G", "N", "R", "H", "M"],
+      // Row 6 — E at col 2
+      ["H", "L", "E", "P", "S", "Y"],
+    ],
+    answer: "REGIME",
+  },
+  // For "PRAISE"
+  {
+    date: "2025-11-15",
+    grid: [
+      // Row 1 — P at col 2
+      ["B", "G", "P", "T", "X", "U"],
+      // Row 2 — R at col 5
+      ["Y", "H", "N", "O", "I", "R"],
+      // Row 3 — A at col 0
+      ["A", "E", "I", "Y", "C", "M"],
+      // Row 4 — I at col 3
+      ["D", "N", "K", "I", "V", "W"],
+      // Row 5 — S at col 1
+      ["B", "S", "F", "N", "K", "X"],
+      // Row 6 — E at col 4
+      ["D", "H", "S", "L", "E", "Y"],
+    ],
+    answer: "PRAISE",
+  },
+  // For "PARDON"
+  {
+    date: "2025-11-14",
+    grid: [
+      // Row 1 — P at col 2
+      ["C", "I", "P", "S", "V", "Y"],
+      // Row 2 — A at col 4
+      ["L", "H", "N", "R", "A", "V"],
+      // Row 3 — R at col 0
+      ["R", "E", "I", "F", "U", "B"],
+      // Row 4 — D at col 3
+      ["B", "T", "K", "D", "G", "S"],
+      // Row 5 — O at col 1
+      ["A", "O", "Q", "T", "W", "E"],
+      // Row 6 — N at col 5
+      ["G", "K", "M", "S", "Y", "N"],
+    ],
+    answer: "PARDON",
+  },
+  // For "BRONZE"
+  {
+    date: "2025-11-13",
+    grid: [
+      // Row 1 — B at col 2
+      ["A", "G", "B", "N", "S", "Z"],
+      // Row 2 — R at col 4
+      ["Y", "H", "F", "U", "R", "L"],
+      // Row 3 — O at col 0
+      ["O", "E", "C", "Y", "W", "I"],
+      // Row 4 — N at col 3
+      ["B", "C", "K", "N", "R", "J"],
+      // Row 5 — Z at col 5
+      ["C", "K", "L", "J", "W", "Z"],
+      // Row 6 — E at col 1
+      ["A", "E", "S", "P", "T", "Y"],
+    ],
+    answer: "BRONZE",
+  },
   // For "VERBAL"
   {
     date: "2025-11-12",
