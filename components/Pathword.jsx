@@ -91,6 +91,386 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "NIGGLE"
+  {
+    date: "2026-01-07",
+    grid: [
+      // Row 1 — N at col 2
+      ["A", "H", "N", "T", "W", "Z"],
+      // Row 2 — I at col 4
+      ["R", "E", "L", "H", "I", "Y"],
+      // Row 3 — G at col 0
+      ["E", "G", "J", "P", "V", "C"],
+      // Row 4 — G at col 3
+      ["A", "F", "K", "G", "S", "E"],
+      // Row 5 — L at col 5
+      ["C", "E", "M", "Q", "V", "L"],
+      // Row 6 — E at col 1
+      ["B", "E", "I", "N", "T", "Y"],
+    ],
+    answer: "NIGGLE",
+  },
+  // For "ITSELF"
+  {
+    date: "2026-01-06",
+    grid: [
+      // Row 1 — I at col 1
+      ["B", "I", "H", "Q", "T", "Y"],
+      // Row 2 — T at col 4
+      ["C", "H", "L", "R", "T", "Z"],
+      // Row 3 — S at col 0
+      ["S", "E", "R", "N", "W", "A"],
+      // Row 4 — E at col 3
+      ["B", "F", "K", "E", "S", "I"],
+      // Row 5 — L at col 5
+      ["N", "H", "C", "Q", "V", "L"],
+      // Row 6 — F at col 2
+      ["D", "H", "F", "S", "W", "Y"],
+    ],
+    answer: "ITSELF",
+  },
+  // For "CLAUSE"
+  {
+    date: "2026-01-05",
+    grid: [
+      // Row 1 — C at col 1
+      ["A", "C", "G", "P", "V", "Z"],
+      // Row 2 — L at col 4
+      ["H", "D", "Y", "O", "L", "W"],
+      // Row 3 — A at col 0
+      ["A", "E", "Y", "O", "W", "I"],
+      // Row 4 — U at col 3
+      ["B", "F", "M", "U", "S", "N"],
+      // Row 5 — S at col 5
+      ["C", "H", "N", "R", "T", "S"],
+      // Row 6 — E at col 2
+      ["D", "H", "E", "S", "W", "Y"],
+    ],
+    answer: "CLAUSE",
+  },
+  // For "INDEED"
+  {
+    date: "2026-01-04",
+    grid: [
+      // Row 1 — I at col 1
+      ["A", "I", "M", "R", "F", "X"],
+      // Row 2 — N at col 4
+      ["C", "H", "L", "R", "N", "Y"],
+      // Row 3 — D at col 0
+      ["D", "G", "N", "P", "T", "Z"],
+      // Row 4 — E at col 3
+      ["B", "F", "I", "E", "S", "Y"],
+      // Row 5 — E at col 5
+      ["C", "G", "N", "Q", "W", "E"],
+      // Row 6 — D at col 2
+      ["B", "H", "D", "N", "T", "Y"],
+    ],
+    answer: "INDEED",
+  },
+  // For "OCCUPY"
+  {
+    date: "2026-01-03",
+    grid: [
+      // Row 1 — O at col 1
+      ["A", "O", "E", "Q", "W", "Z"],
+      // Row 2 — C at col 4
+      ["D", "G", "L", "S", "C", "Y"],
+      // Row 3 — C at col 0
+      ["C", "I", "T", "S", "V", "Z"],
+      // Row 4 — U at col 3
+      ["A", "F", "A", "U", "X", "Y"],
+      // Row 5 — P at col 5
+      ["C", "H", "L", "R", "V", "P"],
+      // Row 6 — Y at col 2
+      ["D", "G", "Y", "S", "W", "Z"],
+    ],
+    answer: "OCCUPY",
+  },
+  // For "QUEASY"
+  {
+    date: "2026-01-02",
+    grid: [
+      // Row 1 — Q at col 2
+      ["B", "H", "Q", "R", "U", "Z"],
+      // Row 2 — U at col 5
+      ["C", "F", "L", "R", "V", "U"],
+      // Row 3 — E at col 1
+      ["A", "E", "I", "L", "S", "Z"],
+      // Row 4 — A at col 4
+      ["D", "G", "K", "V", "A", "Y"],
+      // Row 5 — S at col 0
+      ["S", "E", "I", "T", "U", "Z"],
+      // Row 6 — Y at col 3
+      ["B", "F", "M", "Y", "T", "Z"],
+    ],
+    answer: "QUEASY",
+  },
+  // For "RECOIL"
+  {
+    date: "2026-01-01",
+    grid: [
+      // Row 1 — R at col 1
+      ["A", "R", "E", "N", "T", "Y"],
+      // Row 2 — E at col 4
+      ["H", "G", "L", "O", "E", "A"],
+      // Row 3 — C at col 0
+      ["C", "F", "J", "P", "V", "Z"],
+      // Row 4 — O at col 3
+      ["A", "D", "K", "O", "S", "L"],
+      // Row 5 — I at col 5
+      ["B", "G", "M", "R", "V", "I"],
+      // Row 6 — L at col 2
+      ["D", "H", "L", "Q", "U", "Y"],
+    ],
+    answer: "RECOIL",
+  },
+  // For "GOSSIP"
+  {
+    date: "2025-12-31",
+    grid: [
+      // Row 1 — G at col 1
+      ["B", "G", "J", "P", "U", "Z"],
+      // Row 2 — O at col 4
+      ["Y", "H", "L", "R", "O", "C"],
+      // Row 3 — S at col 0
+      ["S", "D", "I", "N", "W", "Z"],
+      // Row 4 — S at col 3
+      ["A", "F", "E", "S", "T", "P"],
+      // Row 5 — I at col 5
+      ["C", "H", "E", "Q", "V", "I"],
+      // Row 6 — P at col 2
+      ["D", "H", "P", "S", "W", "Y"],
+    ],
+    answer: "GOSSIP",
+  },
+  // For "ASTUTE"
+  {
+    date: "2025-12-30",
+    grid: [
+      // Row 1 — A at col 1
+      ["C", "A", "G", "Q", "U", "Y"],
+      // Row 2 — S at col 4
+      ["D", "H", "L", "R", "S", "X"],
+      // Row 3 — T at col 0
+      ["T", "E", "S", "N", "W", "U"],
+      // Row 4 — U at col 3
+      ["B", "F", "H", "U", "S", "E"],
+      // Row 5 — T at col 5
+      ["C", "G", "R", "Q", "V", "T"],
+      // Row 6 — E at col 2
+      ["D", "H", "E", "S", "W", "Y"],
+    ],
+    answer: "ASTUTE",
+  },
+  // For "FLINCH"
+  {
+    date: "2025-12-29",
+    grid: [
+      // Row 1 — F at col 1
+      ["A", "F", "H", "P", "V", "Z"],
+      // Row 2 — L at col 4
+      ["C", "G", "R", "O", "L", "Y"],
+      // Row 3 — I at col 0
+      ["I", "D", "Y", "O", "W", "C"],
+      // Row 4 — N at col 3
+      ["B", "F", "C", "N", "S", "M"],
+      // Row 5 — C at col 5
+      ["D", "S", "G", "Q", "V", "C"],
+      // Row 6 — H at col 2
+      ["B", "E", "H", "N", "T", "Y"],
+    ],
+    answer: "FLINCH",
+  },
+  // For "DEMURE"
+  {
+    date: "2025-12-28",
+    grid: [
+      // Row 1 — D at col 2
+      ["B", "E", "D", "O", "U", "Z"],
+      // Row 2 — E at col 5
+      ["A", "L", "F", "Y", "V", "E"],
+      // Row 3 — M at col 0
+      ["M", "D", "I", "R", "V", "Z"],
+      // Row 4 — U at col 3
+      ["A", "M", "K", "U", "O", "Y"],
+      // Row 5 — R at col 1
+      ["C", "R", "L", "P", "V", "Z"],
+      // Row 6 — E at col 4
+      ["D", "H", "M", "S", "E", "Y"],
+    ],
+    answer: "DEMURE",
+  },
+  // For "DOCILE"
+  {
+    date: "2025-12-27",
+    grid: [
+      // Row 1 — D at col 1
+      ["A", "D", "F", "Q", "R", "Y"],
+      // Row 2 — O at col 4
+      ["Y", "G", "L", "R", "O", "H"],
+      // Row 3 — C at col 0
+      ["C", "E", "J", "N", "U", "R"],
+      // Row 4 — I at col 3
+      ["B", "F", "K", "I", "S", "A"],
+      // Row 5 — L at col 5
+      ["C", "H", "N", "Q", "V", "L"],
+      // Row 6 — E at col 2
+      ["D", "G", "E", "S", "W", "Y"],
+    ],
+    answer: "DOCILE",
+  },
+  // For "EXPIRY"
+  {
+    date: "2025-12-26",
+    grid: [
+      // Row 1 — E at col 1
+      ["B", "E", "F", "P", "T", "Z"],
+      // Row 2 — X at col 4
+      ["C", "G", "L", "R", "X", "Y"],
+      // Row 3 — P at col 0
+      ["P", "D", "I", "N", "U", "H"],
+      // Row 4 — I at col 3
+      ["B", "F", "O", "I", "S", "Y"],
+      // Row 5 — R at col 5
+      ["C", "H", "M", "Q", "V", "R"],
+      // Row 6 — Y at col 2
+      ["D", "G", "Y", "S", "W", "Z"],
+    ],
+    answer: "EXPIRY",
+  },
+  // For "CRITIC"
+  {
+    date: "2025-12-25",
+    grid: [
+      // Row 1 — C at col 2
+      ["A", "H", "C", "N", "Q", "U"],
+      // Row 2 — R at col 4
+      ["H", "F", "L", "O", "R", "Y"],
+      // Row 3 — I at col 0
+      ["I", "D", "M", "A", "W", "U"],
+      // Row 4 — T at col 3
+      ["A", "N", "K", "T", "V", "C"],
+      // Row 5 — I at col 5
+      ["C", "H", "L", "P", "U", "I"],
+      // Row 6 — C at col 1
+      ["B", "C", "G", "N", "S", "Z"],
+    ],
+    answer: "CRITIC",
+  },
+  // For "DEVOID"
+  {
+    date: "2025-12-24",
+    grid: [
+      // Row 1 — D at col 1
+      ["B", "D", "F", "P", "V", "Y"],
+      // Row 2 — E at col 4
+      ["C", "G", "R", "Y", "E", "U"],
+      // Row 3 — V at col 0
+      ["V", "D", "I", "R", "W", "Y"],
+      // Row 4 — O at col 3
+      ["A", "F", "S", "O", "T", "E"],
+      // Row 5 — I at col 5
+      ["C", "H", "L", "S", "X", "I"],
+      // Row 6 — D at col 2
+      ["E", "G", "D", "N", "U", "Y"],
+    ],
+    answer: "DEVOID",
+  },
+  // For "EXOTIC"
+  {
+    date: "2025-12-23",
+    grid: [
+      // Row 1 — E at col 1
+      ["I", "E", "H", "P", "T", "Z"],
+      // Row 2 — X at col 4
+      ["C", "G", "L", "R", "X", "B"],
+      // Row 3 — O at col 0
+      ["O", "D", "C", "J", "U", "I"],
+      // Row 4 — T at col 3
+      ["B", "F", "N", "T", "V", "S"],
+      // Row 5 — I at col 5
+      ["C", "H", "Y", "Q", "W", "I"],
+      // Row 6 — C at col 2
+      ["D", "G", "C", "S", "X", "Z"],
+    ],
+    answer: "EXOTIC",
+  },
+  // For "RARITY"
+  {
+    date: "2025-12-22",
+    grid: [
+      // Row 1 — R at col 1
+      ["A", "R", "F", "N", "W", "X"],
+      // Row 2 — A at col 4
+      ["H", "G", "O", "I", "A", "Y"],
+      // Row 3 — R at col 0
+      ["R", "D", "I", "U", "G", "Z"],
+      // Row 4 — I at col 3
+      ["B", "F", "A", "I", "S", "Y"],
+      // Row 5 — T at col 5
+      ["C", "H", "M", "Q", "V", "T"],
+      // Row 6 — Y at col 2
+      ["D", "G", "Y", "P", "W", "Z"],
+    ],
+    answer: "RARITY",
+  },
+  // For "SIESTA"
+  {
+    date: "2025-12-21",
+    grid: [
+      // Row 1 — S at col 2
+      ["B", "H", "S", "N", "U", "Z"],
+      // Row 2 — I at col 5
+      ["C", "F", "L", "Q", "W", "I"],
+      // Row 3 — E at col 0
+      ["E", "D", "J", "R", "N", "Y"],
+      // Row 4 — S at col 3
+      ["A", "G", "K", "S", "T", "Z"],
+      // Row 5 — T at col 1
+      ["C", "T", "L", "P", "S", "Y"],
+      // Row 6 — A at col 4
+      ["D", "H", "M", "S", "A", "Z"],
+    ],
+    answer: "SIESTA",
+  },
+  // For "OFFEND"
+  {
+    date: "2025-12-20",
+    grid: [
+      // Row 1 — O at col 2
+      ["A", "E", "O", "S", "U", "X"],
+      // Row 2 — F at col 5
+      ["C", "G", "L", "R", "V", "F"],
+      // Row 3 — F at col 0
+      ["F", "I", "M", "L", "U", "Y"],
+      // Row 4 — E at col 3
+      ["B", "Y", "K", "E", "A", "Z"],
+      // Row 5 — N at col 1
+      ["C", "N", "P", "S", "R", "Y"],
+      // Row 6 — D at col 4
+      ["E", "H", "M", "T", "D", "Z"],
+    ],
+    answer: "OFFEND",
+  },
+  // For "PREFIX"
+  {
+    date: "2025-12-19",
+    grid: [
+      // Row 1 — P at col 2
+      ["B", "H", "P", "S", "W", "Z"],
+      // Row 2 — R at col 4
+      ["H", "F", "L", "I", "R", "Y"],
+      // Row 3 — E at col 0
+      ["E", "I", "M", "Y", "V", "H"],
+      // Row 4 — F at col 3
+      ["A", "G", "K", "F", "R", "Y"],
+      // Row 5 — I at col 5
+      ["C", "E", "L", "Q", "U", "I"],
+      // Row 6 — X at col 1
+      ["A", "X", "N", "S", "W", "Z"],
+    ],
+    answer: "PREFIX",
+  },
   // For "APPEAL"
   {
     date: "2025-12-18",
