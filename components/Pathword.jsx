@@ -91,6 +91,63 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "HOLLOW"
+  {
+    date: "2026-01-10",
+    grid: [
+      // Row 1 — H at col 1
+      ["C", "H", "L", "P", "T", "Y"],
+      // Row 2 — O at col 4
+      ["Y", "G", "R", "A", "O", "U"],
+      // Row 3 — L at col 0
+      ["L", "D", "I", "N", "U", "Y"],
+      // Row 4 — L at col 3
+      ["A", "I", "J", "L", "S", "A"],
+      // Row 5 — O at col 5
+      ["C", "R", "E", "Q", "V", "O"],
+      // Row 6 — W at col 2
+      ["B", "H", "W", "N", "T", "Z"],
+    ],
+    answer: "HOLLOW",
+  },
+  // For "BATTLE"
+  {
+    date: "2026-01-09",
+    grid: [
+      // Row 1 — B at col 1
+      ["A", "B", "C", "D", "E", "F"],
+      // Row 2 — A at col 4
+      ["H", "F", "L", "R", "A", "Y"],
+      // Row 3 — T at col 0
+      ["T", "E", "I", "N", "W", "Z"],
+      // Row 4 — T at col 3
+      ["B", "H", "K", "T", "Y", "S"],
+      // Row 5 — L at col 5
+      ["C", "H", "E", "Q", "V", "L"],
+      // Row 6 — E at col 2
+      ["D", "R", "E", "S", "W", "Y"],
+    ],
+    answer: "BATTLE",
+  },
+  // For "TYRANT"
+  {
+    date: "2026-01-08",
+    grid: [
+      // Row 1 — T at col 1
+      ["A", "T", "G", "P", "V", "Z"],
+      // Row 2 — Y at col 4
+      ["S", "F", "H", "R", "Y", "U"],
+      // Row 3 — R at col 0
+      ["R", "E", "I", "P", "U", "N"],
+      // Row 4 — A at col 3
+      ["B", "H", "E", "A", "S", "O"],
+      // Row 5 — N at col 5
+      ["D", "G", "M", "Q", "W", "N"],
+      // Row 6 — T at col 2
+      ["C", "H", "T", "S", "Y", "M"],
+    ],
+    answer: "TYRANT",
+  },
   // For "NIGGLE"
   {
     date: "2026-01-07",
@@ -100,7 +157,7 @@ const dailyPuzzles = [
       // Row 2 — I at col 4
       ["R", "E", "L", "H", "I", "Y"],
       // Row 3 — G at col 0
-      ["E", "G", "J", "P", "V", "C"],
+      ["G", "E", "J", "P", "V", "C"],
       // Row 4 — G at col 3
       ["A", "F", "K", "G", "S", "E"],
       // Row 5 — L at col 5
