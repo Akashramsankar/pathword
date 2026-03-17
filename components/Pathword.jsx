@@ -91,6 +91,139 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "FORMAL"
+  {
+    date: "2026-03-18",
+    grid: [
+      // Row 1 — F at col 1
+      ["B", "F", "K", "P", "V", "J"],
+      // Row 2 — O at col 4
+      ["W", "G", "L", "R", "O", "Y"],
+      // Row 3 — R at col 0
+      ["R", "D", "I", "N", "W", "Y"],
+      // Row 4 — M at col 3
+      ["A", "E", "S", "M", "Z", "K"],
+      // Row 5 — A at col 5
+      ["C", "H", "E", "Q", "V", "A"],
+      // Row 6 — L at col 2
+      ["D", "J", "L", "N", "S", "Y"],
+    ],
+    answer: "FORMAL",
+  },
+  // For "DAZZLE"
+  {
+    date: "2026-03-17",
+    grid: [
+      // Row 1 — D at col 1
+      ["A", "D", "I", "M", "T", "X"],
+      // Row 2 — A at col 4
+      ["H", "G", "L", "R", "A", "Y"],
+      // Row 3 — Z at col 0
+      ["Z", "D", "I", "C", "W", "J"],
+      // Row 4 — Z at col 3
+      ["A", "F", "S", "Z", "P", "T"],
+      // Row 5 — L at col 5
+      ["C", "H", "A", "Q", "V", "L"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "N", "W", "Y"],
+    ],
+    answer: "DAZZLE",
+  },
+  // For "HUMMUS"
+  {
+    date: "2026-03-16",
+    grid: [
+      // Row 1 — H at col 1
+      ["B", "H", "L", "Q", "V", "Z"],
+      // Row 2 — U at col 4
+      ["C", "G", "A", "R", "U", "Y"],
+      // Row 3 — M at col 0
+      ["M", "D", "I", "O", "W", "J"],
+      // Row 4 — M at col 3
+      ["A", "F", "T", "M", "Z", "S"],
+      // Row 5 — U at col 5
+      ["C", "H", "A", "Q", "V", "U"],
+      // Row 6 — S at col 2
+      ["D", "J", "S", "P", "W", "Y"],
+    ],
+    answer: "HUMMUS",
+  },
+  // For "ASPECT"
+  {
+    date: "2026-03-15",
+    grid: [
+      // Row 1 — A at col 1
+      ["B", "A", "H", "M", "T", "Y"],
+      // Row 2 — S at col 4
+      ["C", "G", "L", "R", "S", "X"],
+      // Row 3 — P at col 0
+      ["P", "D", "I", "O", "W", "Y"],
+      // Row 4 — E at col 3
+      ["Q", "F", "A", "E", "S", "I"],
+      // Row 5 — C at col 5
+      ["B", "H", "R", "Q", "V", "C"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "N", "W", "Y"],
+    ],
+    answer: "ASPECT",
+  },
+  // For "BELONG"
+  {
+    date: "2026-03-14",
+    grid: [
+      // Row 1 — B at col 1
+      ["A", "B", "I", "M", "U", "X"],
+      // Row 2 — E at col 4
+      ["C", "G", "L", "R", "E", "Y"],
+      // Row 3 — L at col 0
+      ["L", "D", "I", "O", "W", "J"],
+      // Row 4 — O at col 3
+      ["A", "F", "L", "O", "S", "I"],
+      // Row 5 — N at col 5
+      ["C", "H", "W", "Q", "V", "N"],
+      // Row 6 — G at col 2
+      ["D", "J", "G", "P", "W", "Y"],
+    ],
+    answer: "BELONG",
+  },
+  // For "CHILLY"
+  {
+    date: "2026-03-13",
+    grid: [
+      // Row 1 — C at col 1
+      ["A", "C", "G", "M", "T", "Z"],
+      // Row 2 — H at col 4
+      ["B", "F", "L", "R", "H", "Y"],
+      // Row 3 — I at col 0
+      ["I", "D", "Y", "O", "W", "U"],
+      // Row 4 — L at col 3
+      ["A", "E", "S", "L", "Z", "P"],
+      // Row 5 — L at col 5
+      ["C", "H", "E", "Q", "V", "L"],
+      // Row 6 — Y at col 2
+      ["D", "G", "Y", "N", "S", "W"],
+    ],
+    answer: "CHILLY",
+  },
+  // For "BEHIND"
+  {
+    date: "2026-03-12",
+    grid: [
+      // Row 1 — B at col 1
+      ["A", "B", "G", "M", "U", "Z"],
+      // Row 2 — E at col 4
+      ["C", "H", "L", "R", "E", "Y"],
+      // Row 3 — H at col 0
+      ["H", "D", "I", "O", "W", "Q"],
+      // Row 4 — I at col 3
+      ["A", "F", "P", "I", "S", "A"],
+      // Row 5 — N at col 5
+      ["C", "G", "M", "Q", "V", "N"],
+      // Row 6 — D at col 2
+      ["E", "J", "D", "N", "W", "Y"],
+    ],
+    answer: "BEHIND",
+  },
   // For "INSURE"
   {
     date: "2026-03-11",
