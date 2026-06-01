@@ -91,6 +91,842 @@ const helpSlidesData = [
 ];
 
 const dailyPuzzles = [
+  // For "BUFFET"
+  {
+    date: "2026-06-02",
+    grid: [
+      // Row 1 — B at col 1
+      ["D", "B", "F", "H", "J", "L"],
+      // Row 2 — U at col 4
+      ["I", "G", "A", "H", "U", "Y"],
+      // Row 3 — F at col 0
+      ["F", "D", "C", "Y", "W", "M"],
+      // Row 4 — F at col 3
+      ["B", "E", "A", "F", "M", "O"],
+      // Row 5 — E at col 5
+      ["U", "H", "Y", "Q", "N", "E"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "S", "E", "K"],
+    ],
+    answer: "BUFFET",
+  },
+  // For "REVIEW"
+  {
+    date: "2026-06-01",
+    grid: [
+      // Row 1 — R at col 1
+      ["S", "R", "T", "U", "V", "X"],
+      // Row 2 — E at col 4
+      ["U", "G", "A", "H", "E", "Y"],
+      // Row 3 — V at col 0
+      ["V", "D", "C", "J", "W", "M"],
+      // Row 4 — I at col 3
+      ["B", "F", "V", "I", "M", "O"],
+      // Row 5 — E at col 5
+      ["U", "H", "T", "Q", "N", "E"],
+      // Row 6 — W at col 2
+      ["D", "J", "W", "S", "E", "K"],
+    ],
+    answer: "REVIEW",
+  },
+  // For "NATIVE"
+  {
+    date: "2026-05-31",
+    grid: [
+      // Row 1 — N at col 1
+      ["M", "N", "L", "K", "O", "Q"],
+      // Row 2 — A at col 4
+      ["U", "G", "E", "H", "A", "Y"],
+      // Row 3 — T at col 0
+      ["T", "D", "C", "J", "W", "M"],
+      // Row 4 — I at col 3
+      ["B", "F", "H", "I", "M", "T"],
+      // Row 5 — V at col 5
+      ["U", "H", "S", "Q", "N", "V"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "S", "W", "K"],
+    ],
+    answer: "NATIVE",
+  },
+  // For "DIGEST"
+  {
+    date: "2026-05-30",
+    grid: [
+      // Row 1 — D at col 1
+      ["H", "D", "E", "K", "F", "L"],
+      // Row 2 — I at col 4
+      ["U", "G", "A", "H", "I", "Y"],
+      // Row 3 — G at col 0
+      ["G", "D", "C", "J", "W", "M"],
+      // Row 4 — E at col 3
+      ["B", "F", "G", "E", "M", "A"],
+      // Row 5 — S at col 5
+      ["U", "H", "R", "Q", "V", "S"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "S", "W", "K"],
+    ],
+    answer: "DIGEST",
+  },
+  // For "BUFFER"
+  {
+    date: "2026-05-29",
+    grid: [
+      // Row 1 — B at col 1
+      ["A", "B", "E", "D", "F", "G"],
+      // Row 2 — U at col 4
+      ["I", "G", "A", "H", "U", "Y"],
+      // Row 3 — F at col 0
+      ["F", "D", "C", "Y", "W", "M"],
+      // Row 4 — F at col 3
+      ["B", "E", "A", "F", "M", "U"],
+      // Row 5 — E at col 5
+      ["U", "H", "Y", "Q", "V", "E"],
+      // Row 6 — R at col 2
+      ["D", "J", "R", "S", "W", "K"],
+    ],
+    answer: "BUFFER",
+  },
+  // For "DECEIT"
+  {
+    date: "2026-05-28",
+    grid: [
+      // Row 1 — D at col 1
+      ["A", "D", "E", "U", "X", "S"],
+      // Row 2 — E at col 4
+      ["I", "G", "A", "H", "E", "Y"],
+      // Row 3 — C at col 0
+      ["C", "D", "U", "Y", "W", "M"],
+      // Row 4 — E at col 3
+      ["B", "F", "A", "E", "M", "C"],
+      // Row 5 — I at col 5
+      ["U", "H", "N", "Q", "V", "I"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "S", "W", "K"],
+    ],
+    answer: "DECEIT",
+  },
+  // For "CLINCH"
+  {
+    date: "2026-05-27",
+    grid: [
+      // Row 1 — C at col 1
+      ["B", "C", "D", "E", "G", "H"],
+      // Row 2 — L at col 4
+      ["I", "G", "E", "H", "L", "Y"],
+      // Row 3 — I at col 0
+      ["I", "D", "U", "Y", "W", "A"],
+      // Row 4 — N at col 3
+      ["B", "F", "M", "N", "A", "C"],
+      // Row 5 — C at col 5
+      ["U", "H", "E", "Q", "V", "C"],
+      // Row 6 — H at col 2
+      ["D", "J", "H", "S", "W", "K"],
+    ],
+    answer: "CLINCH",
+  },
+  // For "VALLEY"
+  {
+    date: "2026-05-26",
+    grid: [
+      // Row 1 — V at col 1
+      ["X", "V", "U", "W", "T", "Z"],
+      // Row 2 — A at col 4
+      ["I", "G", "E", "H", "A", "Y"],
+      // Row 3 — L at col 0
+      ["L", "D", "U", "C", "W", "J"],
+      // Row 4 — L at col 3
+      ["B", "F", "I", "L", "A", "K"],
+      // Row 5 — E at col 5
+      ["U", "H", "A", "Q", "V", "E"],
+      // Row 6 — Y at col 2
+      ["D", "J", "Y", "S", "W", "K"],
+    ],
+    answer: "VALLEY",
+  },
+  // For "CONVEY"
+  {
+    date: "2026-05-25",
+    grid: [
+      // Row 1 — C at col 1
+      ["B", "C", "D", "I", "O", "U"],
+      // Row 2 — O at col 4
+      ["U", "G", "L", "H", "O", "Y"],
+      // Row 3 — N at col 0
+      ["N", "D", "U", "A", "W", "J"],
+      // Row 4 — V at col 3
+      ["B", "F", "N", "V", "A", "S"],
+      // Row 5 — E at col 5
+      ["U", "H", "A", "Q", "V", "E"],
+      // Row 6 — Y at col 2
+      ["D", "J", "Y", "S", "W", "K"],
+    ],
+    answer: "CONVEY",
+  },
+  // For "GRITTY"
+  {
+    date: "2026-05-24",
+    grid: [
+      // Row 1 — G at col 1
+      ["B", "G", "H", "I", "O", "J"],
+      // Row 2 — R at col 4
+      ["U", "G", "L", "H", "R", "Y"],
+      // Row 3 — I at col 0
+      ["I", "D", "U", "A", "W", "Y"],
+      // Row 4 — T at col 3
+      ["B", "F", "M", "T", "A", "S"],
+      // Row 5 — T at col 5
+      ["A", "H", "S", "Q", "V", "T"],
+      // Row 6 — Y at col 2
+      ["D", "J", "Y", "S", "W", "K"],
+    ],
+    answer: "GRITTY",
+  },
+  // For "SHRINK"
+  {
+    date: "2026-05-23",
+    grid: [
+      // Row 1 — S at col 1
+      ["B", "S", "V", "P", "O", "Z"],
+      // Row 2 — H at col 4
+      ["U", "G", "L", "R", "H", "Y"],
+      // Row 3 — R at col 0
+      ["R", "D", "I", "N", "W", "Y"],
+      // Row 4 — I at col 3
+      ["B", "F", "U", "I", "S", "A"],
+      // Row 5 — N at col 5
+      ["A", "H", "M", "Q", "V", "N"],
+      // Row 6 — K at col 2
+      ["D", "J", "K", "S", "W", "Y"],
+    ],
+    answer: "SHRINK",
+  },
+  // For "ATTACH"
+  {
+    date: "2026-05-22",
+    grid: [
+      // Row 1 — A at col 1
+      ["B", "A", "H", "P", "Q", "X"],
+      // Row 2 — T at col 4
+      ["U", "G", "L", "R", "T", "Z"],
+      // Row 3 — T at col 0
+      ["T", "D", "I", "N", "W", "H"],
+      // Row 4 — A at col 3
+      ["B", "F", "E", "A", "S", "M"],
+      // Row 5 — C at col 5
+      ["M", "H", "I", "Q", "V", "C"],
+      // Row 6 — H at col 2
+      ["D", "K", "H", "S", "W", "Y"],
+    ],
+    answer: "ATTACH",
+  },
+  // For "MAYHEM"
+  {
+    date: "2026-05-21",
+    grid: [
+      // Row 1 — M at col 1
+      ["N", "M", "O", "J", "L", "K"],
+      // Row 2 — A at col 4
+      ["I", "E", "H", "C", "A", "Y"],
+      // Row 3 — Y at col 0
+      ["Y", "A", "M", "N", "W", "C"],
+      // Row 4 — H at col 3
+      ["B", "F", "Y", "H", "L", "O"],
+      // Row 5 — E at col 5
+      ["C", "L", "A", "U", "V", "E"],
+      // Row 6 — M at col 2
+      ["A", "J", "M", "N", "L", "W"],
+    ],
+    answer: "MAYHEM",
+  },
+  // For "ANTHEM"
+  {
+    date: "2026-05-20",
+    grid: [
+      // Row 1 — A at col 1
+      ["Y", "A", "O", "J", "I", "Z"],
+      // Row 2 — N at col 4
+      ["C", "A", "H", "B", "N", "I"],
+      // Row 3 — T at col 0
+      ["T", "A", "M", "N", "W", "C"],
+      // Row 4 — H at col 3
+      ["B", "F", "N", "H", "L", "E"],
+      // Row 5 — E at col 5
+      ["C", "L", "A", "U", "V", "E"],
+      // Row 6 — M at col 2
+      ["A", "J", "M", "N", "L", "W"],
+    ],
+    answer: "ANTHEM",
+  },
+  // For "JUNIOR"
+  {
+    date: "2026-05-19",
+    grid: [
+      // Row 1 — J at col 1
+      ["Y", "J", "K", "A", "I", "V"],
+      // Row 2 — U at col 4
+      ["Y", "A", "H", "A", "U", "I"],
+      // Row 3 — N at col 0
+      ["N", "A", "M", "B", "W", "I"],
+      // Row 4 — I at col 3
+      ["B", "F", "N", "I", "L", "G"],
+      // Row 5 — O at col 5
+      ["C", "L", "E", "A", "V", "O"],
+      // Row 6 — R at col 2
+      ["A", "J", "R", "N", "L", "W"],
+    ],
+    answer: "JUNIOR",
+  },
+   // For "OBSESS"
+  {
+    date: "2026-05-18",
+    grid: [
+      // Row 1 — O at col 1
+      ["Y", "O", "Z", "W", "X", "V"],
+      // Row 2 — B at col 4
+      ["Y", "A", "H", "U", "B", "I"],
+      // Row 3 — S at col 0
+      ["S", "A", "Y", "B", "W", "V"],
+      // Row 4 — E at col 3
+      ["B", "F", "A", "E", "L", "O"],
+      // Row 5 — S at col 5
+      ["C", "L", "D", "E", "V", "S"],
+      // Row 6 — S at col 2
+      ["A", "J", "S", "N", "L", "W"],
+    ],
+    answer: "OBSESS",
+  },
+  // For "SPIRAL"
+  {
+    date: "2026-05-17",
+    grid: [
+      // Row 1 — S at col 1
+      ["Y", "S", "Z", "W", "X", "V"],
+      // Row 2 — P at col 4
+      ["Y", "A", "H", "U", "P", "I"],
+      // Row 3 — I at col 0
+      ["I", "A", "Y", "H", "W", "O"],
+      // Row 4 — R at col 3
+      ["B", "F", "N", "R", "O", "L"],
+      // Row 5 — A at col 5
+      ["C", "L", "I", "E", "V", "A"],
+      // Row 6 — L at col 2
+      ["A", "J", "L", "N", "S", "W"],
+    ],
+    answer: "SPIRAL",
+  },
+  // For "WIZARD"
+  {
+    date: "2026-05-16",
+    grid: [
+      // Row 1 — W at col 1
+      ["Y", "W", "Z", "Y", "X", "V"],
+      // Row 2 — I at col 4
+      ["Y", "A", "H", "U", "I", "P"],
+      // Row 3 — Z at col 0
+      ["Z", "A", "C", "S", "W", "N"],
+      // Row 4 — A at col 3
+      ["B", "F", "Z", "A", "L", "O"],
+      // Row 5 — R at col 5
+      ["C", "L", "D", "A", "V", "R"],
+      // Row 6 — D at col 2
+      ["A", "J", "D", "N", "S", "W"],
+    ],
+    answer: "WIZARD",
+  },
+  // For "INVENT"
+  {
+    date: "2026-05-15",
+    grid: [
+      // Row 1 — I at col 1
+      ["G", "I", "H", "J", "K", "L"],
+      // Row 2 — N at col 4
+      ["X", "A", "M", "Z", "N", "T"],
+      // Row 3 — V at col 0
+      ["V", "A", "C", "S", "W", "N"],
+      // Row 4 — E at col 3
+      ["B", "F", "A", "E", "L", "H"],
+      // Row 5 — N at col 5
+      ["C", "L", "S", "A", "V", "N"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "N", "S", "W"],
+    ],
+    answer: "INVENT",
+  },
+  // For "INFLUX"
+  {
+    date: "2026-05-14",
+    grid: [
+      // Row 1 — I at col 1
+      ["A", "I", "X", "Q", "U", "V"],
+      // Row 2 — N at col 4
+      ["U", "A", "M", "Z", "N", "T"],
+      // Row 3 — F at col 0
+      ["F", "A", "C", "S", "W", "N"],
+      // Row 4 — L at col 3
+      ["B", "F", "A", "L", "H", "E"],
+      // Row 5 — U at col 5
+      ["C", "L", "E", "A", "V", "U"],
+      // Row 6 — X at col 2
+      ["D", "J", "X", "N", "S", "W"],
+    ],
+    answer: "INFLUX",
+  },
+  // For "ORATOR"
+  {
+    date: "2026-05-13",
+    grid: [
+      // Row 1 — O at col 1
+      ["A", "O", "X", "Q", "U", "V"],
+      // Row 2 — R at col 4
+      ["U", "A", "I", "H", "R", "M"],
+      // Row 3 — A at col 0
+      ["A", "F", "C", "S", "W", "L"],
+      // Row 4 — T at col 3
+      ["B", "F", "M", "T", "H", "S"],
+      // Row 5 — O at col 5
+      ["C", "E", "R", "A", "V", "O"],
+      // Row 6 — R at col 2
+      ["D", "J", "R", "N", "S", "W"],
+    ],
+    answer: "ORATOR",
+  },
+  // For "COMEDY"
+  {
+    date: "2026-05-12",
+    grid: [
+      // Row 1 — C at col 1
+      ["A", "C", "X", "Q", "U", "V"],
+      // Row 2 — O at col 4
+      ["H", "A", "I", "E", "O", "Y"],
+      // Row 3 — M at col 0
+      ["M", "F", "C", "S", "W", "J"],
+      // Row 4 — E at col 3
+      ["B", "F", "M", "E", "H", "A"],
+      // Row 5 — D at col 5
+      ["C", "E", "S", "O", "V", "D"],
+      // Row 6 — Y at col 2
+      ["D", "J", "Y", "N", "S", "W"],
+    ],
+    answer: "COMEDY",
+  },
+  // For "REVAMP"
+  {
+    date: "2026-05-11",
+    grid: [
+      // Row 1 — R at col 1
+      ["A", "R", "X", "Q", "U", "V"],
+      // Row 2 — E at col 4
+      ["H", "A", "I", "O", "E", "Y"],
+      // Row 3 — V at col 0
+      ["V", "F", "C", "S", "W", "J"],
+      // Row 4 — A at col 3
+      ["B", "F", "V", "A", "H", "E"],
+      // Row 5 — M at col 5
+      ["C", "E", "S", "O", "V", "M"],
+      // Row 6 — P at col 2
+      ["D", "J", "P", "N", "S", "W"],
+    ],
+    answer: "REVAMP",
+  },
+  // For "RANSOM"
+  {
+    date: "2026-05-10",
+    grid: [
+      // Row 1 — R at col 1
+      ["A", "R", "X", "Q", "U", "V"],
+      // Row 2 — A at col 4
+      ["H", "E", "I", "O", "A", "Y"],
+      // Row 3 — N at col 0
+      ["N", "F", "C", "S", "W", "J"],
+      // Row 4 — S at col 3
+      ["A", "F", "D", "S", "H", "N"],
+      // Row 5 — O at col 5
+      ["C", "E", "A", "M", "V", "O"],
+      // Row 6 — M at col 2
+      ["D", "J", "M", "N", "S", "W"],
+    ],
+    answer: "RANSOM",
+  },
+  // For "WISDOM"
+  {
+    date: "2026-05-09",
+    grid: [
+      // Row 1 — W at col 1
+      ["A", "W", "X", "Q", "U", "V"],
+      // Row 2 — I at col 4
+      ["H", "E", "A", "O", "I", "Y"],
+      // Row 3 — S at col 0
+      ["S", "F", "C", "N", "W", "J"],
+      // Row 4 — D at col 3
+      ["A", "F", "S", "D", "N", "H"],
+      // Row 5 — O at col 5
+      ["C", "A", "E", "M", "V", "O"],
+      // Row 6 — M at col 2
+      ["D", "J", "M", "N", "S", "W"],
+    ],
+    answer: "WISDOM",
+  },
+  // For "MARVEL"
+  {
+    date: "2026-05-08",
+    grid: [
+      // Row 1 — M at col 1
+      ["A", "M", "H", "Q", "U", "V"],
+      // Row 2 — A at col 4
+      ["H", "E", "I", "O", "A", "Y"],
+      // Row 3 — R at col 0
+      ["R", "F", "I", "N", "W", "J"],
+      // Row 4 — V at col 3
+      ["A", "F", "I", "V", "N", "R"],
+      // Row 5 — E at col 5
+      ["C", "A", "I", "O", "V", "E"],
+      // Row 6 — L at col 2
+      ["D", "J", "L", "N", "S", "W"],
+    ],
+    answer: "MARVEL",
+  },
+  // For "BETRAY"
+  {
+    date: "2026-05-07",
+    grid: [
+      // Row 1 — B at col 1
+      ["A", "B", "M", "Q", "U", "V"],
+      // Row 2 — E at col 4
+      ["H", "A", "I", "O", "E", "Y"],
+      // Row 3 — T at col 0
+      ["T", "F", "I", "N", "W", "J"],
+      // Row 4 — R at col 3
+      ["A", "F", "I", "R", "N", "H"],
+      // Row 5 — A at col 5
+      ["C", "E", "I", "O", "V", "A"],
+      // Row 6 — Y at col 2
+      ["D", "J", "Y", "N", "S", "W"],
+    ],
+    answer: "BETRAY",
+  },
+  // For "HUDDLE"
+  {
+    date: "2026-05-06",
+    grid: [
+      // Row 1 — H at col 1
+      ["A", "H", "M", "Q", "U", "V"],
+      // Row 2 — U at col 4
+      ["W", "E", "A", "O", "U", "Y"],
+      // Row 3 — D at col 0
+      ["D", "F", "I", "N", "W", "J"],
+      // Row 4 — D at col 3
+      ["A", "F", "I", "D", "N", "S"],
+      // Row 5 — L at col 5
+      ["C", "E", "A", "O", "V", "L"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "N", "S", "Y"],
+    ],
+    answer: "HUDDLE",
+  },
+  // For "EFFORT"
+  {
+    date: "2026-05-05",
+    grid: [
+      // Row 1 — E at col 1
+      ["A", "E", "H", "I", "O", "U"],
+      // Row 2 — F at col 4
+      ["B", "C", "D", "G", "F", "H"],
+      // Row 3 — F at col 0
+      ["F", "D", "I", "E", "W", "Y"],
+      // Row 4 — O at col 3
+      ["A", "F", "I", "O", "N", "T"],
+      // Row 5 — R at col 5
+      ["C", "E", "M", "O", "V", "R"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "N", "S", "Y"],
+    ],
+    answer: "EFFORT",
+  },
+  // For "BRUISE"
+  {
+    date: "2026-05-04",
+    grid: [
+      // Row 1 — B at col 1
+      ["A", "B", "H", "I", "U", "V"],
+      // Row 2 — R at col 4
+      ["C", "E", "H", "O", "R", "Y"],
+      // Row 3 — U at col 0
+      ["U", "D", "I", "A", "W", "Y"],
+      // Row 4 — I at col 3
+      ["A", "F", "G", "I", "N", "T"],
+      // Row 5 — S at col 5
+      ["C", "E", "M", "O", "V", "S"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "N", "S", "Y"],
+    ],
+    answer: "BRUISE",
+  },
+  // For "JIGSAW"
+  {
+    date: "2026-05-03",
+    grid: [
+      // Row 1 — J at col 1
+      ["A", "J", "H", "Q", "V", "Z"],
+      // Row 2 — I at col 4
+      ["A", "E", "H", "O", "I", "Y"],
+      // Row 3 — G at col 0
+      ["G", "D", "V", "N", "W", "M"],
+      // Row 4 — S at col 3
+      ["I", "F", "G", "S", "N", "A"],
+      // Row 5 — A at col 5
+      ["C", "E", "H", "O", "V", "A"],
+      // Row 6 — W at col 2
+      ["D", "J", "W", "N", "S", "Y"],
+    ],
+    answer: "JIGSAW",
+  },
+  // For "MAGNET"
+  {
+    date: "2026-05-02",
+    grid: [
+      // Row 1 — M at col 1
+      ["A", "M", "H", "Q", "V", "Z"],
+      // Row 2 — A at col 4
+      ["C", "E", "H", "O", "A", "Y"],
+      // Row 3 — G at col 0
+      ["G", "D", "I", "N", "W", "J"],
+      // Row 4 — N at col 3
+      ["A", "F", "G", "N", "S", "E"],
+      // Row 5 — E at col 5
+      ["C", "H", "I", "Q", "V", "E"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "N", "S", "Y"],
+    ],
+    answer: "MAGNET",
+  },
+  // For "INWARD"
+  {
+    date: "2026-05-01",
+    grid: [
+      // Row 1 — I at col 1
+      ["B", "I", "G", "M", "V", "Z"],
+      // Row 2 — N at col 4
+      ["C", "H", "L", "R", "N", "J"],
+      // Row 3 — W at col 0
+      ["W", "D", "I", "N", "T", "Y"],
+      // Row 4 — A at col 3
+      ["B", "F", "O", "A", "S", "I"],
+      // Row 5 — R at col 5
+      ["W", "H", "C", "Q", "V", "R"],
+      // Row 6 — D at col 2
+      ["A", "C", "D", "N", "S", "Y"],
+    ],
+    answer: "INWARD",
+  },
+  // For "COUPON"
+  {
+    date: "2026-04-30",
+    grid: [
+      // Row 1 — C at col 1
+      ["A", "C", "B", "D", "E", "F"],
+      // Row 2 — O at col 4
+      ["H", "G", "J", "R", "O", "Y"],
+      // Row 3 — U at col 0
+      ["U", "D", "I", "N", "W", "H"],
+      // Row 4 — P at col 3
+      ["A", "F", "C", "P", "M", "S"],
+      // Row 5 — O at col 5
+      ["C", "H", "P", "Q", "V", "O"],
+      // Row 6 — N at col 2
+      ["D", "J", "N", "R", "S", "Y"],
+    ],
+    answer: "COUPON",
+  },
+  // For "AFRAID"
+  {
+    date: "2026-04-29",
+    grid: [
+      // Row 1 — A at col 1
+      ["E", "A", "I", "O", "U", "Y"],
+      // Row 2 — F at col 4
+      ["B", "C", "D", "E", "F", "G"],
+      // Row 3 — R at col 0
+      ["R", "J", "I", "L", "M", "O"],
+      // Row 4 — A at col 3
+      ["B", "F", "Y", "A", "S", "I"],
+      // Row 5 — I at col 5
+      ["C", "E", "M", "L", "O", "I"],
+      // Row 6 — D at col 2
+      ["A", "C", "D", "N", "S", "Y"],
+    ],
+    answer: "AFRAID",
+  },
+  // For "OCTAVE"
+  {
+    date: "2026-04-28",
+    grid: [
+      // Row 1 — O at col 1
+      ["Q", "O", "P", "M", "N", "L"],
+      // Row 2 — C at col 4
+      ["J", "G", "L", "R", "C", "X"],
+      // Row 3 — T at col 0
+      ["T", "D", "C", "N", "W", "Y"],
+      // Row 4 — A at col 3
+      ["B", "F", "H", "A", "S", "I"],
+      // Row 5 — V at col 5
+      ["C", "H", "N", "Q", "T", "V"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "N", "S", "Y"],
+    ],
+    answer: "OCTAVE",
+  },
+  // For "LISTEN"
+  {
+    date: "2026-04-27",
+    grid: [
+      // Row 1 — L at col 1
+      ["B", "L", "A", "M", "V", "W"],
+      // Row 2 — I at col 4
+      ["A", "G", "H", "R", "I", "Y"],
+      // Row 3 — S at col 0
+      ["S", "D", "E", "N", "W", "J"],
+      // Row 4 — T at col 3
+      ["A", "F", "S", "T", "K", "P"],
+      // Row 5 — E at col 5
+      ["C", "H", "I", "Q", "V", "E"],
+      // Row 6 — N at col 2
+      ["B", "J", "N", "R", "W", "Y"],
+    ],
+    answer: "LISTEN",
+  },
+  // For "LEAGUE"
+  {
+    date: "2026-04-26",
+    grid: [
+      // Row 1 — L at col 1
+      ["B", "L", "H", "Q", "J", "X"],
+      // Row 2 — E at col 4
+      ["H", "G", "I", "Y", "E", "O"],
+      // Row 3 — A at col 0
+      ["A", "D", "I", "N", "W", "J"],
+      // Row 4 — G at col 3
+      ["A", "F", "K", "G", "Z", "S"],
+      // Row 5 — U at col 5
+      ["C", "H", "E", "Q", "V", "U"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "N", "S", "Y"],
+    ],
+    answer: "LEAGUE",
+  },
+  // For "CONVOY"
+  {
+    date: "2026-04-25",
+    grid: [
+      // Row 1 — C at col 1
+      ["A", "C", "H", "M", "T", "Z"],
+      // Row 2 — O at col 4
+      ["H", "G", "J", "R", "O", "Y"],
+      // Row 3 — N at col 0
+      ["N", "D", "I", "O", "W", "V"],
+      // Row 4 — V at col 3
+      ["A", "F", "K", "V", "S", "N"],
+      // Row 5 — O at col 5
+      ["C", "H", "E", "Q", "V", "O"],
+      // Row 6 — Y at col 2
+      ["D", "J", "Y", "N", "S", "W"],
+    ],
+    answer: "CONVOY",
+  },
+  // For "ENSURE"
+  {
+    date: "2026-04-24",
+    grid: [
+      // Row 1 — E at col 1
+      ["B", "E", "H", "M", "V", "Y"],
+      // Row 2 — N at col 4
+      ["C", "G", "L", "R", "N", "J"],
+      // Row 3 — S at col 0
+      ["S", "D", "I", "N", "W", "H"],
+      // Row 4 — U at col 3
+      ["A", "F", "H", "U", "S", "E"],
+      // Row 5 — R at col 5
+      ["C", "H", "M", "Q", "V", "R"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "N", "S", "Y"],
+    ],
+    answer: "ENSURE",
+  },
+  // For "CONCUR"
+  {
+    date: "2026-04-23",
+    grid: [
+      // Row 1 — C at col 1
+      ["A", "C", "B", "D", "E", "F"],
+      // Row 2 — O at col 4
+      ["H", "G", "W", "R", "O", "Y"],
+      // Row 3 — N at col 0
+      ["N", "D", "I", "O", "W", "Y"],
+      // Row 4 — C at col 3
+      ["A", "F", "K", "C", "Z", "S"],
+      // Row 5 — U at col 5
+      ["C", "H", "A", "Q", "V", "U"],
+      // Row 6 — R at col 2
+      ["D", "J", "R", "N", "S", "Y"],
+    ],
+    answer: "CONCUR",
+  },
+  // For "ASSUME"
+  {
+    date: "2026-04-22",
+    grid: [
+      // Row 1 — A at col 1
+      ["E", "A", "I", "O", "U", "Y"],
+      // Row 2 — S at col 4
+      ["H", "G", "L", "R", "S", "X"],
+      // Row 3 — S at col 0
+      ["S", "D", "K", "N", "W", "Y"],
+      // Row 4 — U at col 3
+      ["A", "F", "I", "U", "S", "H"],
+      // Row 5 — M at col 5
+      ["C", "H", "N", "Q", "V", "M"],
+      // Row 6 — E at col 2
+      ["D", "J", "E", "N", "S", "Y"],
+    ],
+    answer: "ASSUME",
+  },
+  // For "INTENT"
+  {
+    date: "2026-04-21",
+    grid: [
+      // Row 1 — I at col 1
+      ["B", "I", "G", "M", "V", "Y"],
+      // Row 2 — N at col 4
+      ["C", "H", "L", "R", "N", "J"],
+      // Row 3 — T at col 0
+      ["T", "D", "I", "N", "W", "Y"],
+      // Row 4 — E at col 3
+      ["C", "F", "H", "E", "S", "A"],
+      // Row 5 — N at col 5
+      ["C", "H", "S", "Q", "V", "N"],
+      // Row 6 — T at col 2
+      ["D", "J", "T", "N", "S", "Y"],
+    ],
+    answer: "INTENT",
+  },
+  // For "HORROR"
+  {
+    date: "2026-04-20",
+    grid: [
+      // Row 1 — H at col 1
+      ["A", "H", "M", "Q", "V", "Z"],
+      // Row 2 — O at col 4
+      ["C", "G", "U", "R", "O", "Y"],
+      // Row 3 — R at col 0
+      ["R", "D", "I", "N", "W", "Y"],
+      // Row 4 — R at col 3
+      ["A", "F", "K", "R", "E", "S"],
+      // Row 5 — O at col 5
+      ["C", "H", "E", "Q", "V", "O"],
+      // Row 6 — R at col 2
+      ["D", "J", "R", "N", "S", "Y"],
+    ],
+    answer: "HORROR",
+  },
   // For "REWIND"
   {
     date: "2026-04-19",
