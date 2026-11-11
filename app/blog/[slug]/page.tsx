@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { blogPosts, getBlogPost } from "@/lib/blogPosts";
 
-const siteUrl = "https://www.pathword.co";
+const siteUrl = "https://akashramsankar.github.io/pathword";
 
 type PageProps = {
   params: Promise<{
@@ -200,12 +200,12 @@ export default async function BlogArticlePage({ params }: PageProps) {
               </span>
               Back to all articles
             </Link>
-            <Link
-              href="/"
+            <a
+              href="/pathword/"
               className="inline-flex items-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-emerald-700"
             >
               Play today&apos;s Pathword
-            </Link>
+            </a>
           </footer>
         </article>
       </main>

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { blogPosts } from "@/lib/blogPosts";
 
-const siteUrl = "https://www.pathword.co";
+const siteUrl = "https://akashramsankar.github.io/pathword";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -185,12 +185,12 @@ export default function BlogPage() {
               Carry these insights into your next run and share your streak with the community. A fresh puzzle is waiting just beyond the next tile.
             </p>
             <div className="mt-6 flex justify-center">
-              <Link
-                href="/"
+              <a
+                href="/pathword/"
                 className="inline-flex items-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-emerald-700"
               >
                 Play today&apos;s challenge
-              </Link>
+              </a>
             </div>
           </div>
         </section>

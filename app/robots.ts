@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: 'https://www.pathword.co/sitemap.xml',
-    host: 'https://www.pathword.co',
+    sitemap: 'https://akashramsankar.github.io/pathword/sitemap.xml',
+    host: 'https://akashramsankar.github.io',
   }
 }

@@ -4,7 +4,7 @@ import { blogPosts } from '@/lib/blogPosts'
 
 export const dynamic = 'force-static'
 
-const siteUrl = 'https://www.pathword.co'
+const siteUrl = 'https://akashramsankar.github.io/pathword'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
