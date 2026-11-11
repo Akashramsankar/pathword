@@ -26,7 +26,8 @@
   --jump:#7b5ea7; --jump-glow:rgba(123,94,167,.35);     /* freefalls (Currents' violet spark) */
   --grid-bg:var(--surface-2);
   --plank:#c9c2b4; --plank-edge:#a39d92;
-  --marble-hi:#ffffff; --marble:#2f5d8a; --marble-lo:#1c3a58;
+  --marble-hi:#ffffff; --marble:#3d72a8; --marble-lo:#16324f; --swirl:#f3c255; --swirl-2:#ffffff;
+  --glass:rgba(255,255,255,.55);
 }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; touch-action:manipulation;}
@@ -387,7 +388,8 @@ button.act:disabled{opacity:.55; cursor:default;}
 /* marbles left: six small marbles in the stats row (as Typeset shows its ink) */
 .stat.marbles .v{display:inline-flex; align-items:center; gap:4px; height:1.76rem;}
 .stat.marbles .v i{width:11px; height:11px; border-radius:50%; flex:none;
-  background:radial-gradient(circle at 34% 30%, var(--marble-hi) 0 12%, var(--marble) 46%, var(--marble-lo) 100%);
+  background:radial-gradient(circle at 34% 28%, var(--marble-hi) 0 14%, transparent 26%), conic-gradient(from 40deg, transparent 0 20%, color-mix(in srgb, var(--swirl) 70%, transparent) 25% 35%, transparent 42%), radial-gradient(circle at 36% 30%, var(--marble) 0 35%, var(--marble-lo) 100%);
+  box-shadow:inset -1px -1px 2px rgba(0,0,0,.3);
   transition:transform .3s ease, background .3s ease, box-shadow .3s ease;}
 .stat.marbles .v i.spent{background:transparent; box-shadow:inset 0 0 0 1.5px var(--rule-strong); transform:scale(.8);}
 .stat.marbles .v i.cur{animation:meterBob 1.6s ease-in-out infinite;}
@@ -398,12 +400,12 @@ button.act:disabled{opacity:.55; cursor:default;}
 
 .stage{
   --gap:6px;
-  --span:max(236px, min(340px, calc(100vw - 40px), calc((100dvh - 490px) * .73 + 30px)));
+  --span:max(236px, min(340px, calc(100vw - 40px), calc((100dvh - 490px) * .71 + 30px)));
   --cell:calc((var(--span) - 5 * var(--gap)) / 6);
   --step:calc(var(--cell) + var(--gap));
-  --rowgap:calc(var(--cell) * .38);
+  --rowgap:calc(var(--cell) * .44);
   --rstep:calc(var(--cell) + var(--rowgap));
-  --m:calc(var(--cell) * .44);
+  --m:calc(var(--cell) * .46);
   position:relative; display:flex; flex-direction:column; align-items:center; gap:6px;
 }
 
@@ -413,13 +415,23 @@ button.act:disabled{opacity:.55; cursor:default;}
   top:calc(var(--rowgap) + var(--r) * var(--rstep));
   transform-origin:50% 100%; transition:transform .28s cubic-bezier(.3,1.3,.5,1);
 }
-/* the plank the tiles rest on */
+/* the plank the tiles rest on, with a bracket under each end */
 .shelf::after{
-  content:""; position:absolute; left:-5px; right:-5px; bottom:-6px; height:5px; border-radius:3px;
-  background:linear-gradient(to bottom, var(--plank) 0 55%, var(--plank-edge) 55%);
-  transition:background .25s;
+  content:""; position:absolute; left:-6px; right:-6px; bottom:-7px; height:6px; border-radius:3px;
+  background:linear-gradient(to bottom, color-mix(in srgb, var(--plank) 70%, #fff) 0 20%, var(--plank) 20% 60%, var(--plank-edge) 60%);
+  transition:background .25s, box-shadow .25s;
 }
-.shelf.live::after{background:linear-gradient(to bottom, var(--accent) 0 55%, var(--accent-ink) 55%);}
+.shelf::before{
+  content:""; position:absolute; left:-2px; right:-2px; bottom:-14px; height:9px; pointer-events:none;
+  background:
+    linear-gradient(var(--plank-edge),var(--plank-edge)) left top / 5px 100% no-repeat,
+    linear-gradient(var(--plank-edge),var(--plank-edge)) right top / 5px 100% no-repeat;
+  border-radius:0 0 2px 2px; opacity:.8;
+}
+.shelf.live::after{
+  background:linear-gradient(to bottom, color-mix(in srgb, var(--accent) 60%, #fff) 0 20%, var(--accent) 20% 60%, var(--accent-ink) 60%);
+  box-shadow:0 4px 14px var(--accent-soft), 0 0 0 1px var(--accent-soft);
+}
 .shelf.tip-r{transform:rotate(5deg);}
 .shelf.tip-l{transform:rotate(-5deg);}
 
@@ -437,9 +449,14 @@ button.act:disabled{opacity:.55; cursor:default;}
   display:flex; align-items:center; justify-content:center;
   font-family:var(--font-ui); font-size:calc(var(--cell) * .44); font-weight:700; text-transform:uppercase;
   border-radius:var(--radius); background:var(--card); border:2px solid var(--rule); color:var(--ink);
+  box-shadow:0 2px 0 var(--rule);
   transform-origin:50% 0;
   transition:background .2s, color .2s, box-shadow .2s, border-color .2s, opacity .25s, transform .12s;
 }
+.tile.ok .face{box-shadow:0 2px 0 color-mix(in srgb, var(--good) 70%, #000), inset 0 1px 0 rgba(255,255,255,.25);}
+.tile.free .face{box-shadow:0 2px 0 color-mix(in srgb, var(--jump) 70%, #000), inset 0 1px 0 rgba(255,255,255,.25);}
+/* the hole under a trapdoor while it swings */
+.well.hole{background:radial-gradient(ellipse at 50% 40%, rgba(0,0,0,.55), rgba(0,0,0,.18) 70%); transition:background .2s;}
 /* shelves below the live one wait, crisp but quiet */
 .shelf.later .face{color:var(--ink-muted); opacity:.62;}
 /* the live shelf lifts and its tiles are tappable */
@@ -450,7 +467,7 @@ button.act:disabled{opacity:.55; cursor:default;}
 .shelf.busy .tile{cursor:default;}
 .shelf.busy .tile:hover .face{transform:none; background:var(--card); color:var(--ink); border-color:var(--rule-strong); box-shadow:0 3px 0 var(--rule);}
 /* opened shelves: the trapdoor stays lit, the rest step back */
-.shelf.done .face{opacity:.3; box-shadow:none;}
+.shelf.done .tile:not(.ok) .face{opacity:.3; box-shadow:none;}
 .tile.ok .face,.shelf.done .tile.ok .face{opacity:1; background:var(--good); border-color:var(--good); color:#fff;}
 .tile.free .face,.shelf.done .tile.free .face{background:var(--jump); border-color:var(--jump);}
 .tile.reveal .face{opacity:1; background:var(--card); border:2px dashed var(--gold); color:var(--gold);}
@@ -469,23 +486,61 @@ button.act:disabled{opacity:.55; cursor:default;}
 
 .marble{
   position:absolute; left:0; top:0; width:var(--m); height:var(--m); border-radius:50%; z-index:5; pointer-events:none;
-  background:radial-gradient(circle at 34% 28%, var(--marble-hi) 0 9%, var(--marble) 44%, var(--marble-lo) 100%);
-  box-shadow:0 4px 7px rgba(27,25,22,.3), inset 0 -3px 5px rgba(0,0,0,.2), inset 0 2px 3px rgba(255,255,255,.25);
-  opacity:0; will-change:transform; transition:box-shadow .25s;
+  transform-origin:50% 100%; opacity:0; will-change:transform; overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 115%, rgba(255,255,255,.45), transparent 55%),
+    radial-gradient(circle at 36% 30%, var(--marble) 0 35%, var(--marble-lo) 100%);
+  box-shadow:inset -2px -3px 5px rgba(0,0,0,.35), inset 2px 2px 3px rgba(255,255,255,.18), 0 0 0 1px rgba(0,0,0,.06);
+  transition:box-shadow .25s, filter .25s;
 }
 .marble.on{opacity:1;}
-.marble.glow{box-shadow:0 0 0 6px var(--jump-glow), 0 0 18px var(--jump-glow), 0 4px 7px rgba(27,25,22,.3);}
-
-/* the cup the marble lands in after the sixth shelf */
-.cup{
-  position:relative; width:calc(var(--span) + 10px); height:calc(var(--m) + 12px);
-  border-radius:4px 4px 18px 18px; background:var(--grid-bg);
-  box-shadow:inset 0 3px 0 var(--plank-edge), inset 0 -2px 6px rgba(27,25,22,.06);
-  transition:box-shadow .35s, background .35s;
+/* the swirl inside the glass: it turns as the marble rolls */
+.mb-core{
+  position:absolute; inset:14%; border-radius:50%; will-change:transform;
+  /* a soft twisted ribbon, like the eye of a glass marble */
+  background:
+    conic-gradient(from 0deg, transparent 0%, var(--swirl) 9%, transparent 22%, transparent 50%, var(--swirl) 59%, transparent 72%),
+    conic-gradient(from 60deg, transparent 0%, var(--swirl-2) 6%, transparent 14%, transparent 50%, var(--swirl-2) 56%, transparent 64%);
+  -webkit-mask:radial-gradient(circle, #000 0 18%, rgba(0,0,0,.7) 45%, transparent 70%);
+          mask:radial-gradient(circle, #000 0 18%, rgba(0,0,0,.7) 45%, transparent 70%);
+  filter:blur(.6px); opacity:.85;
 }
-.cup span{display:none;}
-.cup.full{background:color-mix(in srgb, var(--good) 14%, var(--grid-bg)); box-shadow:inset 0 3px 0 var(--good), 0 6px 20px var(--good-glow);}
-.cup.empty{box-shadow:inset 0 3px 0 var(--bad);}
+/* the highlight stays put, like light on glass */
+.mb-shine{
+  position:absolute; left:20%; top:12%; width:36%; height:26%; border-radius:50%;
+  background:radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.95), rgba(255,255,255,0) 70%);
+  transform:rotate(-25deg);
+}
+.marble.glow{box-shadow:0 0 0 5px var(--jump-glow), 0 0 22px var(--jump), inset -2px -3px 5px rgba(0,0,0,.35);}
+/* soft contact shadow under the marble while it rests */
+.mshadow{
+  position:absolute; left:0; top:0; width:calc(var(--m) * .95); height:calc(var(--m) * .28); border-radius:50%;
+  background:radial-gradient(ellipse, rgba(27,25,22,.38), rgba(27,25,22,0) 70%);
+  z-index:4; pointer-events:none; opacity:0; transition:opacity .15s;
+}
+.mshadow.on{opacity:1;}
+
+/* the cup: a glass jar under the last shelf */
+.cup{
+  position:relative; width:calc(var(--span) + 10px); height:calc(var(--m) + 14px);
+  border-radius:3px 3px 20px 20px;
+  background:linear-gradient(to bottom, var(--grid-bg), color-mix(in srgb, var(--grid-bg) 80%, var(--plank-edge)));
+  box-shadow:inset 0 -3px 8px rgba(27,25,22,.08), inset 6px 0 0 -3px var(--glass), inset -6px 0 0 -3px var(--glass);
+  border:2px solid var(--plank-edge); border-top:none;
+  transition:box-shadow .35s, background .35s, border-color .35s;
+}
+.cup-rim{position:absolute; left:-5px; right:-5px; top:-3px; height:6px; border-radius:3px;
+  background:linear-gradient(to bottom, color-mix(in srgb, var(--plank) 70%, #fff) 0 30%, var(--plank-edge) 30%);}
+.cup.full{border-color:var(--good); background:linear-gradient(to bottom, color-mix(in srgb, var(--good) 8%, var(--grid-bg)), color-mix(in srgb, var(--good) 22%, var(--grid-bg)));
+  box-shadow:0 8px 24px var(--good-glow), inset 6px 0 0 -3px var(--glass), inset -6px 0 0 -3px var(--glass);}
+.cup.full .cup-rim{background:linear-gradient(to bottom, color-mix(in srgb, var(--good) 60%, #fff) 0 30%, var(--good) 30%);}
+.cup.empty{border-color:var(--bad);}
+
+/* effects: sparks, dust, rings and confetti */
+.fx{position:absolute; left:0; top:0; pointer-events:none; z-index:7; border-radius:50%; will-change:transform, opacity;}
+.fx.ring{border:2px solid currentColor; background:transparent;}
+.fx.dust{background:radial-gradient(circle, color-mix(in srgb, var(--plank-edge) 70%, transparent), transparent 70%);}
+.fx.bit{border-radius:2px;}
 
 .float{position:absolute; left:0; top:0; pointer-events:none; z-index:6; transform:translate(-50%,-100%);}
 .float span{display:block; font-family:var(--font-display); font-weight:800; font-size:.95rem; color:var(--jump); white-space:nowrap;
@@ -520,7 +575,7 @@ button.act:disabled{opacity:.55; cursor:default;}
 .pt.x{background:transparent; border:2px solid transparent; box-shadow:inset 0 0 0 30px var(--surface-2);}
 .pt.ok{background:var(--good); border-color:var(--good); color:#fff;}
 .cm{position:absolute; top:16px; left:98px; width:14px; height:14px; border-radius:50%;
-  background:radial-gradient(circle at 34% 28%, var(--marble-hi) 0 9%, var(--marble) 44%, var(--marble-lo) 100%);
+  background:radial-gradient(circle at 34% 28%, var(--marble-hi) 0 14%, transparent 26%), conic-gradient(from 40deg, transparent 0 20%, color-mix(in srgb, var(--swirl) 70%, transparent) 25% 35%, transparent 42%), radial-gradient(circle at 36% 30%, var(--marble) 0 35%, var(--marble-lo) 100%);
   box-shadow:0 2px 4px rgba(27,25,22,.3);}
 /* 1: the marble drops onto a tile */
 .c1 .cm{animation:c1m 2.8s infinite;}
@@ -566,7 +621,8 @@ button.act:disabled{opacity:.55; cursor:default;}
     --good-glow:rgba(63,141,99,.5); --gold-glow:rgba(209,160,50,.35);
     --grid-bg:#151310;
     --plank:#4a453c; --plank-edge:#5b554b;
-    --marble-hi:#e8f1fb; --marble:#7fa7d0; --marble-lo:#3b6f9f;
+    --marble-hi:#f2f7fd; --marble:#6f9fd0; --marble-lo:#24476b; --swirl:#f0c860; --swirl-2:#e9f2fb;
+    --glass:rgba(255,255,255,.18);
   }
   :root:not([data-theme="light"]) .modal{background:rgba(0,0,0,.62);}
   :root:not([data-theme="light"]) .toast:not(.bad){color:var(--paper);}
@@ -586,7 +642,8 @@ button.act:disabled{opacity:.55; cursor:default;}
   --good-glow:rgba(63,141,99,.5); --gold-glow:rgba(209,160,50,.35);
   --grid-bg:#151310;
   --plank:#4a453c; --plank-edge:#5b554b;
-  --marble-hi:#e8f1fb; --marble:#7fa7d0; --marble-lo:#3b6f9f;
+  --marble-hi:#f2f7fd; --marble:#6f9fd0; --marble-lo:#24476b; --swirl:#f0c860; --swirl-2:#e9f2fb;
+  --glass:rgba(255,255,255,.18);
 }
 :root[data-theme="dark"] .modal{background:rgba(0,0,0,.62);}
 :root[data-theme="dark"] .toast:not(.bad){color:var(--paper);}

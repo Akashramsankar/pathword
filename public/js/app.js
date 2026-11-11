@@ -45,7 +45,10 @@
   let shelfEls = [];
   let tileEls = [];
   const marble = $('marble');
+  const core = marble.querySelector('.mb-core');
+  const mShadow = $('mshadow');
   let mPos = { x: 0, y: 0 };
+  let wellEls = [];
 
   function saveState() {
     const all = readJSON(SAVE_KEY, {});
@@ -130,17 +133,21 @@
     shelfEls.forEach((s) => s.remove());
     shelfEls = [];
     tileEls = [];
+    wellEls = [];
     for (let r = 0; r < E.ROWS; r++) {
       const shelf = document.createElement('div');
       shelf.className = 'shelf';
       shelf.style.setProperty('--r', r);
       const row = [];
+      const wells = [];
       for (let c = 0; c < E.COLS; c++) {
         const w = document.createElement('span');
         w.className = 'well';
         w.style.setProperty('--c', c);
         shelf.appendChild(w);
+        wells.push(w);
       }
+      wellEls.push(wells);
       for (let c = 0; c < E.COLS; c++) {
         const t = document.createElement('button');
         t.type = 'button';
@@ -154,7 +161,7 @@
         shelf.appendChild(t);
         row.push(t);
       }
-      $('board').insertBefore(shelf, marble);
+      $('board').insertBefore(shelf, mShadow);
       shelfEls.push(shelf);
       tileEls.push(row);
     }
@@ -206,7 +213,8 @@
     meter.parentElement.classList.toggle('low', playing && left <= 2);
     $('shelfNo').textContent = `${Math.min(st.row + 1, E.ROWS)}/${E.ROWS}`;
     $('freeNo').textContent = E.freefalls(st);
-    $('shelfLabel').textContent = playing ? `Shelf ${st.row + 1} of ${E.ROWS}` : st.status === 'won' ? 'Solved' : 'Revealed';
+    // a freefall through the last shelf is still "playing" for a moment with row = ROWS
+    $('shelfLabel').textContent = playing && st.row < E.ROWS ? `Shelf ${st.row + 1} of ${E.ROWS}` : st.status === 'lost' ? 'Revealed' : 'Solved';
     $('cup').classList.toggle('full', st.status === 'won');
     $('cup').classList.toggle('empty', st.status === 'lost');
     $('shareBtn').disabled = playing;
@@ -273,38 +281,122 @@
       width: board.offsetWidth,
     };
   }
+  // The swirl turns with distance travelled, so the marble reads as rolling.
+  const spinAt = (x) => (x / Math.max(1, marble.offsetWidth / 2)) * (180 / Math.PI);
+  const mTransform = (p) => `translate(${p.x}px, ${p.y}px) scale(${p.sx || 1}, ${p.sy || 1})`;
+  function placeShadow(p, on) {
+    const m = marble.offsetWidth;
+    const w = mShadow.offsetWidth;
+    const h = mShadow.offsetHeight;
+    mShadow.style.transform = `translate(${p.x + m / 2 - w / 2}px, ${p.y + m - h / 2}px)`;
+    mShadow.classList.toggle('on', !!on);
+  }
   function setMarble(p, on = true) {
     mPos = { x: p.x, y: p.y };
-    marble.style.transform = `translate(${p.x}px, ${p.y}px)`;
+    marble.style.transform = mTransform({ x: p.x, y: p.y });
+    core.style.transform = `rotate(${spinAt(p.x)}deg)`;
     marble.classList.toggle('on', on);
+    placeShadow(p, on);
   }
-  /** Animate through points: each { x, y, t (ms to get there), ease, o (opacity) }. */
+  /** Animate through points: each { x, y, t (ms to get there), ease, o (opacity), sx/sy (squash) }. */
   async function moveMarble(points) {
     const from = { ...mPos, o: 1 };
     const all = [from, ...points];
     const total = points.reduce((s, p) => s + p.t, 0) || 1;
     let acc = 0;
-    const frames = all.map((p, i) => {
-      if (i > 0) acc += points[i - 1].t;
-      const k = { transform: `translate(${p.x}px, ${p.y}px)`, opacity: p.o == null ? 1 : p.o, offset: acc / total };
-      if (i < points.length) k.easing = points[i].ease || 'ease-in-out';
-      return k;
-    });
+    const offs = all.map((p, i) => { if (i > 0) acc += points[i - 1].t; return acc / total; });
+    const ease = (i) => (i < points.length ? points[i].ease || 'ease-in-out' : undefined);
+    const frames = all.map((p, i) => ({ transform: mTransform(p), opacity: p.o == null ? 1 : p.o, offset: offs[i], ...(ease(i) ? { easing: ease(i) } : {}) }));
+    const spins = all.map((p, i) => ({ transform: `rotate(${spinAt(p.x)}deg)`, offset: offs[i], ...(ease(i) ? { easing: ease(i) } : {}) }));
+    mShadow.classList.remove('on');
     const a = marble.animate(frames, { duration: pace(total), fill: 'forwards' });
+    const b = core.animate(spins, { duration: pace(total), fill: 'forwards' });
     try { await a.finished; } catch (e) { /* cancelled */ }
     const last = all[all.length - 1];
     setMarble(last, (last.o == null ? 1 : last.o) > 0);
     a.cancel();
+    b.cancel();
   }
   const FALL = 'cubic-bezier(.45,0,.9,.55)';
   const fallTime = (dy) => Math.round(55 * Math.sqrt(Math.max(8, Math.abs(dy)) / 8));
-  const fallTo = (p) => ({ ...p, t: fallTime(p.y - mPos.y), ease: FALL });
+  // stretched as it drops
+  const fallTo = (p) => ({ ...p, t: fallTime(p.y - mPos.y), ease: FALL, sx: 0.88, sy: 1.14 });
   // a quick hop: up and over to a tile top
   function hopTo(p, g) {
     const apex = { x: (mPos.x + p.x) / 2, y: Math.min(mPos.y, p.y) - g.cell * 0.32, t: 110 + Math.abs(p.x - mPos.x) * 0.5, ease: 'cubic-bezier(.2,.6,.4,1)' };
-    return [apex, { ...p, t: 120, ease: 'cubic-bezier(.6,0,.9,.6)' }];
+    return [apex, { ...p, t: 120, ease: 'cubic-bezier(.6,0,.9,.6)', sx: 0.94, sy: 1.06 }, { ...p, t: 60, ease: 'ease-out', sx: 1.12, sy: 0.88 }, { ...p, t: 80, ease: 'ease-in-out' }];
   }
-  const bounce = (p) => [{ x: p.x, y: p.y - 5, t: 80, ease: 'ease-out' }, { x: p.x, y: p.y, t: 80, ease: 'ease-in' }];
+  // squash on impact, a small rebound, settle
+  const bounce = (p) => [
+    { x: p.x, y: p.y, sx: 1.24, sy: 0.78, t: 60, ease: 'ease-out' },
+    { x: p.x, y: p.y - 6, sx: 0.96, sy: 1.04, t: 100, ease: 'ease-out' },
+    { x: p.x, y: p.y, t: 90, ease: 'ease-in' },
+    { x: p.x, y: p.y, sx: 1.08, sy: 0.93, t: 50, ease: 'ease-out' },
+    { x: p.x, y: p.y, t: 70, ease: 'ease-in-out' },
+  ];
+
+  /* ---------------- Effects ----------------
+     Purely decorative particles in #board pixels. Skipped for reduced motion. */
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function fx(cls, x, y, size, color, frames, ms) {
+    const el = document.createElement('i');
+    el.className = `fx ${cls}`;
+    el.style.width = el.style.height = `${size}px`;
+    el.style.left = `${x - size / 2}px`;
+    el.style.top = `${y - size / 2}px`;
+    if (color) { el.style.background = cls === 'ring' ? 'transparent' : color; el.style.color = color; }
+    $('board').appendChild(el);
+    const a = el.animate(frames, { duration: ms, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+    a.finished.then(() => el.remove()).catch(() => el.remove());
+  }
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  function sparks(x, y, color, n = 10, power = 1) {
+    if (reduceMotion) return;
+    for (let i = 0; i < n; i++) {
+      const ang = rnd(-Math.PI, 0) + rnd(-0.3, 0.3); // mostly upward
+      const d = rnd(18, 42) * power;
+      const dx = Math.cos(ang) * d;
+      const dy = Math.sin(ang) * d;
+      const size = rnd(3, 6);
+      fx('spark', x, y, size, color, [
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px) scale(.9)`, opacity: 1, offset: 0.55 },
+        { transform: `translate(${dx * 1.2}px, ${dy + 22}px) scale(.3)`, opacity: 0 },
+      ], rnd(520, 760));
+    }
+  }
+  function ring(x, y, color, size = 18) {
+    if (reduceMotion) return;
+    fx('ring', x, y, size, color, [
+      { transform: 'scale(.3)', opacity: 0.9 },
+      { transform: 'scale(2.4)', opacity: 0 },
+    ], 560);
+  }
+  function dust(x, y, n = 4) {
+    if (reduceMotion) return;
+    for (let i = 0; i < n; i++) {
+      const size = rnd(10, 18);
+      fx('dust', x + rnd(-10, 10), y, size, null, [
+        { transform: 'translate(0,0) scale(.4)', opacity: 0.9 },
+        { transform: `translate(${rnd(-16, 16)}px, ${rnd(-14, -4)}px) scale(1.3)`, opacity: 0 },
+      ], rnd(480, 700));
+    }
+  }
+  function confetti(x, y, w) {
+    if (reduceMotion) return;
+    const colors = [css('--good'), css('--gold'), css('--jump'), css('--accent'), css('--bad')];
+    for (let i = 0; i < 46; i++) {
+      const sx = x + rnd(-w / 2, w / 2);
+      const dx = rnd(-60, 60);
+      const up = rnd(70, 170);
+      const size = rnd(5, 8);
+      fx('bit', sx, y, size, colors[i % colors.length], [
+        { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+        { transform: `translate(${dx * 0.6}px, ${-up}px) rotate(${rnd(-200, 200)}deg)`, opacity: 1, offset: 0.45 },
+        { transform: `translate(${dx}px, ${-up + rnd(60, 120)}px) rotate(${rnd(-400, 400)}deg)`, opacity: 0 },
+      ], rnd(1100, 1600));
+    }
+  }
 
   /** Where the marble rests between taps. */
   function restPos(g) {
@@ -356,11 +448,13 @@
       el.dataset.falling = '1';
       const spin = (how.dir || (i % 2 ? 1 : -1)) * (14 + ((r * 7 + c * 13) % 18));
       const dx = how.dir ? how.dir * g.cell * (1.1 + (i % 3) * 0.25) : 0;
+      const from = getComputedStyle(face).opacity; // fall from how it looks now (later shelves are faded)
       const a = face.animate([
-        { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+        { transform: 'translate(0,0) rotate(0)', opacity: from },
         { transform: `translate(${dx}px, ${g.cell * 1.6}px) rotate(${spin}deg)`, opacity: 0 },
       ], { duration: pace(how.dir ? 520 : 460), delay: pace(how.delay ? i * how.delay : 0), easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' });
       a.finished.then(() => { delete el.dataset.falling; el.classList.add('gone'); a.cancel(); }).catch(() => { delete el.dataset.falling; });
+      setTimeout(() => dust(g.cx(c), g.top(r) + g.cell, 3), pace((how.delay ? i * how.delay : 0) + 120));
     });
   }
 
@@ -398,15 +492,21 @@
   async function openTrapdoor(r, c, crumbled, free) {
     const g = geo();
     const t = tileEls[r][c];
+    const w = wellEls[r][c];
+    w.classList.add('hole');
     t.classList.add('open', 'ok');
     if (free) t.classList.add('free');
-    setTimeout(() => t.classList.remove('open'), 520);
+    setTimeout(() => { t.classList.remove('open'); w.classList.remove('hole'); }, 520);
     shelfEls[r].classList.remove('live');
     if (navigator.vibrate) navigator.vibrate(free ? [15, 30, 15] : 18);
+    const color = css(free ? '--jump' : '--good');
+    sparks(g.cx(c), g.top(r) + 4, color, free ? 18 : 10, free ? 1.3 : 1);
+    ring(g.cx(c), g.top(r) + g.cell / 2, color, g.cell * 0.6);
     await wait(pace(120));
     dropTiles(crumbled, { delay: 55 });
     const land = r + 1 < E.ROWS ? g.inGap(r + 1, c) : g.cup(c);
     await moveMarble([fallTo(land), ...bounce(land)]);
+    if (r + 1 < E.ROWS) dust(land.x + g.m / 2, land.y + g.m, 2);
   }
 
   async function playEvent(ev) {
@@ -440,9 +540,10 @@
       const edgeY = mPos.y + run * 0.087;
       const cells = ev.fell.slice().sort((a, b) => (ev.dir > 0 ? b - a : a - b)).map((c) => [ev.row, c]);
       dropTiles(cells, { dir: ev.dir, delay: 40 });
+      setTimeout(() => dust(ev.dir > 0 ? g.width : 0, g.top(ev.row) + g.cell, 4), pace(180 + run * 1.1));
       await moveMarble([
         { x: edgeX, y: edgeY, t: 180 + run * 1.1, ease: 'cubic-bezier(.5,0,.75,1)' },
-        { x: edgeX + ev.dir * g.m, y: edgeY + g.cell * 1.8, t: 260, ease: FALL, o: 0 },
+        { x: edgeX + ev.dir * g.m, y: edgeY + g.cell * 1.8, t: 260, ease: FALL, o: 0, sx: 0.9, sy: 1.1 },
       ]);
       renderHud(ev.state);
       await wait(pace(120));
@@ -454,6 +555,9 @@
       }
     } else if (ev.type === 'won') {
       $('cup').classList.add('full');
+      const cupTop = $('cup').offsetTop - $('board').offsetTop;
+      ring(mPos.x + g.m / 2, mPos.y + g.m / 2, css('--good'), g.m * 1.2);
+      confetti(g.width / 2, cupTop, g.width * 0.8);
       renderBoard();
       renderHud();
       say(`Into the cup! ${puzzle.answer} with ${used()} of ${E.MARBLES} marbles.`, 'ok');
