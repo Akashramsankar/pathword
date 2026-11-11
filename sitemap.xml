@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://www.pathword.co</loc>
-<lastmod>2026-08-30T03:20:37.789Z</lastmod>
+<loc>https://akashramsankar.github.io/pathword</loc>
+<lastmod>2026-11-11T09:27:46.284Z</lastmod>
 <changefreq>daily</changefreq>
 <priority>1</priority>
 </url>
 <url>
-<loc>https://www.pathword.co/blog</loc>
+<loc>https://akashramsankar.github.io/pathword/blog</loc>
 <lastmod>2025-09-21T00:00:00.000Z</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.8</priority>
 </url>
 <url>
-<loc>https://www.pathword.co/blog/pathword-tips-and-tricks</loc>
+<loc>https://akashramsankar.github.io/pathword/blog/pathword-tips-and-tricks</loc>
 <lastmod>2025-09-21T00:00:00.000Z</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.7</priority>
