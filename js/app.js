@@ -25,10 +25,27 @@
   };
   const entryForDay = (day) => BANK[((day % BANK.length) + BANK.length) % BANK.length];
 
+  /* ---------------- Weekly drop calendar ----------------
+     Week 0 = Weekly Drop #1 = Monday 16 Nov 2026. Each week plays the next five boards
+     from weekly.js (built from puzzles/weekly-words.txt), Monday to Sunday. */
+  const WEEKLY = self.PATHWORD_WEEKLY;
+  const WEEK_WORDS = 5;
+  const WEEK_RACK = 20; // one rack of marbles for all five words
+  const WEEK_EPOCH = new Date(2026, 10, 16);
+  const weekNumber = () => Math.max(0, Math.floor((new Date() - WEEK_EPOCH) / (7 * DAY)));
+  const weekStart = (w) => new Date(WEEK_EPOCH.getFullYear(), WEEK_EPOCH.getMonth(), WEEK_EPOCH.getDate() + 7 * w);
+  const weekDateStr = (w) => weekStart(w).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  function weekEntries(w) {
+    const n = WEEKLY.length / WEEK_WORDS;
+    const k = ((w % n) + n) % n;
+    return WEEKLY.slice(k * WEEK_WORDS, (k + 1) * WEEK_WORDS);
+  }
+
   /* ---------------- Storage ---------------- */
   const SAVE_KEY = 'pathword_progress_v1';
   const STATS_KEY = 'pathword_stats_v1';
   const SEEN_KEY = 'pathword_seen_v1';
+  const WEEKLY_KEY = 'pathword_weekly_v1'; // { [week]: { entries, words: [picks per word], time } }
   const readJSON = (key, fallback) => {
     try { return JSON.parse(localStorage.getItem(key) || 'null') || fallback; } catch (e) { return fallback; }
   };
@@ -45,9 +62,24 @@
   let shelfEls = [];
   let tileEls = [];
   const marble = $('marble');
+  const core = marble.querySelector('.mb-core');
+  const mShadow = $('mshadow');
   let mPos = { x: 0, y: 0 };
+  let wellEls = [];
+  // weekly drop: the board is running one of this week's five words, not a daily puzzle
+  let weeklyMode = false;
+  let activeWeek = 0;
+  let weekIdx = 0;
+  let weekWords = []; // the run's taps, one array per word
 
   function saveState() {
+    if (weeklyMode) {
+      const all = readJSON(WEEKLY_KEY, {});
+      weekWords[weekIdx] = game.picks;
+      all[activeWeek] = { entries: weekEntries(activeWeek), words: weekWords, time: elapsedNow() };
+      writeJSON(WEEKLY_KEY, all);
+      return;
+    }
     const all = readJSON(SAVE_KEY, {});
     all[activeDay] = { entry, picks: game.picks, time: elapsedNow() };
     writeJSON(SAVE_KEY, all);
@@ -130,17 +162,21 @@
     shelfEls.forEach((s) => s.remove());
     shelfEls = [];
     tileEls = [];
+    wellEls = [];
     for (let r = 0; r < E.ROWS; r++) {
       const shelf = document.createElement('div');
       shelf.className = 'shelf';
       shelf.style.setProperty('--r', r);
       const row = [];
+      const wells = [];
       for (let c = 0; c < E.COLS; c++) {
         const w = document.createElement('span');
         w.className = 'well';
         w.style.setProperty('--c', c);
         shelf.appendChild(w);
+        wells.push(w);
       }
+      wellEls.push(wells);
       for (let c = 0; c < E.COLS; c++) {
         const t = document.createElement('button');
         t.type = 'button';
@@ -154,7 +190,7 @@
         shelf.appendChild(t);
         row.push(t);
       }
-      $('board').insertBefore(shelf, marble);
+      $('board').insertBefore(shelf, mShadow);
       shelfEls.push(shelf);
       tileEls.push(row);
     }
@@ -192,9 +228,19 @@
       if (st.status === 'lost') return `<span class="slot miss">${ch}</span>`;
       return `<span class="slot${playing && i === st.row ? ' now' : ''}"></span>`;
     }).join('');
+    const meter = $('marbleMeter');
+    if (weeklyMode) {
+      // the shared rack: what's left of the week's marbles
+      const rack = st.limit - st.lost;
+      meter.innerHTML = `<i class="${playing ? 'cur' : ''}"></i><b>${rack}</b><small>/${WEEK_RACK}</small>`;
+      meter.dataset.lost = st.lost;
+      meter.setAttribute('aria-label', `${rack} of ${WEEK_RACK} marbles left in the rack`);
+      $('marbleLabel').textContent = rack === 1 && playing ? 'Last marble' : 'Rack';
+      meter.parentElement.classList.toggle('low', playing && rack <= 3);
+    }
     const left = E.MARBLES - st.lost;
     // marbles left: the one in play bobs, a newly lost one pops
-    const meter = $('marbleMeter');
+    if (!weeklyMode) {
     const prevLost = Number(meter.dataset.lost || 0);
     meter.innerHTML = Array.from({ length: E.MARBLES }, (_, i) => {
       const cls = i < st.lost ? `spent${i >= prevLost && i < st.lost && st.lost > prevLost ? ' pop' : ''}` : i === st.lost && playing ? 'cur' : '';
@@ -204,9 +250,11 @@
     meter.setAttribute('aria-label', `${left} of ${E.MARBLES} marbles left`);
     $('marbleLabel').textContent = left === 1 && playing ? 'Last marble' : 'Marbles';
     meter.parentElement.classList.toggle('low', playing && left <= 2);
+    }
     $('shelfNo').textContent = `${Math.min(st.row + 1, E.ROWS)}/${E.ROWS}`;
     $('freeNo').textContent = E.freefalls(st);
-    $('shelfLabel').textContent = playing ? `Shelf ${st.row + 1} of ${E.ROWS}` : st.status === 'won' ? 'Solved' : 'Revealed';
+    // a freefall through the last shelf is still "playing" for a moment with row = ROWS
+    $('shelfLabel').textContent = playing && st.row < E.ROWS ? `Shelf ${st.row + 1} of ${E.ROWS}` : st.status === 'lost' ? 'Revealed' : 'Solved';
     $('cup').classList.toggle('full', st.status === 'won');
     $('cup').classList.toggle('empty', st.status === 'lost');
     $('shareBtn').disabled = playing;
@@ -214,6 +262,11 @@
   }
 
   function renderHeader() {
+    if (weeklyMode) {
+      $('dateLabel').textContent = `Drop #${activeWeek + 1} · Week of ${weekDateStr(activeWeek)}`;
+      $('cardLabel').textContent = `Word ${weekIdx + 1} of ${WEEK_WORDS}`;
+      return;
+    }
     const d = dateForDay(activeDay).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
     const today = activeDay === dayNumber();
     $('dateLabel').textContent = `Puzzle #${activeDay + 1} · ${d} · ${today ? 'Today' : 'Archive'}`;
@@ -226,6 +279,8 @@
     m.textContent = text;
   }
   function idleMessage() {
+    if (weeklyMode && game.status === 'won') return say(`${puzzle.answer} is in the cup.`, 'ok');
+    if (weeklyMode && game.status === 'playing' && game.picks.length === 0) return say(`Word ${weekIdx + 1} of ${WEEK_WORDS}: tap a tile on the top shelf.`);
     if (game.status === 'won') return say(`Solved with ${used()} of ${E.MARBLES} marbles.`, 'ok');
     if (game.status === 'lost') return say(`Out of marbles. The word was ${puzzle.answer}.`, 'bad');
     if (game.picks.length === 0) return say('Tap a tile on the top shelf to drop the marble.');
@@ -273,38 +328,122 @@
       width: board.offsetWidth,
     };
   }
+  // The swirl turns with distance travelled, so the marble reads as rolling.
+  const spinAt = (x) => (x / Math.max(1, marble.offsetWidth / 2)) * (180 / Math.PI);
+  const mTransform = (p) => `translate(${p.x}px, ${p.y}px) scale(${p.sx || 1}, ${p.sy || 1})`;
+  function placeShadow(p, on) {
+    const m = marble.offsetWidth;
+    const w = mShadow.offsetWidth;
+    const h = mShadow.offsetHeight;
+    mShadow.style.transform = `translate(${p.x + m / 2 - w / 2}px, ${p.y + m - h / 2}px)`;
+    mShadow.classList.toggle('on', !!on);
+  }
   function setMarble(p, on = true) {
     mPos = { x: p.x, y: p.y };
-    marble.style.transform = `translate(${p.x}px, ${p.y}px)`;
+    marble.style.transform = mTransform({ x: p.x, y: p.y });
+    core.style.transform = `rotate(${spinAt(p.x)}deg)`;
     marble.classList.toggle('on', on);
+    placeShadow(p, on);
   }
-  /** Animate through points: each { x, y, t (ms to get there), ease, o (opacity) }. */
+  /** Animate through points: each { x, y, t (ms to get there), ease, o (opacity), sx/sy (squash) }. */
   async function moveMarble(points) {
     const from = { ...mPos, o: 1 };
     const all = [from, ...points];
     const total = points.reduce((s, p) => s + p.t, 0) || 1;
     let acc = 0;
-    const frames = all.map((p, i) => {
-      if (i > 0) acc += points[i - 1].t;
-      const k = { transform: `translate(${p.x}px, ${p.y}px)`, opacity: p.o == null ? 1 : p.o, offset: acc / total };
-      if (i < points.length) k.easing = points[i].ease || 'ease-in-out';
-      return k;
-    });
+    const offs = all.map((p, i) => { if (i > 0) acc += points[i - 1].t; return acc / total; });
+    const ease = (i) => (i < points.length ? points[i].ease || 'ease-in-out' : undefined);
+    const frames = all.map((p, i) => ({ transform: mTransform(p), opacity: p.o == null ? 1 : p.o, offset: offs[i], ...(ease(i) ? { easing: ease(i) } : {}) }));
+    const spins = all.map((p, i) => ({ transform: `rotate(${spinAt(p.x)}deg)`, offset: offs[i], ...(ease(i) ? { easing: ease(i) } : {}) }));
+    mShadow.classList.remove('on');
     const a = marble.animate(frames, { duration: pace(total), fill: 'forwards' });
+    const b = core.animate(spins, { duration: pace(total), fill: 'forwards' });
     try { await a.finished; } catch (e) { /* cancelled */ }
     const last = all[all.length - 1];
     setMarble(last, (last.o == null ? 1 : last.o) > 0);
     a.cancel();
+    b.cancel();
   }
   const FALL = 'cubic-bezier(.45,0,.9,.55)';
   const fallTime = (dy) => Math.round(55 * Math.sqrt(Math.max(8, Math.abs(dy)) / 8));
-  const fallTo = (p) => ({ ...p, t: fallTime(p.y - mPos.y), ease: FALL });
+  // stretched as it drops
+  const fallTo = (p) => ({ ...p, t: fallTime(p.y - mPos.y), ease: FALL, sx: 0.88, sy: 1.14 });
   // a quick hop: up and over to a tile top
   function hopTo(p, g) {
     const apex = { x: (mPos.x + p.x) / 2, y: Math.min(mPos.y, p.y) - g.cell * 0.32, t: 110 + Math.abs(p.x - mPos.x) * 0.5, ease: 'cubic-bezier(.2,.6,.4,1)' };
-    return [apex, { ...p, t: 120, ease: 'cubic-bezier(.6,0,.9,.6)' }];
+    return [apex, { ...p, t: 120, ease: 'cubic-bezier(.6,0,.9,.6)', sx: 0.94, sy: 1.06 }, { ...p, t: 60, ease: 'ease-out', sx: 1.12, sy: 0.88 }, { ...p, t: 80, ease: 'ease-in-out' }];
   }
-  const bounce = (p) => [{ x: p.x, y: p.y - 5, t: 80, ease: 'ease-out' }, { x: p.x, y: p.y, t: 80, ease: 'ease-in' }];
+  // squash on impact, a small rebound, settle
+  const bounce = (p) => [
+    { x: p.x, y: p.y, sx: 1.24, sy: 0.78, t: 60, ease: 'ease-out' },
+    { x: p.x, y: p.y - 6, sx: 0.96, sy: 1.04, t: 100, ease: 'ease-out' },
+    { x: p.x, y: p.y, t: 90, ease: 'ease-in' },
+    { x: p.x, y: p.y, sx: 1.08, sy: 0.93, t: 50, ease: 'ease-out' },
+    { x: p.x, y: p.y, t: 70, ease: 'ease-in-out' },
+  ];
+
+  /* ---------------- Effects ----------------
+     Purely decorative particles in #board pixels. Skipped for reduced motion. */
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function fx(cls, x, y, size, color, frames, ms) {
+    const el = document.createElement('i');
+    el.className = `fx ${cls}`;
+    el.style.width = el.style.height = `${size}px`;
+    el.style.left = `${x - size / 2}px`;
+    el.style.top = `${y - size / 2}px`;
+    if (color) { el.style.background = cls === 'ring' ? 'transparent' : color; el.style.color = color; }
+    $('board').appendChild(el);
+    const a = el.animate(frames, { duration: ms, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+    a.finished.then(() => el.remove()).catch(() => el.remove());
+  }
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  function sparks(x, y, color, n = 10, power = 1) {
+    if (reduceMotion) return;
+    for (let i = 0; i < n; i++) {
+      const ang = rnd(-Math.PI, 0) + rnd(-0.3, 0.3); // mostly upward
+      const d = rnd(18, 42) * power;
+      const dx = Math.cos(ang) * d;
+      const dy = Math.sin(ang) * d;
+      const size = rnd(3, 6);
+      fx('spark', x, y, size, color, [
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px) scale(.9)`, opacity: 1, offset: 0.55 },
+        { transform: `translate(${dx * 1.2}px, ${dy + 22}px) scale(.3)`, opacity: 0 },
+      ], rnd(520, 760));
+    }
+  }
+  function ring(x, y, color, size = 18) {
+    if (reduceMotion) return;
+    fx('ring', x, y, size, color, [
+      { transform: 'scale(.3)', opacity: 0.9 },
+      { transform: 'scale(2.4)', opacity: 0 },
+    ], 560);
+  }
+  function dust(x, y, n = 4) {
+    if (reduceMotion) return;
+    for (let i = 0; i < n; i++) {
+      const size = rnd(10, 18);
+      fx('dust', x + rnd(-10, 10), y, size, null, [
+        { transform: 'translate(0,0) scale(.4)', opacity: 0.9 },
+        { transform: `translate(${rnd(-16, 16)}px, ${rnd(-14, -4)}px) scale(1.3)`, opacity: 0 },
+      ], rnd(480, 700));
+    }
+  }
+  function confetti(x, y, w) {
+    if (reduceMotion) return;
+    const colors = [css('--good'), css('--gold'), css('--jump'), css('--accent'), css('--bad')];
+    for (let i = 0; i < 46; i++) {
+      const sx = x + rnd(-w / 2, w / 2);
+      const dx = rnd(-60, 60);
+      const up = rnd(70, 170);
+      const size = rnd(5, 8);
+      fx('bit', sx, y, size, colors[i % colors.length], [
+        { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+        { transform: `translate(${dx * 0.6}px, ${-up}px) rotate(${rnd(-200, 200)}deg)`, opacity: 1, offset: 0.45 },
+        { transform: `translate(${dx}px, ${-up + rnd(60, 120)}px) rotate(${rnd(-400, 400)}deg)`, opacity: 0 },
+      ], rnd(1100, 1600));
+    }
+  }
 
   /** Where the marble rests between taps. */
   function restPos(g) {
@@ -356,11 +495,13 @@
       el.dataset.falling = '1';
       const spin = (how.dir || (i % 2 ? 1 : -1)) * (14 + ((r * 7 + c * 13) % 18));
       const dx = how.dir ? how.dir * g.cell * (1.1 + (i % 3) * 0.25) : 0;
+      const from = getComputedStyle(face).opacity; // fall from how it looks now (later shelves are faded)
       const a = face.animate([
-        { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+        { transform: 'translate(0,0) rotate(0)', opacity: from },
         { transform: `translate(${dx}px, ${g.cell * 1.6}px) rotate(${spin}deg)`, opacity: 0 },
       ], { duration: pace(how.dir ? 520 : 460), delay: pace(how.delay ? i * how.delay : 0), easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' });
       a.finished.then(() => { delete el.dataset.falling; el.classList.add('gone'); a.cancel(); }).catch(() => { delete el.dataset.falling; });
+      setTimeout(() => dust(g.cx(c), g.top(r) + g.cell, 3), pace((how.delay ? i * how.delay : 0) + 120));
     });
   }
 
@@ -384,6 +525,7 @@
   }
 
   function finishTurn() {
+    if (weeklyMode) { weeklyTurnDone(); return; }
     if (game.status !== 'playing') { pauseClock(); saveState(); }
     renderBoard();
     renderHud(); // the last event's message stays up until the next tap
@@ -398,15 +540,21 @@
   async function openTrapdoor(r, c, crumbled, free) {
     const g = geo();
     const t = tileEls[r][c];
+    const w = wellEls[r][c];
+    w.classList.add('hole');
     t.classList.add('open', 'ok');
     if (free) t.classList.add('free');
-    setTimeout(() => t.classList.remove('open'), 520);
+    setTimeout(() => { t.classList.remove('open'); w.classList.remove('hole'); }, 520);
     shelfEls[r].classList.remove('live');
     if (navigator.vibrate) navigator.vibrate(free ? [15, 30, 15] : 18);
+    const color = css(free ? '--jump' : '--good');
+    sparks(g.cx(c), g.top(r) + 4, color, free ? 18 : 10, free ? 1.3 : 1);
+    ring(g.cx(c), g.top(r) + g.cell / 2, color, g.cell * 0.6);
     await wait(pace(120));
     dropTiles(crumbled, { delay: 55 });
     const land = r + 1 < E.ROWS ? g.inGap(r + 1, c) : g.cup(c);
     await moveMarble([fallTo(land), ...bounce(land)]);
+    if (r + 1 < E.ROWS) dust(land.x + g.m / 2, land.y + g.m, 2);
   }
 
   async function playEvent(ev) {
@@ -440,9 +588,10 @@
       const edgeY = mPos.y + run * 0.087;
       const cells = ev.fell.slice().sort((a, b) => (ev.dir > 0 ? b - a : a - b)).map((c) => [ev.row, c]);
       dropTiles(cells, { dir: ev.dir, delay: 40 });
+      setTimeout(() => dust(ev.dir > 0 ? g.width : 0, g.top(ev.row) + g.cell, 4), pace(180 + run * 1.1));
       await moveMarble([
         { x: edgeX, y: edgeY, t: 180 + run * 1.1, ease: 'cubic-bezier(.5,0,.75,1)' },
-        { x: edgeX + ev.dir * g.m, y: edgeY + g.cell * 1.8, t: 260, ease: FALL, o: 0 },
+        { x: edgeX + ev.dir * g.m, y: edgeY + g.cell * 1.8, t: 260, ease: FALL, o: 0, sx: 0.9, sy: 1.1 },
       ]);
       renderHud(ev.state);
       await wait(pace(120));
@@ -454,9 +603,12 @@
       }
     } else if (ev.type === 'won') {
       $('cup').classList.add('full');
+      const cupTop = $('cup').offsetTop - $('board').offsetTop;
+      ring(mPos.x + g.m / 2, mPos.y + g.m / 2, css('--good'), g.m * 1.2);
+      confetti(g.width / 2, cupTop, g.width * 0.8);
       renderBoard();
       renderHud();
-      say(`Into the cup! ${puzzle.answer} with ${used()} of ${E.MARBLES} marbles.`, 'ok');
+      say(weeklyMode ? `Into the cup! ${puzzle.answer} is word ${weekIdx + 1} of ${WEEK_WORDS}.` : `Into the cup! ${puzzle.answer} with ${used()} of ${E.MARBLES} marbles.`, 'ok');
       game.locked.forEach((c, r) => {
         const t = tileEls[r][c];
         t.style.setProperty('--delay', `${r * 90}ms`);
@@ -524,6 +676,7 @@
     renderStats('st', loadStats(), activeDay === dayNumber() ? resultKey() : null);
     $('share').textContent = shareText();
     lbAfterWin();
+    renderWeeklyEntries();
     $('countdown').textContent = nextWordIn();
     clearInterval(countdownTimer);
     countdownTimer = setInterval(() => { $('countdown').textContent = nextWordIn(); }, 1000);
@@ -547,8 +700,8 @@
     $('dropMap').innerHTML = cells.join('');
   }
 
-  async function shareResult() {
-    const text = $('share').textContent;
+  async function shareResult(boxId = 'share') {
+    const text = $(typeof boxId === 'string' ? boxId : 'share').textContent;
     if (navigator.share && navigator.canShare && navigator.canShare({ text })) {
       try { await navigator.share({ text }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
     }
@@ -589,6 +742,15 @@
   const LB_POSTED_KEY = 'pathword_lb_posted';
   const LB_ASKED_KEY = 'pathword_lb_asked';
   const LB_ENTRY_KEY = 'pathword_lb_entry'; // { day, entry }: today's first win, which is what posts
+  const LB_POSTED_W_KEY = 'pathword_lb_posted_w';
+  const LB_ASKED_W_KEY = 'pathword_lb_asked_w';
+  /* A board is one leaderboard: a day's word (pathword/daily/{day}) or a week's drop
+     (pathword/weekly/{week}). Daily rows are {n, s: marbles used, t}; weekly rows are
+     {n, w: words dropped, s: roll-offs, t}. */
+  const dailyBoard = (day) => ({ kind: 'daily', id: String(day), path: `pathword/daily/${day}`, posted: LB_POSTED_KEY, asked: LB_ASKED_KEY,
+    live: () => day === dayNumber(), what: "today's word", name: "today's leaderboard" });
+  const weeklyBoard = (w) => ({ kind: 'weekly', id: String(w), path: `pathword/weekly/${w}`, posted: LB_POSTED_W_KEY, asked: LB_ASKED_W_KEY,
+    live: () => w === weekNumber(), what: "this week's drop", name: "this week's leaderboard" });
   const LB_SHOW = 50;
   const LB_TIMEOUT = 8000;
   const lbGet = (k) => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
@@ -630,73 +792,87 @@
       await withTimeout(db.ref(`pathword/userProfile/${lbPid()}`).update(profile), LB_TIMEOUT);
     } catch (e) { /* Visit tracking is best effort and must not block the game. */ }
   }
-  async function lbPost(day, entry) {
+  async function lbPost(b, entry) {
     const db = await lbDb();
-    const ref = db.ref(`pathword/daily/${day}/${lbPid()}`);
+    const ref = db.ref(`${b.path}/${lbPid()}`);
     const row = { ...entry, at: firebase.database.ServerValue.TIMESTAMP };
     await withTimeout(ref.transaction((cur) => (cur === null ? row : undefined)), LB_TIMEOUT); // first result stands
-    lbSet(LB_POSTED_KEY, String(day));
+    lbSet(b.posted, b.id);
     void markVisit(); // a posted score always comes with a profile
   }
-  async function lbFetch(day) {
+  async function lbFetch(b) {
     const db = await lbDb();
-    const snap = await withTimeout(db.ref(`pathword/daily/${day}`).once('value'), LB_TIMEOUT);
+    const snap = await withTimeout(db.ref(b.path).once('value'), LB_TIMEOUT);
     const rows = [];
     snap.forEach((c) => {
       const v = c.val() || {};
-      if (typeof v.s === 'number') rows.push({ pid: c.key, n: cleanName(v.n) || 'Anonymous', s: v.s | 0, t: v.t | 0, at: +v.at || 0 });
+      if (typeof v.s === 'number') rows.push({ pid: c.key, n: cleanName(v.n) || 'Anonymous', w: v.w | 0, s: v.s | 0, t: v.t | 0, at: +v.at || 0 });
     });
-    rows.sort((a, b) => a.s - b.s || a.t - b.t || a.at - b.at);
+    if (b.kind === 'weekly') rows.sort((a, c) => c.w - a.w || a.s - c.s || a.t - c.t || a.at - c.at);
+    else rows.sort((a, c) => a.s - c.s || a.t - c.t || a.at - c.at);
     return rows;
   }
-  function lbRow(r, rank, me) {
+  function lbRow(r, rank, me, b) {
     const el = document.createElement('div');
     el.className = `lb-row${r.pid === me ? ' you' : ''}`;
-    el.innerHTML = `<span class="lr">${rank}</span><span class="ln"></span><span class="lm"></span>` +
+    const wk = b && b.kind === 'weekly';
+    el.innerHTML = `<span class="lr">${rank}</span><span class="ln"></span><span class="lm${wk ? ' wk' : ''}">${wk ? `${r.w}/${WEEK_WORDS}` : ''}</span>` +
       `<span class="ls">${r.s}</span><span class="lt">${fmtTime(r.t)}</span>`;
     el.querySelector('.ln').textContent = r.n;
     if (r.pid === me) el.querySelector('.ln').insertAdjacentHTML('beforeend', '<small>You</small>');
     return el;
   }
-  function renderLbYou(day) {
+  function renderLbYou(b) {
     const you = $('lbYou');
-    const isToday = day === dayNumber();
-    if (!lbName) { you.textContent = isToday ? "Solve today's word to put your name on the leaderboard." : ''; return; }
+    const live = b.live();
+    const verb = b.kind === 'weekly' ? 'Finish' : 'Solve';
+    if (!lbName) { you.textContent = live ? `${verb} ${b.what} and add your name to appear here.` : ''; return; }
     you.innerHTML = 'Playing as <b></b> · <button class="lnk" type="button" id="lbRename">Change name</button>' +
-      (!isToday || lbGet(LB_POSTED_KEY) === String(day) ? '' : "<br>Solve today's word to post your score.");
+      (!live || lbGet(b.posted) === b.id ? '' : `<br>${verb} ${b.what} to post your score.`);
     you.querySelector('b').textContent = lbName;
-    $('lbRename').onclick = () => openNameCard('rename', dayNumber(), null); // a rename only touches today's entry
+    $('lbRename').onclick = () => openNameCard('rename', null, null, null); // a rename only touches the live entries
   }
-  // ago: 0 = today's board, 1 = yesterday's (read-only — only today's live result ever posts).
+  // ago: 0 = today's board, 1 = yesterday's (read-only), "w" = this week's drop.
   let lbReq = 0;
   let lbAgo = 0;
   async function openLeaderboard(ago = 0) {
     const today = Math.max(0, dayNumber());
-    if (today < 1) ago = 0;
+    if (today < 1 && ago === 1) ago = 0;
     lbAgo = ago;
-    const day = today - ago;
     const list = $('lbList');
     const req = ++lbReq;
-    document.querySelector('.lb-tabs').hidden = today < 1; // launch day: nothing to look back on
     document.querySelectorAll('.lb-tab').forEach((t) => {
-      const on = Number(t.dataset.ago) === ago;
+      const on = t.dataset.ago === String(ago);
       t.classList.toggle('on', on);
       t.setAttribute('aria-selected', on);
+      if (t.dataset.ago === '1') t.hidden = today < 1; // launch day: nothing to look back on
     });
-    const dstr = dateForDay(day).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    $('lbSub').innerHTML = `Word #${day + 1} · ${dstr}<br>Ranked by marbles used, then time`;
+    let b;
+    let empty;
+    if (ago === 'w') {
+      const w = weekNumber();
+      b = weeklyBoard(w);
+      $('lbSub').innerHTML = `Weekly drop #${w + 1} · week of ${weekDateStr(w)}<br>Ranked by words dropped, then roll-offs, then time`;
+      empty = "No one's finished this week's drop yet. Be the first.";
+    } else {
+      const day = today - ago;
+      b = dailyBoard(day);
+      const dstr = dateForDay(day).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      $('lbSub').innerHTML = `Word #${day + 1} · ${dstr}<br>Ranked by marbles used, then time`;
+      empty = ago ? "No one solved yesterday's word." : "No one's on the board yet. Solve today's word to be first.";
+    }
     list.innerHTML = '<div class="lb-empty">Loading…</div>';
-    renderLbYou(day);
+    renderLbYou(b);
     openModal($('lbModal'));
     try {
-      const rows = await lbFetch(day);
+      const rows = await lbFetch(b);
       const me = lbPid();
       if (req !== lbReq) return; // the player switched tabs while this was loading
       list.innerHTML = '';
-      if (!rows.length) { list.innerHTML = `<div class="lb-empty">${ago ? "No one solved yesterday's word." : "No one's on the board yet. Solve today's word to be first."}</div>`; return; }
-      rows.slice(0, LB_SHOW).forEach((r, i) => list.appendChild(lbRow(r, i + 1, me)));
+      if (!rows.length) { list.innerHTML = `<div class="lb-empty">${empty}</div>`; return; }
+      rows.slice(0, LB_SHOW).forEach((r, i) => list.appendChild(lbRow(r, i + 1, me, b)));
       const mine = rows.findIndex((r) => r.pid === me);
-      if (mine >= LB_SHOW) { const el = lbRow(rows[mine], mine + 1, me); el.classList.add('gap'); list.appendChild(el); }
+      if (mine >= LB_SHOW) { const el = lbRow(rows[mine], mine + 1, me, b); el.classList.add('gap'); list.appendChild(el); }
     } catch (e) {
       if (req !== lbReq) return;
       list.innerHTML = '<div class="lb-empty">Couldn\'t reach the leaderboard. Check your connection and try again.</div>';
@@ -712,44 +888,46 @@
     const e = readJSON(LB_ENTRY_KEY, null);
     return e && e.day === day && e.entry ? e.entry : null;
   }
-  // Result card: today's first win posts itself once a name is known; archive games never post.
-  // With no name yet, the name card opens over the result once per day.
+  // Daily result card: today's first win posts itself once a name is known; archive games never post.
   function lbAfterWin() {
     const day = dayNumber();
-    const box = $('lbJoin');
     const entry = activeDay === day ? lbEntryFor(day) : null;
-    box.hidden = !entry;
-    if (!entry) return;
-    if (lbGet(LB_POSTED_KEY) === String(day)) { lbShowRank(day); return; }
-    if (lbName) { lbSubmit(day, entry); return; }
-    lbShowJoinLink(day, entry);
-    if (lbGet(LB_ASKED_KEY) === String(day)) return;
-    lbSet(LB_ASKED_KEY, String(day));
+    $('lbJoin').hidden = !entry;
+    if (entry) lbAfterResult(dailyBoard(day), entry, 'lbJoinMsg', 'endModal');
+  }
+  /* After a live result: post it once a name is known; with no name yet, the name card
+     opens over the result once per board. msgId is the result card's status line. */
+  function lbAfterResult(b, entry, msgId, modalId) {
+    if (lbGet(b.posted) === b.id) { lbShowRank(b, msgId); return; }
+    if (lbName) { lbSubmit(b, entry, msgId); return; }
+    lbShowJoinLink(b, entry, msgId);
+    if (lbGet(b.asked) === b.id) return;
+    lbSet(b.asked, b.id);
     // let the result land first, then ask
     setTimeout(() => {
-      if (activeDay === day && $('endModal').classList.contains('show')) openNameCard('join', day, entry);
+      if (b.live() && $(modalId).classList.contains('show')) openNameCard('join', b, entry, msgId);
     }, 700);
   }
-  function lbShowJoinLink(day, entry) {
-    $('lbJoinMsg').innerHTML = 'You\'re not on today\'s leaderboard yet. <button class="lnk" type="button" id="lbAdd">Add your name</button>';
-    $('lbAdd').onclick = () => openNameCard('join', day, entry);
+  function lbShowJoinLink(b, entry, msgId) {
+    $(msgId).innerHTML = `You're not on ${b.name} yet. <button class="lnk" type="button">Add your name</button>`;
+    $(msgId).querySelector('button').onclick = () => openNameCard('join', b, entry, msgId);
   }
-  async function lbSubmit(day, entry) {
-    const msg = $('lbJoinMsg');
-    msg.textContent = "Posting to today's leaderboard…";
-    try { await lbPost(day, { n: lbName, ...entry }); await lbShowRank(day); } catch (e) {
-      msg.innerHTML = 'Couldn\'t reach the leaderboard. <button class="lnk" type="button" id="lbRetry">Try again</button>';
-      $('lbRetry').onclick = () => lbSubmit(day, entry);
+  async function lbSubmit(b, entry, msgId) {
+    const msg = $(msgId);
+    msg.textContent = `Posting to ${b.name}…`;
+    try { await lbPost(b, { n: lbName, ...entry }); await lbShowRank(b, msgId); } catch (e) {
+      msg.innerHTML = 'Couldn\'t reach the leaderboard. <button class="lnk" type="button">Try again</button>';
+      msg.querySelector('button').onclick = () => lbSubmit(b, entry, msgId);
     }
   }
-  async function lbShowRank(day) {
-    const msg = $('lbJoinMsg');
-    msg.textContent = "Checking today's leaderboard…";
+  async function lbShowRank(b, msgId) {
+    const msg = $(msgId);
+    msg.textContent = `Checking ${b.name}…`;
     try {
-      const rows = await lbFetch(day);
+      const rows = await lbFetch(b);
       const i = rows.findIndex((r) => r.pid === lbPid());
-      msg.innerHTML = i < 0 ? "You're on today's leaderboard." : `You're <b>#${i + 1}</b> of ${rows.length} on today's leaderboard.`;
-    } catch (e) { msg.textContent = "You're on today's leaderboard."; }
+      msg.innerHTML = i < 0 ? `You're on ${b.name}.` : `You're <b>#${i + 1}</b> of ${rows.length} on ${b.name}.`;
+    } catch (e) { msg.textContent = `You're on ${b.name}.`; }
   }
 
   /* Name card: one dedicated step for joining the board (mode "join", with the
@@ -761,12 +939,14 @@
     ln.textContent = n || 'Your name';
     ln.classList.toggle('ph', !n);
   }
-  function openNameCard(mode, day, entry) {
+  function openNameCard(mode, b, entry, msgId) {
     const join = mode === 'join';
-    $('nameTitle').textContent = join ? 'Sign your word' : 'Change your name';
-    $('nameText').textContent = join
-      ? "Pick a name to post today's result. Everyone who solves today's word is ranked by marbles used, then time."
-      : 'This is the name other players see next to your result.';
+    const wk = join && b.kind === 'weekly';
+    $('nameTitle').textContent = join ? (wk ? 'Sign your drop' : 'Sign your word') : 'Change your name';
+    $('nameText').textContent = !join ? 'This is the name other players see next to your result.'
+      : wk ? "Pick a name to post this week's result. Everyone who plays this week's drop is ranked by words dropped, then roll-offs, then time."
+        : "Pick a name to post today's result. Everyone who solves today's word is ranked by marbles used, then time.";
+    $('namePreview').querySelector('.lm').textContent = wk ? `${entry.w}/${WEEK_WORDS}` : '';
     $('nameSave').textContent = join ? 'Post to leaderboard' : 'Save name';
     $('nameSkip').textContent = join ? 'Not now' : 'Cancel';
     const pv = $('namePreview');
@@ -779,7 +959,7 @@
     $('nameInput').classList.remove('shake');
     renderNamePreview();
     openModal($('nameModal'));
-    nameCtx = { mode, day, entry };
+    nameCtx = { mode, board: b, entry, msgId };
     setTimeout(() => $('nameInput').focus(), 60);
   }
   $('nameInput').addEventListener('input', () => { $('nameInput').classList.remove('shake'); renderNamePreview(); });
@@ -793,23 +973,27 @@
     lbSetName(n);
     closeModal($('nameModal'));
     if (ctx.mode === 'join') {
-      if (ctx.day === dayNumber()) lbSubmit(ctx.day, ctx.entry);
+      if (ctx.board.live()) lbSubmit(ctx.board, ctx.entry, ctx.msgId);
       return;
     }
-    if (lbGet(LB_POSTED_KEY) === String(ctx.day)) {
-      try { const db = await lbDb(); await withTimeout(db.ref(`pathword/daily/${ctx.day}/${lbPid()}/n`).set(n), LB_TIMEOUT); } catch (err) { toast("Couldn't update your name", true); }
+    // a rename carries over to the entries still live: today's word and this week's drop
+    for (const b of [dailyBoard(dayNumber()), weeklyBoard(weekNumber())]) {
+      if (lbGet(b.posted) !== b.id) continue;
+      try { const db = await lbDb(); await withTimeout(db.ref(`${b.path}/${lbPid()}/n`).set(n), LB_TIMEOUT); } catch (err) { toast("Couldn't update your name", true); }
     }
     openLeaderboard(lbAgo);
   });
-  $('lbBtn').addEventListener('click', () => openLeaderboard());
+  $('lbBtn').addEventListener('click', () => openLeaderboard(weeklyMode ? 'w' : 0));
   $('lbJoinOpen').addEventListener('click', () => openLeaderboard());
-  document.querySelectorAll('.lb-tab').forEach((t) => t.addEventListener('click', () => openLeaderboard(Number(t.dataset.ago))));
+  $('wkLbOpen').addEventListener('click', () => openLeaderboard('w'));
+  document.querySelectorAll('.lb-tab').forEach((t) => t.addEventListener('click', () => openLeaderboard(t.dataset.ago === 'w' ? 'w' : Number(t.dataset.ago))));
 
   /* ---------------- Modals ---------------- */
   function openModal(m) { m.classList.add('show'); }
   function closeModal(m) {
     m.classList.remove('show');
     if (m.id === 'endModal') clearInterval(countdownTimer);
+    if (m.id === 'weekModal') clearInterval(weekCountdownTimer);
     if (m.id === 'nameModal') nameCtx = null;
     if (m.id === 'rulesModal') {
       try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* ignore */ }
@@ -818,12 +1002,12 @@
   }
   document.querySelectorAll('.modal').forEach((m) => {
     m.addEventListener('click', (e) => {
-      if (m.id === 'readyModal') return;
+      if (m.id === 'readyModal' || m.id === 'weekReadyModal' || m.id === 'wordModal') return;
       if (e.target === m || e.target.closest('.x-close') || e.target.closest('[data-close]')) closeModal(m);
     });
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.querySelectorAll('.modal.show:not(#readyModal)').forEach(closeModal);
+    if (e.key === 'Escape') document.querySelectorAll('.modal.show:not(#readyModal):not(#weekReadyModal):not(#wordModal)').forEach(closeModal);
   });
   // A card that scrolls grows a scrollbar under the pinned x; --sbw shifts the x left of it.
   const sbObs = new ResizeObserver((es) => es.forEach(({ target: w }) =>
@@ -846,9 +1030,13 @@
   });
   $('helpBtn').addEventListener('click', () => { showSlide(0); openModal($('rulesModal')); });
   $('statsBtn').addEventListener('click', () => { renderStats('sm', loadStats(), null); openModal($('statsModal')); });
-  $('gamesBtn').addEventListener('click', () => openModal($('gamesModal')));
+  $('gamesBtn').addEventListener('click', () => { renderWeeklyEntries(); openModal($('gamesModal')); });
   $('copyBtn').addEventListener('click', shareResult);
-  $('shareBtn').addEventListener('click', () => { if (game.status !== 'playing') showEnd(); });
+  $('shareBtn').addEventListener('click', () => {
+    if (game.status === 'playing') return;
+    if (!weeklyMode) { showEnd(); return; }
+    if (weeklyRun(activeWeek, weekWords).finished) showWeeklyResult(); else showWordDone();
+  });
 
   function buildArchive() {
     const today = Math.max(0, dayNumber());
@@ -873,9 +1061,245 @@
   }
   $('calBtn').addEventListener('click', () => { buildArchive(); openModal($('archiveModal')); });
 
+  /* ---------------- Weekly drop ----------------
+     Five words back to back on one clock, with one rack of WEEK_RACK marbles for the
+     whole run: each word may lose whatever the rack still holds. One go per week,
+     Monday to Sunday. It never touches the daily streak, stats or saves. */
+  function weeklySave(w) {
+    const s = readJSON(WEEKLY_KEY, {})[w];
+    const entries = weekEntries(w);
+    return s && Array.isArray(s.words) && Array.isArray(s.entries) && s.entries.join() === entries.join()
+      ? s : { entries, words: [], time: 0 };
+  }
+  // Replays a week's taps. next = the word to play (-1 once the run is over).
+  function weeklyRun(w, words) {
+    const s = weeklySave(w);
+    const taps = words || s.words;
+    const games = [];
+    let left = WEEK_RACK;
+    for (let i = 0; i < WEEK_WORDS; i++) {
+      if (i > 0 && (games[i - 1].status !== 'won' || !taps[i])) break; // not reached yet
+      const g = E.replay(E.parse(s.entries[i]), taps[i] || [], left);
+      games.push(g);
+      left -= g.lost;
+    }
+    const solved = games.filter((g) => g.status === 'won').length;
+    const over = games.some((g) => g.status === 'lost');
+    const done = solved === WEEK_WORDS;
+    const last = games[games.length - 1];
+    const next = done || over ? -1 : last.status === 'won' ? games.length : games.length - 1;
+    const started = (s.time || 0) > 0 || taps.some((p) => p && p.length);
+    return { w, entries: s.entries, games, solved, lost: WEEK_RACK - left, left, over, done, finished: done || over, started, next };
+  }
+  const weekTime = () => Math.floor(elapsedNow() / 1000);
+  function pipsHTML(run) {
+    return Array.from({ length: WEEK_WORDS }, (_, i) => {
+      const g = run.games[i];
+      const cls = g && g.status === 'won' ? 'done' : g && g.status === 'lost' ? 'lost' : i === run.next ? 'current' : '';
+      return `<i class="${cls}"></i>`;
+    }).join('');
+  }
+  function renderWeekBar() {
+    const run = weeklyRun(activeWeek, weekWords);
+    $('weekLabelText').textContent = run.done ? 'All five dropped' : run.over ? 'Drop over' : `Word ${weekIdx + 1} of ${WEEK_WORDS}`;
+    $('weekPips').innerHTML = pipsHTML(run);
+    $('weekLabel').classList.toggle('done', run.finished);
+  }
+  function leaveWeeklyState() {
+    weeklyMode = false;
+    document.body.classList.remove('weekly');
+    $('subLabel').textContent = 'Daily word drop';
+  }
+  function loadWeekWord(i) {
+    weekIdx = i;
+    const run = weeklyRun(activeWeek, weekWords);
+    const rack = WEEK_RACK - run.games.slice(0, i).reduce((n, g) => n + g.lost, 0);
+    entry = weekEntries(activeWeek)[i];
+    puzzle = E.parse(entry);
+    if (new URLSearchParams(location.search).has('debug')) console.info(`Weekly drop #${activeWeek + 1} word ${i + 1}: ${puzzle.answer}`);
+    game = E.replay(puzzle, weekWords[i] || [], rack);
+    busy = false;
+    $('marbleMeter').dataset.lost = game.lost;
+    renderHeader();
+    buildBoard();
+    renderBoard();
+    renderHud();
+    idleMessage();
+    renderWeekBar();
+    requestAnimationFrame(() => {
+      // a fresh word keeps its marble up top until the clock starts
+      if (game.status === 'playing' && game.picks.length === 0) setMarble(geo().above(geo().start().x), false);
+      else placeMarble();
+    });
+  }
+  function openWeekly() {
+    ['gamesModal', 'readyModal', 'endModal', 'statsModal', 'archiveModal', 'lbModal'].forEach((id) => $(id).classList.remove('show'));
+    if (game && !weeklyMode) { pauseClock(); saveState(); } // bank the daily board
+    weeklyMode = true;
+    activeWeek = weekNumber();
+    document.body.classList.add('weekly');
+    $('subLabel').textContent = 'Weekly drop';
+    const s = weeklySave(activeWeek);
+    weekWords = s.words.map((p) => (p || []).slice());
+    timeBase = s.time || 0;
+    runningSince = 0;
+    const run = weeklyRun(activeWeek, weekWords);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (run.finished) { loadWeekWord(run.games.length - 1); showWeeklyResult(); return; }
+    loadWeekWord(run.next);
+    showWeekReady();
+    track('weekly_open', activeWeek + 1);
+  }
+  function leaveWeekly() {
+    ['weekModal', 'weekReadyModal', 'wordModal'].forEach((id) => $(id).classList.remove('show'));
+    clearInterval(weekCountdownTimer);
+    loadDay(Math.max(0, dayNumber()));
+  }
+  function showWeekReady() {
+    const run = weeklyRun(activeWeek, weekWords);
+    $('wrSub').textContent = `Drop #${activeWeek + 1} · week of ${weekDateStr(activeWeek)}`;
+    $('wrPips').innerHTML = pipsHTML(run);
+    $('wrText').textContent = run.started
+      ? `Word ${weekIdx + 1} of ${WEEK_WORDS}, with ${run.left} marble${run.left === 1 ? '' : 's'} left in the rack. The clock is paused at ${fmtTime(weekTime())} and picks up when you resume.`
+      : 'The clock starts when you press Start and runs across all five words. It pauses between words.';
+    $('wrStart').textContent = run.started ? 'Resume' : 'Start the drop';
+    openModal($('weekReadyModal'));
+  }
+  $('wrStart').addEventListener('click', () => {
+    $('weekReadyModal').classList.remove('show');
+    startClock();
+    if (game.status === 'playing' && game.picks.length === 0 && !marble.classList.contains('on')) setTimeout(() => { void spawnMarble(); }, pace(250));
+  });
+  $('wrBack').addEventListener('click', leaveWeekly);
+  $('weekBack').addEventListener('click', leaveWeekly);
+  $('wkBack').addEventListener('click', leaveWeekly);
+  $('weekLabel').addEventListener('click', () => { if (weeklyMode && weeklyRun(activeWeek, weekWords).finished) showWeeklyResult(); });
+
+  // A word has ended: on to the next one, or the result.
+  function weeklyTurnDone() {
+    if (game.status !== 'playing') { pauseClock(); saveState(); }
+    renderBoard();
+    renderHud();
+    renderWeekBar();
+    if (game.status === 'playing') return;
+    const run = weeklyRun(activeWeek, weekWords);
+    if (!run.finished) { setTimeout(showWordDone, pace(1000)); return; }
+    track(run.done ? 'weekly_done' : 'weekly_over', run.solved);
+    setTimeout(showWeeklyResult, pace(1100));
+  }
+  function showWordDone() {
+    const run = weeklyRun(activeWeek, weekWords);
+    $('wdSub').textContent = `Weekly drop · word ${weekIdx + 1} of ${WEEK_WORDS}`;
+    $('wdTitle').textContent = game.lost ? 'Into the cup' : 'Clean drop';
+    $('wdWord').textContent = puzzle.answer;
+    $('wdPips').innerHTML = pipsHTML(run);
+    $('wdText').textContent = `${run.left} marble${run.left === 1 ? '' : 's'} left in the rack, ${fmtTime(weekTime())} on the clock. It starts again when the next word opens.`;
+    $('wdNext').textContent = `On to word ${weekIdx + 2}`;
+    openModal($('wordModal'));
+  }
+  $('wdNext').addEventListener('click', () => {
+    $('wordModal').classList.remove('show');
+    loadWeekWord(weekIdx + 1);
+    startClock();
+    setTimeout(() => { void spawnMarble(); }, pace(250));
+  });
+
+  let weekCountdownTimer;
+  function nextDropIn() {
+    const s = Math.max(0, Math.floor((weekStart(weekNumber() + 1) - new Date()) / 1000));
+    const d = Math.floor(s / 86400);
+    const hms = `${pad(Math.floor((s % 86400) / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+    return d ? `${d}d ${hms}` : hms;
+  }
+  function weeklyGrade(run) {
+    if (!run.done) return [`${run.solved}/${WEEK_WORDS} WORDS`, 'var(--color-far)'];
+    if (run.lost === 0) return ['FLAWLESS', 'var(--color-close)'];
+    if (run.lost <= 4) return ['BRILLIANT', 'var(--color-correct)'];
+    if (run.lost <= 9) return ['GREAT', 'var(--color-correct)'];
+    if (run.lost <= 14) return ['SOLID', 'var(--accent)'];
+    return ['PHEW', 'var(--ink-muted)'];
+  }
+  const wordMark = (g) => (!g ? '⬛' : g.status === 'lost' ? '❌' : g.lost === 0 ? '🟩' : g.lost <= 2 ? '🟨' : '🟧');
+  function showWeeklyResult() {
+    const run = weeklyRun(activeWeek, weekWords);
+    const w = activeWeek;
+    const secs = weekTime();
+    const [grade, colr] = weeklyGrade(run);
+    $('wkSub').textContent = `Weekly drop #${w + 1} · week of ${weekDateStr(w)}`;
+    $('wkTitle').textContent = run.done ? 'All five dropped' : 'Out of marbles';
+    const gr = $('wkGrade');
+    gr.textContent = grade;
+    gr.style.background = `color-mix(in srgb, ${colr} 12%, transparent)`;
+    gr.style.color = colr;
+    gr.style.border = `1px solid ${colr}`;
+    $('wkScore').textContent = `${run.solved}/${WEEK_WORDS}`;
+    $('wkBreakdown').textContent = `${run.lost} roll-off${run.lost === 1 ? '' : 's'} · ${run.left} marble${run.left === 1 ? '' : 's'} left in the rack · ${fmtTime(secs)}.`;
+    $('wkWords').innerHTML = run.entries.map((e, i) => {
+      const g = run.games[i];
+      const word = g ? e.slice(0, 6) : '······';
+      const cls = !g ? 'unplayed' : g.status === 'lost' ? 'lost' : '';
+      const note = !g ? 'Not reached' : g.status === 'lost' ? 'Out of marbles'
+        : g.lost ? `${g.lost} roll-off${g.lost === 1 ? '' : 's'}` : 'Clean';
+      return `<div><span class="wn">${wordMark(g)} ${i + 1}</span><span class="ww ${cls}">${word}</span><span class="wt">${note}</span></div>`;
+    }).join('');
+    $('wkShare').textContent =
+      `Pathword Weekly Drop #${w + 1} · ${run.solved}/${WEEK_WORDS}\n` +
+      `${run.lost} roll-off${run.lost === 1 ? '' : 's'} · ⏱${fmtTime(secs)}\n` +
+      `${Array.from({ length: WEEK_WORDS }, (_, i) => wordMark(run.games[i])).join('')}\nakashramsankar.github.io/pathword`;
+    const live = w === weekNumber();
+    $('wkLb').hidden = !live; // only the live week posts
+    if (live) lbAfterResult(weeklyBoard(w), { w: run.solved, s: run.lost, t: secs }, 'wkLbMsg', 'weekModal');
+    $('wkCountdown').textContent = nextDropIn();
+    clearInterval(weekCountdownTimer);
+    weekCountdownTimer = setInterval(() => { $('wkCountdown').textContent = nextDropIn(); }, 1000);
+    openModal($('weekModal'));
+  }
+  $('wkCopy').addEventListener('click', () => shareResult('wkShare'));
+
+  /* The weekly card on the daily ready and result cards, and in More games: says where
+     this week's run stands, not just "play". */
+  function weeklyCardHTML(run) {
+    const daysLeft = 7 - ((new Date().getDay() + 6) % 7); // Monday-based, today included
+    const open = daysLeft <= 1 ? 'last day to play' : `open ${daysLeft} more days`;
+    let tag;
+    let st;
+    let desc;
+    if (run.finished) {
+      st = 'done';
+      tag = run.done ? 'Dropped' : 'Played';
+      desc = `${run.solved}/${WEEK_WORDS} words · ${run.lost} roll-offs · see where you rank`;
+    } else if (run.started) {
+      st = 'started';
+      tag = `Word ${run.next + 1}/${WEEK_WORDS}`;
+      desc = `${run.left} marbles left in the rack · ${open}`;
+    } else {
+      st = 'new';
+      tag = 'New';
+      desc = `Five words, one rack of ${WEEK_RACK} marbles, one go · ${open}`;
+    }
+    return `<span class="wc-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15" r="2"/></svg></span>` +
+      `<span class="wc-body"><span class="wc-title">Weekly drop<span class="wc-tag ${st}">${tag}</span></span>` +
+      `<span class="wc-desc">${desc}</span><span class="week-pips">${pipsHTML(run)}</span></span>` +
+      '<svg class="wc-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  }
+  function renderWeeklyEntries() {
+    const run = weeklyRun(weekNumber());
+    const html = weeklyCardHTML(run);
+    const aria = run.finished ? 'Weekly drop: see your result' : run.started ? 'Weekly drop: resume your run' : "Weekly drop: start this week's run";
+    for (const id of ['readyWeekly', 'endWeekly']) { $(id).innerHTML = html; $(id).setAttribute('aria-label', aria); }
+    $('gamesWeeklyDesc').textContent = run.finished
+      ? "Played this week. See your result and this week's leaderboard; a new drop lands Monday."
+      : run.started ? "Your run is paused. Pick it up where you left off; it's open until Sunday night."
+        : `Five words back to back on one clock, with one rack of ${WEEK_RACK} marbles. One go per week, open Monday to Sunday.`;
+  }
+  $('readyWeekly').addEventListener('click', openWeekly);
+  $('endWeekly').addEventListener('click', openWeekly);
+  $('gamesWeekly').addEventListener('click', openWeekly);
+
   /* ---------------- Boot ---------------- */
   function loadDay(day) {
     if (game) { pauseClock(); saveState(); }
+    leaveWeeklyState();
     activeDay = day;
     entry = entryForDay(day);
     puzzle = E.parse(entry);
@@ -917,6 +1341,7 @@
       ? `You're on shelf ${game.row + 1} with ${E.MARBLES - game.lost} marble${E.MARBLES - game.lost === 1 ? '' : 's'} left. The clock picks up where you left off.`
       : 'Drop the marble through all six shelves. Use as few marbles as you can; the clock starts when you begin.';
     $('readyStart').textContent = resuming ? 'Resume' : 'Start';
+    renderWeeklyEntries();
     openModal($('readyModal'));
   }
   $('readyStart').addEventListener('click', () => {
