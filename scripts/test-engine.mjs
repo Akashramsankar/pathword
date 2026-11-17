@@ -57,6 +57,27 @@ for (const p of puzzles) {
   assert.equal(g.status, 'lost');
   assert.equal(g.lost, 6);
 }
+// a smaller limit (the weekly rack) ends the word sooner, and replays with the same limit
+{
+  const p = puzzles[2];
+  const g = E.newGame(2);
+  let guard = 0;
+  while (g.status === 'playing' && guard++ < 50) E.pick(p, g, E.alive(g, g.row).find((c) => c !== p.path[g.row]));
+  assert.equal(g.status, 'lost');
+  assert.equal(g.lost, 2);
+  assert.equal(E.replay(p, g.picks, 2).status, 'lost');
+}
+// every weekly board has exactly one way through
+vm.runInContext(fs.readFileSync(path.join(root, 'public/js/weekly.js'), 'utf8'), ctx);
+const weekly = ctx.self.PATHWORD_WEEKLY.map((e) => JSON.parse(JSON.stringify(E.parse(e))));
+assert.equal(weekly.length % 5, 0);
+for (const p of weekly) {
+  const g = E.newGame();
+  for (let r = 0; r < 6 && g.status === 'playing'; r++) if (g.row === r) assert.ok(E.pick(p, g, p.path[r]), p.answer);
+  assert.equal(g.status, 'won', p.answer);
+  p.grid.forEach((row, r) => assert.equal(row.filter((ch) => ch === p.answer[r]).length, 1, `${p.answer} shelf ${r}`));
+}
+console.log(`weekly ok: ${weekly.length / 5} drops`);
 console.log(`rules ok on ${puzzles.length} puzzles`);
 
 // --- balance ---

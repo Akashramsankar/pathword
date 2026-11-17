@@ -24,11 +24,13 @@
     };
   }
 
-  function newGame() {
+  /** limit: marbles this word may lose before it ends (6 for the daily; the weekly passes what's left in its rack). */
+  function newGame(limit = MARBLES) {
     // gone[r][c]: the tile has left the board (tipped off or crumbled)
     return {
       row: 0,
       lost: 0,
+      limit,
       gone: Array.from({ length: ROWS }, () => Array(COLS).fill(false)),
       locked: [], // column locked on each shelf so far
       // per shelf: miss directions, the wrong columns picked, freefall
@@ -79,6 +81,7 @@
     shelves: g.shelves.map((s) => ({ misses: s.misses.slice(), wrong: s.wrong.slice(), free: s.free })),
     picks: g.picks.slice(),
     status: g.status,
+    limit: g.limit,
   });
 
   /**
@@ -106,8 +109,8 @@
     g.lost++;
     g.shelves[r].misses.push(dir);
     g.shelves[r].wrong.push(c);
-    if (g.lost >= MARBLES) g.status = 'lost';
-    events.push({ type: 'miss', row: r, col: c, dir, fell, left: MARBLES - g.lost, state: snapshot(g) });
+    if (g.lost >= g.limit) g.status = 'lost';
+    events.push({ type: 'miss', row: r, col: c, dir, fell, left: g.limit - g.lost, state: snapshot(g) });
     if (g.status === 'lost') {
       events.push({ type: 'lost', state: snapshot(g) });
       return events;
@@ -116,8 +119,8 @@
   }
 
   /** Rebuild a game from its saved taps. */
-  function replay(puzzle, picks) {
-    const g = newGame();
+  function replay(puzzle, picks, limit = MARBLES) {
+    const g = newGame(limit);
     for (const c of picks || []) if (!pick(puzzle, g, c)) break;
     return g;
   }
