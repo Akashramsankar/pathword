@@ -440,6 +440,7 @@ body.weekly .stage{--span:max(236px, min(340px, calc(100vw - 40px), calc((100dvh
 /* ==================== SHELVES (Pathword's own) ==================== */
 /* four sibling games: two per row */
 .win-more-games-row{display:grid; grid-template-columns:1fr 1fr;}
+.win-more-games-row > :last-child:nth-child(odd){grid-column:1 / -1;} /* an odd last link spans the row */
 .winstats .srow.four{grid-template-columns:repeat(4,1fr);}
 .stat.jp .v{color:var(--jump);}
 
